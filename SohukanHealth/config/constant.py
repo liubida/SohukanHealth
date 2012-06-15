@@ -3,6 +3,8 @@ Created on Jun 14, 2012
 
 @author: liubida
 '''
+import os
+ROOT_PATH = os.path.dirname(os.path.dirname(__file__))
 
 '''Monitor'''
 class APP_AVAILABLE_CATEGORY():
@@ -10,7 +12,6 @@ class APP_AVAILABLE_CATEGORY():
     READ = 'read'
     ADD = 'add'
     LOGIN = 'login'
-
 
 
 
