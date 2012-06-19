@@ -1,6 +1,5 @@
 # Django settings for SohukanHealth project.
-from config import constant
-
+from config.config import c
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -55,7 +54,7 @@ USE_I18N = True
 USE_L10N = True
 
 # If you set this to False, Django will not use timezone-aware datetimes.
-USE_TZ = True
+USE_TZ = False
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
@@ -78,7 +77,7 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-                    '%s/resources' % constant.ROOT_PATH,
+                    '%s/resources' % c.ROOT_PATH,
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -118,7 +117,7 @@ ROOT_URLCONF = 'SohukanHealth.urls'
 WSGI_APPLICATION = 'SohukanHealth.wsgi.application'
 
 TEMPLATE_DIRS = (
-                 '%s/resources/templates' % constant.ROOT_PATH
+                 '%s/resources/templates' % c.ROOT_PATH
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.

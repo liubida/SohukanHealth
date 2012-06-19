@@ -5,15 +5,21 @@ from django.template.context import Context
 from monitor.models import AppAvailableData
 import json
 
-def learning_jquery(request):
+def monitor(request):
 #    latest_poll_list = Poll.objects.all().order_by('-pub_date')[:5]
     
-    t = loader.get_template('monitor/learning_jquery.html')
+    t = loader.get_template('monitor/monitor.html')
     c = Context({
         'name': 'liubida&&zww',
     })
     return HttpResponse(t.render(c))
 
+def all(request):
+    t = loader.get_template('all.html')
+    c = Context({
+        'name': 'liubida&&zww',
+    })
+    return HttpResponse(t.render(c))
 
 def appAvailableData_to_json(data):
     s = {}

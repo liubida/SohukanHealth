@@ -5,49 +5,91 @@ Created on Jun 7, 2012
 @author: liubida
 '''
 
-from config import constant
-from config.constant import cookie
-from exception import JobException
-from log import logger
-from monitor.models import AppAvailableData, UserTotal
+from config.config import c
+from monitor.models import AppAvailableData, SomeTotal
 from monitor.system.worker import add_worker, read_worker
 from util.random_spider import RandomSpider
-import config
 import datetime
 
 def read_job():
-    value = read_worker(cookie).test()
+    value = read_worker(c.cookie).test()
     data = AppAvailableData(name='read', category='', result=value.get('result', False), \
-                            time=datetime.datetime.now(), time_used=value.get('time_used', constant.read_time_limit), comments='')
+                            time=datetime.datetime.now(), time_used=value.get('time_used', c.read_time_limit), comments='')
     data.save()
 
 def add_job():
     url = RandomSpider().get_valid_url()
-    value = add_worker(url, cookie).test()
+    value = add_worker(url, c.cookie).test()
     data = AppAvailableData(name='add', category='', result=value.get('result', False), \
-                            time=datetime.datetime.now(), time_used=value.get('time_used', constant.add_time_limit), comments=url)
+                            time=datetime.datetime.now(), time_used=value.get('time_used', c.add_time_limit), comments=url)
     data.save()
 
 def user_total_job():
+    # TODO: this is a tmp job, it will be deleted
     try:
-        conn = config.conn;
+        conn = c.conn;
         cursor = conn.cursor()
         cursor.execute('select count(*) from account_user')
         result = cursor.fetchone()
-        data = UserTotal(time=datetime.datetime.now(), count=result[0])
+        now = datetime.datetime.now()
+        data = SomeTotal(name='user', time=now, count=result[0])
         data.save()
-    except JobException as e:
-        logger.error(e)
+        print '[%s] user_total:%s' % (now, result[0])
+    except Exception as e:
+        c.logger.error(e)
     finally:
         try:
             if cursor:
                 cursor.close()
-        except JobException as e:
-            logger.error(e)
+        except Exception as e:
+            c.logger.error(e)
         finally:
             pass
 #            if conn:
 #                conn.close()
+
+def bookmark_total_job():
+    # TODO: this is a tmp job, it will be deleted
+    try:
+        conn = c.conn
+        cursor = conn.cursor()
+        sum = 0
+        for i in range(64):
+            cursor.execute ("select count(*) from bookmark_bookmark_%s" % i)
+            result = cursor.fetchone()
+            sum += result[0]
+        now = datetime.datetime.now()
+        data = SomeTotal(name='bookmark', time=now, count=sum)
+        data.save()
+        print '[%s] bookmark_total:%s' % (now, sum)
+    except Exception as e:
+        c.logger.error(e)
+    finally:
+        try:
+            if cursor:
+                cursor.close()
+        except Exception as e:
+            c.logger.error(e)
+        finally:
+            pass
+#            if conn:
+#                conn.close()
+        
+        
+if __name__ == '__main__':
+    user_total_job()
+    bookmark_total_job()
+
+#    url = RandomSpider().get_valid_url()
+#        
+#    add = add_worker(url, c.cookie)
+#    add_value = add.test()
+    
+#    read = read_worker(c.cookie)
+#    read_value = read.test()
+#    monitor_read(c.cookie)
+    
+
 
 #def user_register_job():
 #    try:
@@ -79,17 +121,3 @@ def user_total_job():
 #        finally:
 #            if conn:
 #                conn.close()
-
-        
-if __name__ == '__main__':
-    user_total_job()
-#    url = RandomSpider().get_valid_url()
-#        
-#    add = add_worker(url, cookie)
-#    add_value = add.test()
-    
-#    read = read_worker(cookie)
-#    read_value = read.test()
-#    monitor_read(cookie)
-    
-

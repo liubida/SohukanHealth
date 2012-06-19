@@ -3,13 +3,14 @@ var chartData = [];
 var chartCursor;
 
 AmCharts.ready(function() {
-	adddiv();
-	readdiv();
+	add_div();
+	read_div();
 });
 
-function adddiv() {
+function add_div() {
 	// generate some data first
-	var avg_visits = generateChartData('add');
+//	var avg_visits = 
+	get_chart_data('add');
 
 	// SERIAL CHART
 	chart = new AmCharts.AmSerialChart();
@@ -23,8 +24,12 @@ function adddiv() {
 
 	// listen for "dataUpdated" event (fired when chart is rendered) and call
 	// zoomChart method when it happens
-	chart.addListener("dataUpdated", zoomChart);
-
+	chart.addListener("dataUpdated", function() {
+		// different zoom methods can be used - zoomToIndexes, zoomToDates,
+		// zoomToCategoryValues
+		chart.zoomToIndexes(chartData.length - 8, chartData.length - 1);
+	});
+	
 	// AXES
 	// category
 	var categoryAxis = chart.categoryAxis;
@@ -47,7 +52,7 @@ function adddiv() {
 	// GRAPH
 	var graph = new AmCharts.AmGraph();
 	graph.title = "red line";
-	graph.valueField = "visits";
+	graph.valueField = "time_used";
 	graph.bullet = "round";
 	graph.bulletBorderColor = "#FFFFFF";
 	graph.bulletBorderThickness = 2;
@@ -57,7 +62,7 @@ function adddiv() {
 	graph.hideBulletsCount = 50; // this makes the chart to hide bullets when
 	// there are more than 50 series in
 	// selection
-	graph.negativeBase = avg_visits
+	graph.negativeBase = 0
 	chart.addGraph(graph);
 
 	// CURSOR
@@ -74,12 +79,12 @@ function adddiv() {
 	chart.addChartScrollbar(chartScrollbar);
 
 	// WRITE
-	chart.write("adddiv");
+	chart.write("add_div");
 };
 
-function readdiv() {
+function read_div() {
 	// generate some data first
-	var avg_visits = generateChartData('read');
+	get_chart_data('read');
 
 	// SERIAL CHART
 	chart = new AmCharts.AmSerialChart();
@@ -94,7 +99,11 @@ function readdiv() {
 
 	// listen for "dataUpdated" event (fired when chart is rendered) and call
 	// zoomChart method when it happens
-	chart.addListener("dataUpdated", zoomChart);
+	chart.addListener("dataUpdated", function() {
+		// different zoom methods can be used - zoomToIndexes, zoomToDates,
+		// zoomToCategoryValues
+		chart.zoomToIndexes(chartData.length - 9, chartData.length - 1);
+	});
 
 	// AXES
 	// category
@@ -118,7 +127,7 @@ function readdiv() {
 	// GRAPH
 	var graph = new AmCharts.AmGraph();
 	graph.title = "red line";
-	graph.valueField = "visits";
+	graph.valueField = "time_used";
 	graph.bullet = "round";
 	graph.bulletBorderColor = "#FFFFFF";
 	graph.bulletBorderThickness = 2;
@@ -128,7 +137,7 @@ function readdiv() {
 	graph.hideBulletsCount = 50; // this makes the chart to hide bullets when
 	// there are more than 50 series in
 	// selection
-	graph.negativeBase = avg_visits
+	graph.negativeBase = 0;
 	chart.addGraph(graph);
 
 	// CURSOR
@@ -145,42 +154,17 @@ function readdiv() {
 	chart.addChartScrollbar(chartScrollbar);
 
 	// WRITE
-	chart.write("readdiv");
+	chart.write("read_div");
 };
 
-// generate some random data, quite different range
-function generateChartData(name) {
-	url = '/monitor/' + name;
-	myAjax(url, null, function(obj) {
-		data = obj.list;
-		sum = data.length;
-		for ( var i = 0; i < sum; i++) {
-			chartData.push({
-				// date : new Date(data[i].time),
-				date : data[i].time,
-				visits : data[i].time_used
-			});
-		}
-	});
-	return Math.round(10)
-}
-
-// this method is called when chart is first inited as we listen for
-// "dataUpdated" event
-function zoomChart() {
-	// different zoom methods can be used - zoomToIndexes, zoomToDates,
-	// zoomToCategoryValues
-	chart.zoomToIndexes(chartData.length - 8, chartData.length - 1);
-}
-
-// changes cursor mode from pan to select
-function setPanSelect() {
-	if (document.getElementById("rb1").checked) {
-		chartCursor.pan = false;
-		chartCursor.zoomable = true;
-
-	} else {
-		chartCursor.pan = true;
+var get_chart_data = function(name) {
+	data = get_monitor_data(name)
+	len = data.length;
+	chartData = [];
+	for ( var i = 0; i < len; i++) {
+		chartData.push({
+			date : data[i].time,
+			time_used : data[i].time_used
+		});
 	}
-	chart.validateNow();
 }

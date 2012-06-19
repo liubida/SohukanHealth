@@ -4,10 +4,8 @@ Created on Jun 14, 2012
 
 @author: liubida
 '''
-from config import constant
-from config.constant import expires_seconds, bucket_name
+from config.config import c
 from exception import MonitorException
-from log import logger
 from lxml import etree
 from monitor.system.s3.mod_storage_helper import get_expire_data_url
 from util import mytimer, request
@@ -37,8 +35,8 @@ class add_worker():
         try:
             time_used = self.add()
         except Exception as e:
-            logger.error(e)
-            ret = {"result" : False, "time_used" : constant.add_time_limit}
+            c.logger.error(e)
+            ret = {"result" : False, "time_used" : c.add_time_limit}
         else:
             ret = {"result" : True, "time_used" : time_used}
         finally:
@@ -60,7 +58,7 @@ class add_worker():
         read_thread = threading.Thread(target=self._get_bookmark, args=(self.url, self.cookie))
         read_thread.start()
         
-        self.event.wait(constant.add_time_limit)
+        self.event.wait(c.add_time_limit)
         self.flag = False
         return self.result            
         
@@ -105,8 +103,8 @@ class read_worker():
         try:
             time_used = self.read()
         except Exception as e:
-            logger.error(e)
-            ret = {"result" : False, "time_used" : constant.add_time_limit}
+            c.logger.error(e)
+            ret = {"result" : False, "time_used" : c.read_time_limit}
         else:
             ret = {"result" : True, "time_used" : time_used}
         finally:
@@ -188,7 +186,7 @@ class read_worker():
         '''
         if None == key:
             raise MonitorException('get_image_2_error, key is None') 
-        url_bookmarks_get_raw_s3 = get_expire_data_url(bucket_name, key, expires_seconds)
+        url_bookmarks_get_raw_s3 = get_expire_data_url(c.bucket_name, key, c.expires_seconds)
         response = request(url_bookmarks_get_raw_s3);
         if 200 != response.code:
             raise MonitorException('get_image_2_error, url:%s, response.code:' % (url_bookmarks_get_raw_s3, response.code))

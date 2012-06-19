@@ -1,0 +1,17 @@
+{% extends "base.html" %} {% block title %} 统计信息 {% endblock %}
+
+{%block js %}
+<link rel="stylesheet" href="/static/css/style.css" type="text/css">
+<script type="text/javascript" src="/static/js/statistics/user_total.js"></script>
+<script type="text/javascript" src="/static/js/statistics/bookmark_total.js"></script>
+{% endblock %}
+
+{% block content %}
+<h2>注册用户数</h2>
+<div id="user_total_div" style="width: 80%; height: 300px;"></div>
+
+<h2>收藏文章数</h2>
+<div id="bookmark_total_div" style="width: 80%; height: 300px;"></div>
+
+<button type="button">Click me</button>
+{% endblock %}
