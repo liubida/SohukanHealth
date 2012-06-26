@@ -4,14 +4,26 @@
 <link rel="stylesheet" href="/static/css/style.css" type="text/css">
 <script type="text/javascript" src="/static/js/statistics/user_total.js"></script>
 <script type="text/javascript" src="/static/js/statistics/bookmark_total.js"></script>
+<script type="text/javascript" src="/static/js/statistics/bookmark_per_user.js"></script>
+<script type="text/javascript" src="/static/js/statistics/bookmark_time.js"></script>
 {% endblock %}
 
 {% block content %}
-<h2>注册用户数</h2>
-<div id="user_total_div" style="width: 80%; height: 300px;"></div>
+<div class="grid">
+<div id="user_total_div" class="grid_item"></div>
+</div>
 
-<h2>收藏文章数</h2>
-<div id="bookmark_total_div" style="width: 80%; height: 300px;"></div>
+<div class="grid">
+<div id="bookmark_total_div" class="grid_item"></div>
+</div>
 
-<button type="button">Click me</button>
+<div class="grid">
+<div id="bookmark_per_user_div" class="grid_item"></div>
+</div>
+
+<div class="grid">
+<div id="bookmark_time_div" class="grid_item"></div>
+</div>
+
+
 {% endblock %}

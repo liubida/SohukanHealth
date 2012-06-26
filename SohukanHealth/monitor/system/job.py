@@ -5,78 +5,99 @@ Created on Jun 7, 2012
 @author: liubida
 '''
 
-from config.config import c
+from config.config import c, lock
 from monitor.models import AppAvailableData, SomeTotal
 from monitor.system.worker import add_worker, read_worker
+from util import print_info
 from util.random_spider import RandomSpider
+import MySQLdb
 import datetime
 
+@print_info(name='read_job')
 def read_job():
     value = read_worker(c.cookie).test()
     data = AppAvailableData(name='read', category='', result=value.get('result', False), \
-                            time=datetime.datetime.now(), time_used=value.get('time_used', c.read_time_limit), comments='')
+                            time=datetime.datetime.now(), time_used=value.get('time_used', c.read_time_limit), \
+                            comments=value.get('comments', ''))
     data.save()
+    return value
 
+@print_info(name='add_job')
 def add_job():
     url = RandomSpider().get_valid_url()
     value = add_worker(url, c.cookie).test()
     data = AppAvailableData(name='add', category='', result=value.get('result', False), \
-                            time=datetime.datetime.now(), time_used=value.get('time_used', c.add_time_limit), comments=url)
+                            time=datetime.datetime.now(), time_used=value.get('time_used', c.add_time_limit), \
+                            comments=value.get('comments', url))
     data.save()
+    return value
 
+@print_info(name='user_total_job')
 def user_total_job():
     # TODO: this is a tmp job, it will be deleted
+    locked = False
     try:
-        conn = c.conn;
-        cursor = conn.cursor()
-        cursor.execute('select count(*) from account_user')
-        result = cursor.fetchone()
-        now = datetime.datetime.now()
-        data = SomeTotal(name='user', time=now, count=result[0])
-        data.save()
-        print '[%s] user_total:%s' % (now, result[0])
+        if lock.acquire():
+            locked = True
+            # TODO: there should be a dbhelper
+            conn = MySQLdb.connect(**c.db_config)
+            cursor = conn.cursor()
+            cursor.execute('select count(*) from account_user')
+            result = cursor.fetchone()
+            now = datetime.datetime.now()
+            data = SomeTotal(name='user', time=now, count=result[0])
+            data.save()
+            return result[0]
     except Exception as e:
         c.logger.error(e)
+        return str(e)
     finally:
+        if locked:
+            lock.release()
         try:
             if cursor:
                 cursor.close()
         except Exception as e:
             c.logger.error(e)
         finally:
-            pass
-#            if conn:
-#                conn.close()
+            if conn:
+                conn.close()
 
+@print_info(name='bookmark_total_job')
 def bookmark_total_job():
     # TODO: this is a tmp job, it will be deleted
+    locked = False;
     try:
-        conn = c.conn
-        cursor = conn.cursor()
-        sum = 0
-        for i in range(64):
-            cursor.execute ("select count(*) from bookmark_bookmark_%s" % i)
-            result = cursor.fetchone()
-            sum += result[0]
-        now = datetime.datetime.now()
-        data = SomeTotal(name='bookmark', time=now, count=sum)
-        data.save()
-        print '[%s] bookmark_total:%s' % (now, sum)
+        if lock.acquire():
+            locked = True
+            conn = MySQLdb.connect(**c.db_config)
+            cursor = conn.cursor()
+            sum = 0
+            for i in range(64):
+                cursor.execute ("select count(*) from bookmark_bookmark_%s" % i)
+                result = cursor.fetchone()
+                sum += result[0]
+            now = datetime.datetime.now()
+            data = SomeTotal(name='bookmark', time=now, count=sum)
+            data.save()
+            return sum
     except Exception as e:
         c.logger.error(e)
+        return str(e)
     finally:
+        if locked:
+            lock.release()
         try:
             if cursor:
                 cursor.close()
         except Exception as e:
             c.logger.error(e)
         finally:
-            pass
-#            if conn:
-#                conn.close()
-        
+            if conn:
+                conn.close()
         
 if __name__ == '__main__':
+#    mysql_ping_job();
     user_total_job()
     bookmark_total_job()
 

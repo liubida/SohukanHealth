@@ -6,11 +6,7 @@ Created on Jun 14, 2012
 from django.http import HttpResponse, Http404
 from django.template import loader
 from django.template.context import Context
-from django.views.generic.base import View
-from httplib import HTTPResponse
 import datetime
-import json
-
 
 def home_page(request):
     return HttpResponse("hi, i'm at home!")
@@ -40,6 +36,16 @@ def demo(request):
     })
     return HttpResponse(t.render(c))
 
+def all(request):
+    t = loader.get_template('all.html')
+    c = Context()
+    return HttpResponse(t.render(c))
+
+def about(request):
+    t = loader.get_template('about.html')
+    c = Context()
+    return HttpResponse(t.render(c))
+    
 #    
 #class JSONResponseMixin(object):
 #    """

@@ -1,1 +1,57 @@
-body { font-family: Tahoma, Arial, Verdana; font-size: 12px; 	color: black; }
+body {
+	font-family: Tahoma, Arial, Verdana;
+	font-size: 16px;
+	color: black;
+}
+
+.container {
+	margin: 10 auto;
+	width: 1200px;
+	height: 650px;
+}
+
+.grid {
+	float: left;
+	width: 600px;
+	height: 325px;
+}
+
+.grid_item {
+	width: 98%;
+	height: 95%;
+	margin: 10px;
+}
+
+.normal_a {
+	margin: 2px 10px 2px 10px;
+	
+}
+
+
+#app_available { /*list-style:none;*/
+	
+}
+
+#menu_ul {
+	
+}
+
+#menu_ul li {
+	display: inline;
+}
+
+#app_available li {
+	display: inline;
+	padding-right: 8px;
+	padding-left: 8px;
+	border-style: none solid none solid;
+	border-width: 1px;
+}
+
+.heng_li {
+	display: inline;
+	padding-right: 8px;
+	padding-left: 8px;
+	/*border-style: none solid none solid;
+	border-width: 1px;*/
+}

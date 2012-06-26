@@ -9,6 +9,19 @@ def mytimer(func):
         return (end - start).seconds
     return wrapper
 
+def print_info(name=''):
+    def wrapper1(func):
+        def wrapper2(*args, **kwargs):
+            date, time = get_date_and_time()
+            print '[%s %s] %s start' % (date, time, name)
+            ret = func(*args, **kwargs)
+            if ret:
+                print '[%s %s] %s end result:%s' % (date, time, name, ret)
+            else:
+                print '[%s %s] %s end' % (date, time, name)
+        return wrapper2
+    return wrapper1;
+
 def request(url, data=None, cookie=None):
     try:
         req = urllib2.Request(url=url, data=data);
@@ -17,7 +30,7 @@ def request(url, data=None, cookie=None):
             
         return urllib2.urlopen(req)
     except Exception as e:
-        return e
+        raise e
 
 def get_date_and_time():
     day_format = "%Y.%m.%d"
@@ -30,4 +43,4 @@ def get_date_and_time():
     return date, time
 
 if __name__ == '__main__':
-    pass
+    get_date_and_time()

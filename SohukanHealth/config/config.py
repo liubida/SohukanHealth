@@ -4,9 +4,9 @@ Created on Jun 18, 2012
 
 @author: liubida
 '''
-import MySQLdb
 import logging
 import os
+import threading
 
 class Config:
     ROOT_PATH = os.path.dirname(os.path.dirname(__file__))
@@ -36,14 +36,11 @@ class DevConfig(Config):
     
     logger = logging.getLogger()
     
-    @staticmethod
-    def do():
-        DevConfig.conn = MySQLdb.connect(**DevConfig.db_config)
-
-        handler = logging.FileHandler('../../sohukan.log')
-        DevConfig.logger.addHandler(handler)
-        DevConfig.logger.setLevel(logging.NOTSET)
-        
+    def do(self):
+#        handler = logging.FileHandler('../../sohukan.log')
+        handler = logging.FileHandler('/home/liubida/git/SohukanHealth/SohukanHealth/sohukan.log')
+        self.logger.addHandler(handler)
+        self.logger.setLevel(logging.ERROR)
     
 class ProdConfig(Config):
     cookie = ["Cookie", "access_token = eeeb8e686a2a148de62b2352ea88b9c6d4b8bd24"]
@@ -51,33 +48,26 @@ class ProdConfig(Config):
 
     logger = logging.getLogger()
 
-    @staticmethod
-    def do():
-        ProdConfig.conn = MySQLdb.connect(**ProdConfig.db_config)
-
-        handler = logging.FileHandler('../../sohukan.log')
-        ProdConfig.logger.addHandler(handler)
-        ProdConfig.logger.setLevel(logging.NOTSET)
+    def do(self):
+#        handler = logging.FileHandler('../../sohukan.log')
+        handler = logging.FileHandler('/home/liubida/git/SohukanHealth/SohukanHealth/sohukan.log')
+        self.logger.addHandler(handler)
+        self.logger.setLevel(logging.ERROR)
         
 class QaConfig(Config):
     pass
 
 class ConfigFactory:
     
-    DEV = DevConfig();
-    PROD = ProdConfig();
-    QA = QaConfig();
-    
     '''这个办法产用Configuration对象。目前而言针对开发，测试，和产品环境，只需要修改返回的值就可以 
     之后可以考虑用不同的方法来适配不同的开发环境'''
-    @staticmethod
-    def getConfig():
-        config = ConfigFactory.DEV
+    def getConfig(self):
+        config = DevConfig();
         config.do() 
         return config
 
-
 c = ConfigFactory().getConfig()
+lock = threading.Lock()
 
 if __name__ == '__main__':
     c = ConfigFactory()

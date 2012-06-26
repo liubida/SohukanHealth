@@ -1,17 +1,9 @@
-var chart;
-var chartData = [];
-var chartCursor;
-
-AmCharts.ready(function() {
-	bookmark_total_div();
-});
-
-function bookmark_total_div() {
-	// generate some data first
-	bookmark_total_chart_data();
-
+var make_bookmark_total_chart = function(chartData) {
+	var e = document.getElementById('bookmark_total_div')
+	clearElement(e);
+	
 	// SERIAL CHART
-	chart = new AmCharts.AmSerialChart();
+	var chart = new AmCharts.AmSerialChart();
 	chart.pathToImages = "/static/images/";
 	chart.zoomOutButton = {
 		backgroundColor : '#000000',
@@ -23,11 +15,15 @@ function bookmark_total_div() {
 	// listen for "dataUpdated" event (fired when chart is rendered) and call
 	// zoomChart method when it happens
 	chart.addListener("dataUpdated", function() {
-		// different zoom methods can be used - zoomToIndexes, zoomToDates,
-		// zoomToCategoryValues
-		chart.zoomToIndexes(chartData.length - 8, chartData.length - 1);
-	});
-	
+				// different zoom methods can be used - zoomToIndexes,
+				// zoomToDates,
+				// zoomToCategoryValues
+				chart
+						.zoomToIndexes(chartData.length - 48, chartData.length
+										- 1);
+			});
+	chart.addTitle('添加文章数', 20);
+
 	// AXES
 	// category
 	var categoryAxis = chart.categoryAxis;
@@ -64,7 +60,7 @@ function bookmark_total_div() {
 	chart.addGraph(graph);
 
 	// CURSOR
-	chartCursor = new AmCharts.ChartCursor();
+	var chartCursor = new AmCharts.ChartCursor();
 	chartCursor.cursorPosition = "mouse";
 	chartCursor.pan = true;
 	chart.addChartCursor(chartCursor);
@@ -81,14 +77,26 @@ function bookmark_total_div() {
 	chart.write("bookmark_total_div");
 };
 
-var bookmark_total_chart_data = function() {
-	data = get_statistics_data('bookmark/total')
-	len = data.length;
-	chartData = [];
-	for ( var i = 0; i < len; i++) {
-		chartData.push({
-			date : data[i].time,
-			count : data[i].count
+var load_bookmark_total = function(params, callback) {
+	url = '/statistics/bookmark/total'
+
+	myAjax(url, params, function(obj) {
+				if (callback && typeof callback == 'function') {
+					callback();
+				}
+				data = obj.list;
+				len = data.length;
+				chartData = [];
+				for (var i = 0; i < len; i++) {
+					chartData.push({
+								date : chart_date_handler(data[i].time),
+								count : data[i].count
+							});
+				}
+				make_bookmark_total_chart(chartData);
+			});
+};
+
+AmCharts.ready(function() {
+			load_bookmark_total(null, null);
 		});
-	}
-}

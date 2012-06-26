@@ -9,7 +9,6 @@ from exception import MonitorException
 from lxml import etree
 from monitor.system.s3.mod_storage_helper import get_expire_data_url
 from util import mytimer, request
-from util.random_spider import RandomSpider
 import threading
 import time
 import urllib
@@ -36,7 +35,7 @@ class add_worker():
             time_used = self.add()
         except Exception as e:
             c.logger.error(e)
-            ret = {"result" : False, "time_used" : c.add_time_limit}
+            ret = {"result" : False, "time_used" : c.add_time_limit, 'comments': str(e)}
         else:
             ret = {"result" : True, "time_used" : time_used}
         finally:
@@ -66,7 +65,6 @@ class add_worker():
         url_bookmarks_list = "http://kan.sohu.com/api/2/bookmarks/list/";
         data = urllib.urlencode({"order_by":"-create_time", "limit":1, "submit":"提交"});
         while self.flag:
-            print 'get_bookmark'
             response = request(url_bookmarks_list, data, cookie);
             s = response.read()
             
@@ -97,14 +95,13 @@ class read_worker():
             raise MonitorException('cookie should not be None')
 
         self.cookie = cookie
-        print self.cookie
-    
+        
     def test(self):
         try:
             time_used = self.read()
         except Exception as e:
             c.logger.error(e)
-            ret = {"result" : False, "time_used" : c.read_time_limit}
+            ret = {"result" : False, "time_used" : c.read_time_limit, 'comments': str(e)}
         else:
             ret = {"result" : True, "time_used" : time_used}
         finally:
@@ -189,21 +186,21 @@ class read_worker():
         url_bookmarks_get_raw_s3 = get_expire_data_url(c.bucket_name, key, c.expires_seconds)
         response = request(url_bookmarks_get_raw_s3);
         if 200 != response.code:
-            raise MonitorException('get_image_2_error, url:%s, response.code:' % (url_bookmarks_get_raw_s3, response.code))
+            raise MonitorException('get_image_2_error, url:%s, response.code:%d' % (url_bookmarks_get_raw_s3, response.code))
 
 if __name__ == '__main__':
     cookie = ["Cookie", "access_token = eeeb8e686a2a148de62b2352ea88b9c6d4b8bd24"]
-    for i in range(20):
-        url = RandomSpider().get_valid_url()
-        print url
-        a = add_worker(url, cookie)
-        try:
-            a.test()
-            time.sleep(4)
-        except Exception as e:
-            print e
-        print '...'
+#    for i in range(20):
+#        url = RandomSpider().get_valid_url()
+#        print url
+#        a = add_worker(url, cookie)
+#        try:
+#            a.test()
+#            time.sleep(4)
+#        except Exception as e:
+#            print e
+#        print '...'
 
-#    b = read_worker(cookie)
-#    b.test()
+    b = read_worker(cookie)
+    print b.test()
     
