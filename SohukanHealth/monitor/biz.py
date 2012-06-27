@@ -32,7 +32,7 @@ def calc_app_available(duration='day'):
 
     if success_data or failure_data:
         ret = 100 * (success_data + 0.00001) / (success_data + failure_data)
-        return format(ret, '.2f')
+        return round(ret, 2)
     else:
         return 'None'
 
