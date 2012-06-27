@@ -1,0 +1,111 @@
+Error: getsockaddrarg: port must be 0-65535.
+Validating models...
+
+0 errors found
+Django version 1.4, using settings 'SohukanHealth.settings'
+Development server is running at http://0.0.0.0:8001/
+Quit the server with CONTROL-C.
+[{'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 23, 1), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 23, 1), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 23), 'id': 3L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 23, 1), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 23, 1), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 23), 'id': 4L}, {'category': u'', 'name': u'read', 'time_used': 1L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 24, 1), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 24, 1), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 24, 1), 'id': 5L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 28, 30), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 28, 30), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 28, 30), 'id': 9L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 29), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 29), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 29), 'id': 12L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 29, 30), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 29, 30), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 29, 30), 'id': 14L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 30), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 30), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 30), 'id': 16L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 30, 30), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 30, 30), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 30, 30), 'id': 19L}, {'category': u'', 'name': u'read', 'time_used': 6L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 31, 6), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 31, 6), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 31, 6), 'id': 21L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 31, 30), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 31, 30), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 31, 30), 'id': 24L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 32), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 32), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 32), 'id': 26L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 7, 2, 34), 'gmt_create': datetime.datetime(2012, 6, 14, 7, 2, 34), 'result': True, 'time': datetime.datetime(2012, 6, 14, 7, 2, 30), 'id': 28L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 7, 3, 8), 'gmt_create': datetime.datetime(2012, 6, 14, 7, 3, 8), 'result': True, 'time': datetime.datetime(2012, 6, 14, 7, 3), 'id': 30L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 7, 3, 31), 'gmt_create': datetime.datetime(2012, 6, 14, 7, 3, 31), 'result': True, 'time': datetime.datetime(2012, 6, 14, 7, 3, 30), 'id': 32L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 7, 5, 37), 'gmt_create': datetime.datetime(2012, 6, 14, 7, 5, 37), 'result': True, 'time': datetime.datetime(2012, 6, 14, 7, 5, 30), 'id': 33L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comme[27/Jun/2012 10:58:59] "GET / HTTP/1.1" 200 1344
+[27/Jun/2012 10:58:59] "GET /static/js/statistics/user_total.js HTTP/1.1" 200 3166
+[27/Jun/2012 10:58:59] "GET /static/js/util.js HTTP/1.1" 200 2148
+[27/Jun/2012 10:58:59] "GET /static/js/statistics/bookmark_total.js HTTP/1.1" 200 2813
+[27/Jun/2012 10:58:59] "GET /static/css/style.css HTTP/1.1" 200 674
+[27/Jun/2012 10:58:59] "GET /static/js/amcharts/amcharts.js HTTP/1.1" 200 185894
+[27/Jun/2012 10:58:59] "GET /static/js/monitor/monitor.js HTTP/1.1" 200 6297
+[27/Jun/2012 10:58:59] "GET /static/css/bootstrap.min.css HTTP/1.1" 200 47423
+[27/Jun/2012 10:58:59] "GET /static/js/jquery-1.7.2.min.js HTTP/1.1" 200 94840
+[27/Jun/2012 10:58:59] "GET /monitor/read HTTP/1.1" 301 0
+[27/Jun/2012 10:58:59] "GET /monitor/add HTTP/1.1" 301 0
+[27/Jun/2012 10:59:00] "GET /statistics/user/total HTTP/1.1" 200 5968
+[27/Jun/2012 10:59:00] "GET /statistics/bookmark/total HTTP/1.1" 200 5258
+[27/Jun/2012 10:59:00] "GET /static/images/lens.png HTTP/1.1" 200 295
+[27/Jun/2012 10:59:00] "GET /static/images/dragIcon.gif HTTP/1.1" 200 90
+[27/Jun/2012 10:59:00] "GET /monitor/read/ HTTP/1.1" 200 266384
+[27/Jun/2012 10:59:00] "GET /monitor/add/ HTTP/1.1" 200 125919
+[27/Jun/2012 10:59:16] "GET / HTTP/1.1" 200 1344
+[27/Jun/2012 10:59:17] "GET /statistics/user/total HTTP/1.1" 200 5968
+[27/Jun/2012 10:59:17] "GET /statistics/bookmark/total HTTP/1.1" 200 5258
+[27/Jun/2012 10:59:17] "GET /monitor/add/ HTTP/1.1" 200 125919
+[27/Jun/2012 10:59:18] "GET /monitor/read/ HTTP/1.1" 200 266384
+[27/Jun/2012 10:59:18] "GET /statistics HTTP/1.1" 301 0
+[27/Jun/2012 10:59:18] "GET /statistics/ HTTP/1.1" 200 1291
+[27/Jun/2012 10:59:18] "GET /static/js/statistics/bookmark_per_user.js HTTP/1.1" 200 2987
+[27/Jun/2012 10:59:18] "GET /static/js/statistics/bookmark_time.js HTTP/1.1" 200 3815
+[27/Jun/2012 10:59:18] "GET /statistics/bookmark/total HTTP/1.1" 200 5258
+[27/Jun/2012 10:59:18] "GET /statistics/user/total HTTP/1.1" 200 5968
+[27/Jun/2012 10:59:20] "GET /statistics/bookmark/per_user HTTP/1.1" 200 5170
+[27/Jun/2012 10:59:23] "GET /statistics/bookmark/time HTTP/1.1" 200 1224
+[27/Jun/2012 10:59:33] "GET /statistics/bookmark/per_user?includeTest=false HTTP/1.1" 200 5185
+[27/Jun/2012 10:59:37] "GET /statistics/bookmark/time?start_time=2012.06.26+10%3A59%3A18 HTTP/1.1" 200 1185
+[27/Jun/2012 11:00:04] "GET /statistics/ HTTP/1.1" 200 1291
+[27/Jun/2012 11:00:04] "GET /statistics/bookmark/total HTTP/1.1" 200 5307
+[27/Jun/2012 11:00:04] "GET /statistics/user/total HTTP/1.1" 200 6016
+[27/Jun/2012 11:00:06] "GET /statistics/bookmark/per_user HTTP/1.1" 200 5170
+[27/Jun/2012 11:00:09] "GET /statistics/bookmark/time HTTP/1.1" 200 1224
+[27/Jun/2012 11:00:19] "GET /statistics/ HTTP/1.1" 200 1291
+[27/Jun/2012 11:00:19] "GET /static/js/jquery-1.7.2.min.js HTTP/1.1" 304 0
+[27/Jun/2012 11:00:19] "GET /static/js/statistics/user_total.js HTTP/1.1" 200 3166
+[27/Jun/2012 11:00:19] "GET /static/js/util.js HTTP/1.1" 200 2148
+[27/Jun/2012 11:00:19] "GET /static/css/style.css HTTP/1.1" 200 674
+[27/Jun/2012 11:00:19] "GET /static/css/bootstrap.min.css HTTP/1.1" 304 0
+[27/Jun/2012 11:00:19] "GET /static/js/amcharts/amcharts.js HTTP/1.1" 200 185894
+[27/Jun/2012 11:00:19] "GET /static/js/statistics/bookmark_total.js HTTP/1.1" 200 2813
+[27/Jun/2012 11:00:19] "GET /static/js/statistics/bookmark_per_user.js HTTP/1.1" 200 2987
+[27/Jun/2012 11:00:19] "GET /static/js/statistics/bookmark_time.js HTTP/1.1" 200 3815
+[27/Jun/2012 11:00:19] "GET /statistics/user/total HTTP/1.1" 200 6016
+[27/Jun/2012 11:00:19] "GET /statistics/bookmark/total HTTP/1.1" 200 5307
+[27/Jun/2012 11:00:21] "GET /statistics/bookmark/per_user HTTP/1.1" 200 5170
+[27/Jun/2012 11:00:23] "GET /statistics/bookmark/time HTTP/1.1" 200 1224
+[27/Jun/2012 11:02:07] "GET /statistics/ HTTP/1.1" 200 1291
+[27/Jun/2012 11:02:07] "GET /statistics/user/total HTTP/1.1" 200 6016
+[27/Jun/2012 11:02:07] "GET /statistics/bookmark/total HTTP/1.1" 200 5307
+[27/Jun/2012 11:02:09] "GET /statistics/bookmark/per_user HTTP/1.1" 200 5170
+[27/Jun/2012 11:02:13] "GET /statistics/bookmark/time HTTP/1.1" 200 1224
+Validating models...
+
+0 errors found
+Django version 1.4, using settings 'SohukanHealth.settings'
+Development server is running at http://0.0.0.0:8001/
+Quit the server with CONTROL-C.
+[{'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 23, 1), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 23, 1), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 23), 'id': 3L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 23, 1), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 23, 1), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 23), 'id': 4L}, {'category': u'', 'name': u'read', 'time_used': 1L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 24, 1), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 24, 1), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 24, 1), 'id': 5L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 28, 30), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 28, 30), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 28, 30), 'id': 9L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 29), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 29), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 29), 'id': 12L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 29, 30), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 29, 30), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 29, 30), 'id': 14L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 30), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 30), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 30), 'id': 16L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 30, 30), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 30, 30), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 30, 30), 'id': 19L}, {'category': u'', 'name': u'read', 'time_used': 6L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 31, 6), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 31, 6), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 31, 6), 'id': 21L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 31, 30), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 31, 30), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 31, 30), 'id': 24L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 6, 32), 'gmt_create': datetime.datetime(2012, 6, 14, 6, 32), 'result': True, 'time': datetime.datetime(2012, 6, 14, 6, 32), 'id': 26L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 7, 2, 34), 'gmt_create': datetime.datetime(2012, 6, 14, 7, 2, 34), 'result': True, 'time': datetime.datetime(2012, 6, 14, 7, 2, 30), 'id': 28L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 7, 3, 8), 'gmt_create': datetime.datetime(2012, 6, 14, 7, 3, 8), 'result': True, 'time': datetime.datetime(2012, 6, 14, 7, 3), 'id': 30L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 7, 3, 31), 'gmt_create': datetime.datetime(2012, 6, 14, 7, 3, 31), 'result': True, 'time': datetime.datetime(2012, 6, 14, 7, 3, 30), 'id': 32L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 7, 5, 37), 'gmt_create': datetime.datetime(2012, 6, 14, 7, 5, 37), 'result': True, 'time': datetime.datetime(2012, 6, 14, 7, 5, 30), 'id': 33L}, {'category': u'', 'name': u'read', 'time_used': 0L, 'comme[27/Jun/2012 11:21:37] "GET / HTTP/1.1" 200 1344
+[27/Jun/2012 11:21:38] "GET /statistics/bookmark/total HTTP/1.1" 200 5307
+[27/Jun/2012 11:21:38] "GET /statistics/user/total HTTP/1.1" 200 6016
+[27/Jun/2012 11:21:38] "GET /monitor/add/ HTTP/1.1" 200 126112
+[27/Jun/2012 11:21:38] "GET /monitor/read/ HTTP/1.1" 200 266581
+[27/Jun/2012 11:21:40] "GET /statistics/ HTTP/1.1" 200 1291
+[27/Jun/2012 11:21:41] "GET /statistics/user/total HTTP/1.1" 200 6016
+[27/Jun/2012 11:21:41] "GET /statistics/bookmark/total HTTP/1.1" 200 5307
+[27/Jun/2012 11:21:42] "GET /statistics/bookmark/per_user HTTP/1.1" 200 5170
+[27/Jun/2012 11:21:45] "GET /statistics/bookmark/time HTTP/1.1" 200 1224
+nts': u'', 'gmt_modify': datetime.datetime(2012, 6, 14, 7, 6, 8), 'gmt_create': datetime.datetime(2012, 6, 14, 7, 6, 8), 'result': True, 'time': datetime.datetime(2012, 6, 14, 7, 6), 'id': 35L}, {'category': u'', 'name': u'read', 'time_used': 5L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 15, 9, 18, 35), 'gmt_create': datetime.datetime(2012, 6, 15, 9, 18, 35), 'result': True, 'time': datetime.datetime(2012, 6, 15, 9, 18, 35), 'id': 37L}, {'category': u'', 'name': u'read', 'time_used': 1L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 15, 9, 19, 1), 'gmt_create': datetime.datetime(2012, 6, 15, 9, 19, 1), 'result': True, 'time': datetime.datetime(2012, 6, 15, 9, 19, 1), 'id': 39L}, {'category': u'', 'name': u'read', 'time_used': 2L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 15, 10, 8, 2), 'gmt_create': datetime.datetime(2012, 6, 15, 10, 8, 2), 'result': True, 'time': datetime.datetime(2012, 6, 15, 10, 8, 2), 'id': 42L}, {'category': u'', 'name': u'read', 'time_used': 2L, 'comments': u'', 'gmt_modify': datetime.datetime(2012, 6, 15, 10, 10, 2), 'gmt_create': datetime.datetime(2012, 6, 15, 10, 10, 2), 'result': True, 'time': datetime.datetime(2012, 6, 15, 10, 10, 2), 'id': 43L}, '...(remaining elements truncated)...']
+Validating models...
+
+0 errors found
+Django version 1.4, using settings 'SohukanHealth.settings'
+Development server is running at http://0.0.0.0:8001/
+Quit the server with CONTROL-C.
+Traceback (most recent call last):
+  File "manage.py", line 10, in <module>
+    execute_from_command_line(sys.argv)
+  File "/usr/lib/python2.7/site-packages/django/core/management/__init__.py", line 443, in execute_from_command_line
+    utility.execute()
+  File "/usr/lib/python2.7/site-packages/django/core/management/__init__.py", line 382, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "/usr/lib/python2.7/site-packages/django/core/management/__init__.py", line 252, in fetch_command
+    app_name = get_commands()[subcommand]
+  File "/usr/lib/python2.7/site-packages/django/core/management/__init__.py", line 101, in get_commands
+    apps = settings.INSTALLED_APPS
+  File "/usr/lib/python2.7/site-packages/django/utils/functional.py", line 184, in inner
+    self._setup()
+  File "/usr/lib/python2.7/site-packages/django/conf/__init__.py", line 42, in _setup
+    self._wrapped = Settings(settings_module)
+  File "/usr/lib/python2.7/site-packages/django/conf/__init__.py", line 93, in __init__
+    mod = importlib.import_module(self.SETTINGS_MODULE)
+  File "/usr/lib/python2.7/site-packages/django/utils/importlib.py", line 35, in import_module
+    __import__(name)
+  File "/home/liubida/git/SohukanHealth/SohukanHealth/SohukanHealth/settings.py", line 2, in <module>
+    from config.config import c
+  File "/home/liubida/git/SohukanHealth/SohukanHealth/config/config.py", line 80
+    
+        ^
+IndentationError: expected an indented block
