@@ -15,7 +15,6 @@ def monitor(request):
     return HttpResponse(t.render(c))
 
 def app_available(request):
-    
     return HttpResponse(get_app_available())
 
 def read(request):

@@ -71,8 +71,12 @@ c = ConfigFactory().getConfig()
 lock = threading.Lock()
 
 if __name__ == '__main__':
-    c = ConfigFactory()
-    d = c.getConfig()
-    print d.conn
-    print d.db_config['host']
+#    c = ConfigFactory()
+#    d = c.getConfig()
+#    print d.conn
+#    print d.db_config['host']
+    a = os.path.dirname(__file__)
+    print a
+    b = os.path.dirname(a)
+    print b
     

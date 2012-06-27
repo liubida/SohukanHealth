@@ -12,6 +12,15 @@
 {% block js%}{% endblock %}
 </head>
 <body>
-	<div class="container">{% block content %} 内容 {% endblock %}</div>
+	<div class="container">
+		<ul id="menu_ul">
+			<li><a href="/">首页</a></li>
+			<li><a href="/statistics">统计</a></li>
+			<li><a href="/monitor">业务监控</a></li>
+			<li><a href="http://10.10.69.54:8080/ganglia">运维监控</a></li>
+			<li><a href="/about" style="display: none">计划</a></li>
+		</ul>
+		{% block content %} 内容 {% endblock %}
+	</div>
 </body>
 </html>

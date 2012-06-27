@@ -26,7 +26,6 @@ def calc_app_available(duration='day'):
     elif 'year' == duration:
         delta = datetime.timedelta(weeks=4 * 52)
     start_time = now - delta
-    print start_time
     
     success_data = AppAvailableData.objects.filter(result=True, time__gte=start_time).count()
     failure_data = AppAvailableData.objects.filter(result=False, time__gte=start_time).count()
@@ -82,5 +81,4 @@ def appAvailableData_to_json(data):
     return anyjson.dumps(s)   
     
 if __name__ == '__main__':
-    a = get_app_available()
-    print a
+    pass

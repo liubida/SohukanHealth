@@ -1,9 +1,9 @@
-from SohukanHealth.views import home_page, demo, about, all
+from SohukanHealth.views import demo, about, index
 from api.v1.app_available_data import LineItemResource, read_data_resource
 from django.conf.urls import patterns
 from djangorestframework.views import ListOrCreateModelView
 from monitor.views import read, add, monitor
-from statistics.views import user_total, bookmark_total, statistics, \
+from statistics.views import user_total, user_bookmark_percent, bookmark_total, statistics, \
     bookmark_per_user, bookmark_time
 
 # Uncomment the next two lines to enable the admin:
@@ -11,18 +11,19 @@ from statistics.views import user_total, bookmark_total, statistics, \
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-                       (r'^$', all),
+                       (r'^$', index),
                        (r'^demo/$', demo),
                        (r'^api/v1/demo', ListOrCreateModelView.as_view(resource=LineItemResource)),
                        (r'^monitor/$', monitor),
                        (r'^monitor/read/$', read),
                        (r'^monitor/add/$', add),
                        (r'^statistics/user/total$', user_total),
+                       (r'^statistics/user/bookmark_percent$', user_bookmark_percent),
                        (r'^statistics/bookmark/total$', bookmark_total),
                        (r'^statistics/bookmark/per_user$', bookmark_per_user),
                        (r'^statistics/bookmark/time$', bookmark_time),
                        (r'^statistics/$', statistics),
-                       (r'^all/$', all),
+                       (r'^all/$', index),
                        (r'^about/$', about),
 #                       (r'^now/$', now),
 #                       (r'^now/plus/(\d{1,2})/$', now_plus),
