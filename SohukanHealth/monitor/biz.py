@@ -6,7 +6,7 @@ Created on Jun 19, 2012
 '''
 from monitor.models import AppAvailableData
 import datetime
-import json
+import anyjson
 
 def calc_app_available(duration='day'):
     '''duration=hour, day, week, month, sixmonths, year'''
@@ -79,7 +79,7 @@ def appAvailableData_to_json(data):
         tmp['time_used'] = d['time_used']
         tmp['time'] = d['time'].strftime('%Y.%m.%d %H:%M:%S')
         s['list'].append(tmp)
-    return json.dumps(s)   
+    return anyjson.dumps(s)   
     
 if __name__ == '__main__':
     a = get_app_available()

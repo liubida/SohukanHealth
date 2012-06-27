@@ -8,7 +8,7 @@ from config.config import lock, c
 from monitor.models import AppAvailableData
 import MySQLdb
 import datetime
-import json
+import anyjson
 
 #ring = HashRing([str(i) for i in range(64)])
 
@@ -46,7 +46,7 @@ def get_bookmark_per_user(include_test=True):
         s['list'].append(tmp)
         i += 1
 
-    return json.dumps(s)
+    return anyjson.dumps(s)
 
 def get_bookmark_time(start_time=None):
     dd = calc_bookmark_time(start_time);
@@ -58,7 +58,7 @@ def get_bookmark_time(start_time=None):
     s['total'] = len(dd)
     s['list'] = dd
     
-    return json.dumps(s)
+    return anyjson.dumps(s)
 
 def calc_bookmark_time(start_time=None):
     raw_data = get_bookmark_time_raw_data(start_time);
@@ -237,7 +237,7 @@ def appAvailableData_to_json(data):
         tmp['time_used'] = d['time_used']
         tmp['time'] = d['time'].strftime('%Y.%m.%d %H:%M:%S')
         s['list'].append(tmp)
-    return json.dumps(s)   
+    return anyjson.dumps(s)   
     
 if __name__ == '__main__':
 #    a = get_app_available()
