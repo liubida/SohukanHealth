@@ -21,7 +21,8 @@ class Config:
     #["Cookie", "access_token = 432925e688a245092439b1532408cbccc5dc5e67"]
     
     cookie = ["Cookie", "access_token = 0381d220305f5acc8dab9a2ab9692a9d09be5e1d"]
-    
+    log_file = ROOT_PATH + '/sohukan.log' 
+
     add_time_limit = 15
     read_time_limit = 20
     
@@ -38,7 +39,7 @@ class DevConfig(Config):
     
     def do(self):
 #        handler = logging.FileHandler('../../sohukan.log')
-        handler = logging.FileHandler('/home/liubida/git/SohukanHealth/SohukanHealth/sohukan.log')
+        handler = logging.FileHandler(self.log_file)
         self.logger.addHandler(handler)
         self.logger.setLevel(logging.ERROR)
     
@@ -50,7 +51,7 @@ class ProdConfig(Config):
 
     def do(self):
 #        handler = logging.FileHandler('../../sohukan.log')
-        handler = logging.FileHandler('/home/liubida/git/SohukanHealth/SohukanHealth/sohukan.log')
+        handler = logging.FileHandler(self.log_file)
         self.logger.addHandler(handler)
         self.logger.setLevel(logging.ERROR)
         
@@ -74,3 +75,4 @@ if __name__ == '__main__':
     d = c.getConfig()
     print d.conn
     print d.db_config['host']
+    
