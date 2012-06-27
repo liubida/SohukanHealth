@@ -4,7 +4,7 @@ Created on Jun 15, 2012
 
 @author: liubida
 '''
-import json
+import anyjson
 
 #class JSChart(object):
 #     JSChart 
@@ -50,10 +50,10 @@ if __name__ == '__main__':
 #    o = dict2object(d) 
 
 
-    dump = json.dumps(p, default=object2dict) 
+    dump = anyjson.dumps(p, default=object2dict) 
     print dump 
     #{"age": 22, "__module__": "Person", "__class__": "Person", "name": "Peter"} 
 
-    load = json.loads(dump, object_hook=dict2object) 
+    load = anyjson.loads(dump, object_hook=dict2object) 
     print load.name #Person Object name : Peter , age : 22
     

@@ -4,7 +4,7 @@ from django.template import loader
 from django.template.context import Context
 from monitor.models import SomeTotal
 from statistics.biz import get_bookmark_per_user, get_bookmark_time
-import json
+import anyjson
 
 
 def statistics(request):
@@ -49,4 +49,4 @@ def someTotal_to_json(data):
         tmp['time'] = d['time'].strftime('%Y.%m.%d %H:%M:%S')
         tmp['count'] = d['count']
         s['list'].append(tmp)
-    return json.dumps(s)
+    return anyjson.dumps(s)
