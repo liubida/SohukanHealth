@@ -115,7 +115,7 @@ def get_bookmark_time_raw_data(start_time=None):
                                 
             ret.sort(key=lambda x:x['time'], reverse=True)
             return ret;
-    except Exception as e:
+    except Exception, e:
         c.logger.error(e)
         return str(e)
     finally:
@@ -124,7 +124,7 @@ def get_bookmark_time_raw_data(start_time=None):
         try:
             if cursor:
                 cursor.close()
-        except Exception as e:
+        except Exception, e:
             c.logger.error(e)
         finally:
             if conn:
@@ -151,7 +151,7 @@ def get_bookmark_per_user_raw_data(include_test=True):
                                 
             ret.sort(key=lambda x:x['count'], reverse=True)
             return ret;
-    except Exception as e:
+    except Exception, e:
         c.logger.error(e)
         return str(e)
     finally:
@@ -160,7 +160,7 @@ def get_bookmark_per_user_raw_data(include_test=True):
         try:
             if cursor:
                 cursor.close()
-        except Exception as e:
+        except Exception, e:
             c.logger.error(e)
         finally:
             if conn:
@@ -243,4 +243,5 @@ if __name__ == '__main__':
 #    a = get_app_available()
 #    print a
 #    get_bookmark_per_user()
-    calc_bookmark_time(0, 0)
+#    calc_bookmark_time(0, 0)
+    print get_bookmark_per_user_raw_data()

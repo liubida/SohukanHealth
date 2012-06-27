@@ -48,7 +48,7 @@ def user_total_job():
             data = SomeTotal(name='user', time=now, count=result[0])
             data.save()
             return result[0]
-    except Exception as e:
+    except Exception, e:
         c.logger.error(e)
         return str(e)
     finally:
@@ -57,7 +57,7 @@ def user_total_job():
         try:
             if cursor:
                 cursor.close()
-        except Exception as e:
+        except Exception, e:
             c.logger.error(e)
         finally:
             if conn:
@@ -81,7 +81,7 @@ def bookmark_total_job():
             data = SomeTotal(name='bookmark', time=now, count=sum)
             data.save()
             return sum
-    except Exception as e:
+    except Exception, e:
         c.logger.error(e)
         return str(e)
     finally:
@@ -90,7 +90,7 @@ def bookmark_total_job():
         try:
             if cursor:
                 cursor.close()
-        except Exception as e:
+        except Exception, e:
             c.logger.error(e)
         finally:
             if conn:
@@ -131,13 +131,13 @@ if __name__ == '__main__':
 #        
 #        
 #        print 'count:', count[0]
-#    except JobException as e:
+#    except JobException, e:
 #        logger.error(e)
 #    finally:
 #        try:
 #            if cursor:
 #                cursor.close()
-#        except JobException as e:
+#        except JobException, e:
 #            logger.error(e)
 #        finally:
 #            if conn:

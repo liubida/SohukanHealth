@@ -33,7 +33,7 @@ class add_worker():
     def test(self):
         try:
             time_used = self.add()
-        except Exception as e:
+        except Exception, e:
             c.logger.error(e)
             ret = {"result" : False, "time_used" : c.add_time_limit, 'comments': str(e)}
         else:
@@ -99,7 +99,7 @@ class read_worker():
     def test(self):
         try:
             time_used = self.read()
-        except Exception as e:
+        except Exception, e:
             c.logger.error(e)
             ret = {"result" : False, "time_used" : c.read_time_limit, 'comments': str(e)}
         else:
@@ -197,7 +197,7 @@ if __name__ == '__main__':
 #        try:
 #            a.test()
 #            time.sleep(4)
-#        except Exception as e:
+#        except Exception, e:
 #            print e
 #        print '...'
 

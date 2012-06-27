@@ -29,7 +29,7 @@ def request(url, data=None, cookie=None):
             req.add_header(*cookie);
             
         return urllib2.urlopen(req)
-    except Exception as e:
+    except Exception, e:
         raise e
 
 def get_date_and_time():

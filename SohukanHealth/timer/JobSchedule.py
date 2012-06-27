@@ -30,7 +30,7 @@ if __name__ == '__main__':
         usertotaljob = sched.add_cron_job(user_total_job, minute='*/60')
         bookmarktotaljob = sched.add_cron_job(bookmark_total_job, minute='*/60')
         sched.start()
-    except Exception as e:
+    except Exception, e:
         c.logger.error(e)
     finally:
         pass
