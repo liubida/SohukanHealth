@@ -5,7 +5,10 @@ Created on Jun 13, 2012
 '''
 
 import sys
-sys.path.append('/home/liubida/git/SohukanHealth/SohukanHealth/')
+import os
+root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print root_path
+sys.path.append(root_path)
 print sys.path
 
 from django.core.management import setup_environ
@@ -26,7 +29,7 @@ if __name__ == '__main__':
 #        usertotal_job = sched.add_cron_job(user_total_job, second='*/20')
 #        bookmarktotal_job = sched.add_cron_job(bookmark_total_job, second='*/15')
         addjob = sched.add_cron_job(add_job, minute='*/10')
-        readjob = sched.add_cron_job(read_job, minute='*/10')
+        readjob = sched.add_cron_job(read_job, minute='*/15')
         usertotaljob = sched.add_cron_job(user_total_job, minute='*/60')
         bookmarktotaljob = sched.add_cron_job(bookmark_total_job, minute='*/60')
         sched.start()
