@@ -22,7 +22,8 @@ from monitor.system.job import add_job, read_job, user_total_job, \
     bookmark_total_job
 
 def start_job():
-    try:    
+    try:
+        print 'job start'
         sched = Scheduler(daemonic=True)
 #        add_job = sched.add_cron_job(add_job, second='*/1')
 #        read_job = sched.add_cron_job(read_job, second='*/10')
