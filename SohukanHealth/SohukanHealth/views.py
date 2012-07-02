@@ -45,7 +45,11 @@ def about(request):
     t = loader.get_template('about.html')
     c = Context()
     return HttpResponse(t.render(c))
-    
+
+def sched(request):
+    from timer import JobSchedule
+    ret = JobSchedule.start_job()
+    return HttpResponse(ret)        
 #    
 #class JSONResponseMixin(object):
 #    """

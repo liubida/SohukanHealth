@@ -1,10 +1,10 @@
-from SohukanHealth.views import demo, about, index
+from SohukanHealth.views import demo, about, index, sched
 from api.v1.app_available_data import LineItemResource, read_data_resource
 from django.conf.urls import patterns
 from djangorestframework.views import ListOrCreateModelView
 from monitor.views import read, add, monitor
-from statistics.views import user_total, user_bookmark_percent, bookmark_total, statistics, \
-    bookmark_per_user, bookmark_time
+from statistics.views import user_total, user_bookmark_percent, bookmark_total, \
+    statistics, bookmark_per_user, bookmark_time
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -25,6 +25,7 @@ urlpatterns = patterns('',
                        (r'^statistics/$', statistics),
                        (r'^all/$', index),
                        (r'^about/$', about),
+                       (r'^sched/$', sched),
 #                       (r'^now/$', now),
 #                       (r'^now/plus/(\d{1,2})/$', now_plus),
 #                       (r'^hello/$', hello),
