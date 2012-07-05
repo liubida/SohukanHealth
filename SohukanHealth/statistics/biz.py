@@ -7,8 +7,8 @@ Created on Jun 19, 2012
 from config.config import lock, c
 from monitor.models import AppAvailableData
 import MySQLdb
-import datetime
 import anyjson
+import datetime
 
 #ring = HashRing([str(i) for i in range(64)])
 
@@ -339,6 +339,46 @@ def appAvailableData_to_json(data):
         tmp['time'] = d['time'].strftime('%Y.%m.%d %H:%M:%S')
         s['list'].append(tmp)
     return anyjson.dumps(s)   
+
+def tmp_raw_data(include_test=False):
+    locked = False;
+    try:
+        if lock.acquire():
+            locked = True
+            conn = MySQLdb.connect(**c.db_config)
+            cursor = conn.cursor()
+            
+            ret = []
+            for i in range(64):
+                cursor.execute("select user_id, url from bookmark_bookmark_%s where gmt_create > '2012-07-04 20:00:00' \
+                and gmt_create < '2012-07-04 22:20:00'" % i)
+                results = cursor.fetchall()
+                for d in results:
+                    if d[0]:
+                        kv = {}
+                        kv['user_id'] = int(d[0])
+                        kv['url'] = str(d[1])
+                        kv['bookmark'] = i
+                        print kv['user_id'], kv['url']
+    #                    if include_test or not _is_test(kv['user_id']):
+    #                        ret.append(kv)
+                        ret.append(kv)
+            ret.sort(key=lambda x:x['user_id'], reverse=True)
+            return ret;
+    except Exception, e:
+        c.logger.error(e)
+        return str(e)
+    finally:
+        if locked:
+            lock.release()
+        try:
+            if cursor:
+                cursor.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()
     
 if __name__ == '__main__':
 #    a = get_app_available()
@@ -348,9 +388,12 @@ if __name__ == '__main__':
 #    print get_bookmark_per_user_raw_data()
 #    get_bookmark_percent_raw_data()
 #    a = get_bookmark_percent(include_test=True)
-    a = get_bookmark_percent()
-    print a
+#    a = get_bookmark_percent()
+#    print a
 #    tmp = 'or id = '
 #    tmp += " or id=".join(map(lambda x:str(x), test_id))
 ##        tmp += 'or id='.join(str(i))
 #    print tmp        
+
+    a = tmp_raw_data()
+    print a

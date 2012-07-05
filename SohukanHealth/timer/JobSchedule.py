@@ -19,7 +19,7 @@ Created on Jun 13, 2012
 from apscheduler.scheduler import Scheduler
 from config.config import c
 from monitor.system.job import add_job, read_job, user_total_job, \
-    bookmark_total_job
+    bookmark_total_job, add_and_read_alarm_job
 import threading
 
 class Sched(object):
@@ -41,7 +41,7 @@ class Sched(object):
 def status(sched):        
     try:
         return sched.running
-    except Exception,e:
+    except Exception, e:
         print e
         return False
     
@@ -60,8 +60,9 @@ def start_job():
     #        read_job = sched.add_cron_job(read_job, second='*/10')
     #        usertotal_job = sched.add_cron_job(user_total_job, second='*/20')
     #        bookmarktotal_job = sched.add_cron_job(bookmark_total_job, second='*/15')
-            sched.add_cron_job(add_job, minute='*/10')
-            sched.add_cron_job(read_job, minute='*/10')
+            sched.add_cron_job(add_job, minute='*/5')
+            sched.add_cron_job(read_job, minute='*/5')
+            sched.add_cron_job(add_and_read_alarm_job, minute='*/10')
             sched.add_cron_job(user_total_job, minute='*/60')
             sched.add_cron_job(bookmark_total_job, minute='*/60')
             sched.start()

@@ -8,6 +8,7 @@ Created on Jun 7, 2012
 from config.config import c, lock
 from monitor.models import AppAvailableData, SomeTotal
 from monitor.system.worker import add_worker, read_worker
+from timer.sms import sms
 from util import print_info
 from util.random_spider import RandomSpider
 import MySQLdb
@@ -95,12 +96,36 @@ def bookmark_total_job():
         finally:
             if conn:
                 conn.close()
+
+@print_info(name='add_and_read_alarm_job')
+def add_and_read_alarm_job():
+    now = datetime.datetime.now()
+    delta = datetime.timedelta(hours=0.5)
+    start_time = now - delta
+    print start_time
+    
+    add_failure_data = AppAvailableData.objects.filter(name='add', result=True, time__gte=start_time).count()
+    read_failure_data = AppAvailableData.objects.filter(name='read', result=True, time__gte=start_time).count()
+    
+    max_count = 2
+    if add_failure_data >= max_count or read_failure_data >= max_count:
+        msg = 'add bookmark failure count(30min):%s' % str(add_failure_data)
+        msg += '\nread bookmark failure count(30min):%s' % str(read_failure_data)
+        sms(mobile_list=c.mobile_list, message_post=msg)
+        c.logger.error(msg)
+        print msg
+
+#sms(mobile_list=None, message_post=None)
+
+
+"select * from app_available_data where result=0 and gmt_create > '2012-07-04 18:20:00' and gmt_create < '2012-07-05 09:25:00'"
+
         
 if __name__ == '__main__':
 #    mysql_ping_job();
-    user_total_job()
-    bookmark_total_job()
-
+#    user_total_job()
+#    bookmark_total_job()
+    add_and_read_alarm_job()
 #    url = RandomSpider().get_valid_url()
 #        
 #    add = add_worker(url, c.cookie)
