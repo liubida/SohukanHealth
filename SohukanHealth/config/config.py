@@ -7,6 +7,7 @@ Created on Jun 18, 2012
 import logging
 import os
 import threading
+#import syslog
 
 class Config:
     ROOT_PATH = os.path.dirname(os.path.dirname(__file__))
@@ -34,8 +35,8 @@ class Config:
 class DevConfig(Config):
     cookie = ["Cookie", "access_token = 0381d220305f5acc8dab9a2ab9692a9d09be5e1d"]
     db_config = {'host':'10.10.58.17', 'port':3306, 'user':'sohupocketlib', 'passwd':'SejJGGk2', 'db':'sohupocketlib'}
-    
-    logger = logging.getLogger()
+    mobile_list = ['13476852610', '18627839148', '13545257885']
+    logger = logging.getLogger("SohukanHealth")
     
     def do(self):
 #        handler = logging.FileHandler('../../sohukan.log')
@@ -46,8 +47,9 @@ class DevConfig(Config):
 class ProdConfig(Config):
     cookie = ["Cookie", "access_token = eeeb8e686a2a148de62b2352ea88b9c6d4b8bd24"]
     db_config = {'host':'10.10.58.16', 'port':3306, 'user':'sohupocketlib', 'passwd':'SejJGGk2', 'db':'sohupocketlib'}
+    mobile_list = ['13476852610', '18627839148', '13545257885']
 
-    logger = logging.getLogger()
+    logger = logging.getLogger("SohukanHealth")
 
     def do(self):
 #        handler = logging.FileHandler('../../sohukan.log')
@@ -80,3 +82,10 @@ if __name__ == '__main__':
     b = os.path.dirname(a)
     print b
     
+#    syslog.openlog("test.py")
+#    syslog.syslog("The process is test.py")
+#    syslog.syslog("i am liubida")
+    
+#    syslog.openlog(logoption=syslog.LOG_PID, facility=syslog.LOG_LOCAL2)
+#    syslog.syslog('E-mail processing initiated...')
+        
