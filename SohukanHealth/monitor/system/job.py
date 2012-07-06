@@ -104,11 +104,11 @@ def add_and_read_alarm_job():
     start_time = now - delta
     print start_time
     
-    add_failure_data = AppAvailableData.objects.filter(name='add', result=True, time__gte=start_time).count()
-    read_failure_data = AppAvailableData.objects.filter(name='read', result=True, time__gte=start_time).count()
+    add_failure_data = AppAvailableData.objects.filter(name='add', result=False, time__gte=start_time).count()
+    read_failure_data = AppAvailableData.objects.filter(name='read', result=False, time__gte=start_time).count()
     
     max_count = 2
-    if add_failure_data >= max_count or read_failure_data >= max_count:
+    if add_failure_data >= 3 or read_failure_data >= 5:
         msg = 'add bookmark failure count(30min):%s' % str(add_failure_data)
         msg += '\nread bookmark failure count(30min):%s' % str(read_failure_data)
         sms(mobile_list=c.mobile_list, message_post=msg)
