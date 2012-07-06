@@ -35,7 +35,7 @@ class Config:
 class DevConfig(Config):
     cookie = ["Cookie", "access_token = 0381d220305f5acc8dab9a2ab9692a9d09be5e1d"]
     db_config = {'host':'10.10.58.17', 'port':3306, 'user':'sohupocketlib', 'passwd':'SejJGGk2', 'db':'sohupocketlib'}
-    mobile_list = ['13476852610', '18627839148', '13545257885']
+    mobile_list = '13476852610,18627839148,13545257885'
     logger = logging.getLogger("SohukanHealth")
     
     def do(self):
@@ -47,7 +47,7 @@ class DevConfig(Config):
 class ProdConfig(Config):
     cookie = ["Cookie", "access_token = eeeb8e686a2a148de62b2352ea88b9c6d4b8bd24"]
     db_config = {'host':'10.10.58.16', 'port':3306, 'user':'sohupocketlib', 'passwd':'SejJGGk2', 'db':'sohupocketlib'}
-    mobile_list = ['13476852610', '18627839148', '13545257885']
+    mobile_list = '13476852610,18627839148,13545257885'
 
     logger = logging.getLogger("SohukanHealth")
 

@@ -22,4 +22,4 @@ def sms(mobile_list=None, message_post=None):
 
 #This code is for debugging and unit testing    
 if __name__ == '__main__':
-    sms(['13476852610'], 'test by sohukanhealth')
+    sms('13476852610,13545257885', 'test by sohukanhealth')
