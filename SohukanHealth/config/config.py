@@ -86,6 +86,6 @@ if __name__ == '__main__':
 #    syslog.syslog("The process is test.py")
 #    syslog.syslog("i am liubida")
     
-    syslog.openlog(logoption=syslog.LOG_PID, facility=syslog.LOG_LOCAL2)
+    syslog.openlog('',syslog.LOG_PID, syslog.LOG_LOCAL2)
     syslog.syslog('E-mail processing initiated...')
         
