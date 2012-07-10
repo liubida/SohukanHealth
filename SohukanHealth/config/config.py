@@ -7,7 +7,7 @@ Created on Jun 18, 2012
 import logging
 import os
 import threading
-#import syslog
+import syslog
 
 class Config:
     ROOT_PATH = os.path.dirname(os.path.dirname(__file__))
@@ -86,6 +86,6 @@ if __name__ == '__main__':
 #    syslog.syslog("The process is test.py")
 #    syslog.syslog("i am liubida")
     
-#    syslog.openlog(logoption=syslog.LOG_PID, facility=syslog.LOG_LOCAL2)
-#    syslog.syslog('E-mail processing initiated...')
+    syslog.openlog(logoption=syslog.LOG_PID, facility=syslog.LOG_LOCAL2)
+    syslog.syslog('E-mail processing initiated...')
         

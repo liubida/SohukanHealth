@@ -1,4 +1,4 @@
-from SohukanHealth.views import demo, about, index, sched
+from SohukanHealth.views import demo, about, index, sched, logtest
 from api.v1.app_available_data import LineItemResource, read_data_resource
 from django.conf.urls import patterns
 from djangorestframework.views import ListOrCreateModelView
@@ -26,6 +26,7 @@ urlpatterns = patterns('',
                        (r'^all/$', index),
                        (r'^about/$', about),
                        (r'^sched/$', sched),
+                       (r'^logtest/$', logtest),
 #                       (r'^now/$', now),
 #                       (r'^now/plus/(\d{1,2})/$', now_plus),
 #                       (r'^hello/$', hello),
