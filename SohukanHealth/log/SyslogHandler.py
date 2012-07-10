@@ -18,8 +18,8 @@ class SyslogHandler(logging.Handler, object):
         
         self.format(record)
         try:
-            syslog.openlog(logoption=syslog.LOG_PID, facility=syslog.LOG_LOCAL2)
+            syslog.openlog('', logoption=syslog.LOG_PID, facility=syslog.LOG_LOCAL2)
             syslog.syslog(record.message)
         except Exception, e:
-            syslog.openlog(logoption=syslog.LOG_PID, facility=syslog.LOG_LOCAL2)
+            syslog.openlog('', logoption=syslog.LOG_PID, facility=syslog.LOG_LOCAL2)
             syslog.syslog(str(e))
