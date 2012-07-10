@@ -3,10 +3,12 @@ Created on Jun 14, 2012
 
 @author: liubida
 '''
+from config.config import c
 from django.http import HttpResponse, Http404
 from django.template import loader
 from django.template.context import Context
 import datetime
+import random
 
 def home_page(request):
     return HttpResponse("hi, i'm at home!")
@@ -50,6 +52,15 @@ def sched(request):
     from timer import JobSchedule
     ret = JobSchedule.start_job()
     return HttpResponse(ret)        
+
+def logtest(request):
+    a = random.randint(0, 10)
+    if a % 2:
+        c.logger.info("SohukanHealth logtest info")
+    else:
+        c.logger.error("SohukanHealth logtest error")
+    return HttpResponse("hehe")        
+        
 #    
 #class JSONResponseMixin(object):
 #    """
