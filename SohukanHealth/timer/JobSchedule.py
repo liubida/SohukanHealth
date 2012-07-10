@@ -34,7 +34,7 @@ class Sched(object):
         Sched.__lock.acquire()
         if not Sched.__instance:
             Sched.__instance = Scheduler(daemonic=True)
-#            object.__init__(Sched.__instance)
+            object.__init__(Sched.__instance)
         Sched.__lock.release()
         return Sched.__instance
     
