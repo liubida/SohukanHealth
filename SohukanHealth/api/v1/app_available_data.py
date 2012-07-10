@@ -9,6 +9,7 @@ from djangorestframework.resources import ModelResource
 from djangorestframework.tests import reverse
 from monitor.models import AppAvailableData
 
+
 class LineItemResource(ModelResource):  
     model =  AppAvailableData 
 #    fields = ('name', 'time', 'time_used')
