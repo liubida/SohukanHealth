@@ -5,7 +5,7 @@ Created on Jun 7, 2012
 @author: liubida
 '''
 
-from config.config import c, lock
+from config.config import c
 from monitor.models import AppAvailableData, SomeTotal
 from monitor.system.worker import add_worker, read_worker
 from timer.sms import sms
@@ -35,26 +35,20 @@ def add_job():
 
 @print_info(name='user_total_job')
 def user_total_job():
-    # TODO: this is a tmp job, it will be deleted
-    locked = False
     try:
-        if lock.acquire():
-            locked = True
-            # TODO: there should be a dbhelper
-            conn = MySQLdb.connect(**c.db_config)
-            cursor = conn.cursor()
-            cursor.execute('select count(*) from account_user')
-            result = cursor.fetchone()
-            now = datetime.datetime.now()
-            data = SomeTotal(name='user', time=now, count=result[0])
-            data.save()
-            return result[0]
+        # TODO: there should be a dbhelper
+        conn = MySQLdb.connect(**c.db_config)
+        cursor = conn.cursor()
+        cursor.execute('select count(*) from account_user')
+        result = cursor.fetchone()
+        now = datetime.datetime.now()
+        data = SomeTotal(name='user', time=now, count=result[0])
+        data.save()
+        return result[0]
     except Exception, e:
         c.logger.error(e)
         return str(e)
     finally:
-        if locked:
-            lock.release()
         try:
             if cursor:
                 cursor.close()
@@ -66,28 +60,22 @@ def user_total_job():
 
 @print_info(name='bookmark_total_job')
 def bookmark_total_job():
-    # TODO: this is a tmp job, it will be deleted
-    locked = False;
     try:
-        if lock.acquire():
-            locked = True
-            conn = MySQLdb.connect(**c.db_config)
-            cursor = conn.cursor()
-            sum = 0
-            for i in range(64):
-                cursor.execute ("select count(*) from bookmark_bookmark_%s" % i)
-                result = cursor.fetchone()
-                sum += result[0]
-            now = datetime.datetime.now()
-            data = SomeTotal(name='bookmark', time=now, count=sum)
-            data.save()
-            return sum
+        conn = MySQLdb.connect(**c.db_config)
+        cursor = conn.cursor()
+        sum = 0
+        for i in range(64):
+            cursor.execute ("select count(*) from bookmark_bookmark_%s" % i)
+            result = cursor.fetchone()
+            sum += result[0]
+        now = datetime.datetime.now()
+        data = SomeTotal(name='bookmark', time=now, count=sum)
+        data.save()
+        return sum
     except Exception, e:
         c.logger.error(e)
         return str(e)
     finally:
-        if locked:
-            lock.release()
         try:
             if cursor:
                 cursor.close()

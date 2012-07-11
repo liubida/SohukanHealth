@@ -70,7 +70,7 @@ class ConfigFactory:
         return config
 
 c = ConfigFactory().getConfig()
-lock = threading.Lock()
+#lock = threading.Lock()
 
 if __name__ == '__main__':
 #    c = ConfigFactory()

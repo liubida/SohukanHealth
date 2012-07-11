@@ -4,7 +4,7 @@ Created on Jun 19, 2012
 
 @author: liubida
 '''
-from config.config import lock, c
+from config.config import c
 from monitor.models import AppAvailableData
 import MySQLdb
 import anyjson
@@ -123,66 +123,60 @@ def calc_bookmark_time(start_time=None):
     return ret
 
 def get_bookmark_percent_raw_data(include_test=False):
-    locked = False;
     try:
-        if lock.acquire():
-            locked = True
-            conn = MySQLdb.connect(**c.db_config)
-            cursor = conn.cursor()
+        conn = MySQLdb.connect(**c.db_config)
+        cursor = conn.cursor()
 
-            ret = [{'name':'1篇', 'count':0},
-                   {'name':'2-5篇', 'count':0},
-                   {'name':'6-50篇', 'count':0},
-                   {'name':'51-100篇', 'count':0},
-                   {'name':'101-200篇', 'count':0},
-                   {'name':'>200篇', 'count':0}]
-            
+        ret = [{'name':'1篇', 'count':0},
+               {'name':'2-5篇', 'count':0},
+               {'name':'6-50篇', 'count':0},
+               {'name':'51-100篇', 'count':0},
+               {'name':'101-200篇', 'count':0},
+               {'name':'>200篇', 'count':0}]
+        
 #            if start_time:
 #                prefix = "where create_time > '%s'" % start_time
 #            else:
 #                prefix = ''
-            prefix = ''
-            print include_test
+        prefix = ''
+        print include_test
+        
+        if include_test:
+            sql_total = "select count(*) from account_user"
+        else:
+            tmp = ' and id !='
+            tmp += ' and id !='.join(map(lambda x:str(x), test_id))
+            print tmp
+            sql_total = "select count(*) from account_user where id > 100 %s" % tmp
+            print sql_total
             
-            if include_test:
-                sql_total = "select count(*) from account_user"
-            else:
-                tmp = ' and id !='
-                tmp += ' and id !='.join(map(lambda x:str(x), test_id))
-                print tmp
-                sql_total = "select count(*) from account_user where id > 100 %s" % tmp
-                print sql_total
-                
-            cursor.execute(sql_total)
-            result = cursor.fetchone()
-            user_total = result[0]
-            print user_total
-            
-            for i in range(64):
+        cursor.execute(sql_total)
+        result = cursor.fetchone()
+        user_total = result[0]
+        print user_total
+        
+        for i in range(64):
 #                cursor.execute("select id, create_time from bookmark_bookmark_%s %s" % (i, prefix))
-                cursor.execute("select user_id, count(*) from bookmark_bookmark_%s group by user_id %s" % (i, prefix))
-                results = cursor.fetchall()
-                for d in results:
-                    if include_test or not _is_test(int(d[0])):
-                        ret[_which_index(int(d[1]))]['count'] += 1
-            
+            cursor.execute("select user_id, count(*) from bookmark_bookmark_%s group by user_id %s" % (i, prefix))
+            results = cursor.fetchall()
+            for d in results:
+                if include_test or not _is_test(int(d[0])):
+                    ret[_which_index(int(d[1]))]['count'] += 1
+        
 # TODO:     a = reduce(lambda x, y:x['count'] + y['count'], ret)
 
-            user_used = 0
-            for r in ret:
-                user_used += r['count']
-            
-            ret.append({'name':'0篇', 'count':user_total - user_used})
-            
-            ret.sort(key=lambda x:x['count'], reverse=True)
-            return ret;
+        user_used = 0
+        for r in ret:
+            user_used += r['count']
+        
+        ret.append({'name':'0篇', 'count':user_total - user_used})
+        
+        ret.sort(key=lambda x:x['count'], reverse=True)
+        return ret;
     except Exception, e:
         c.logger.error(e)
         raise e
-#        return str(e)
     finally:
-        if locked:
-            lock.release()
         try:
             if cursor:
                 cursor.close()
@@ -193,35 +187,31 @@ def get_bookmark_percent_raw_data(include_test=False):
                 conn.close()
                         
 def get_bookmark_time_raw_data(start_time=None):
-    locked = False;
+    '''为[收藏文章时间段]获取原始数据'''
     try:
-        if lock.acquire():
-            locked = True
-            conn = MySQLdb.connect(**c.db_config)
-            cursor = conn.cursor()
-            
-            if start_time:
-                prefix = "where create_time > '%s'" % start_time
-            else:
-                prefix = ''
-            ret = []
-            for i in range(64):
-                cursor.execute("select id, create_time from bookmark_bookmark_%s %s" % (i, prefix))
-                results = cursor.fetchall()
-                for d in results:
-                    kv = {}
-                    kv['id'] = '%d_%d' % (i, int(d[0]))
-                    kv['time'] = d[1]
-                    ret.append(kv)
-                                
-            ret.sort(key=lambda x:x['time'], reverse=True)
-            return ret;
+        conn = MySQLdb.connect(**c.db_config)
+        cursor = conn.cursor()
+        
+        if start_time:
+            prefix = "where create_time > '%s'" % start_time
+        else:
+            prefix = ''
+        ret = []
+        for i in range(64):
+            cursor.execute("select id, create_time from bookmark_bookmark_%s %s" % (i, prefix))
+            results = cursor.fetchall()
+            for d in results:
+                kv = {}
+                kv['id'] = '%d_%d' % (i, int(d[0]))
+                kv['time'] = d[1]
+                ret.append(kv)
+                            
+        ret.sort(key=lambda x:x['time'], reverse=True)
+        return ret;
     except Exception, e:
         c.logger.error(e)
         return str(e)
     finally:
-        if locked:
-            lock.release()
         try:
             if cursor:
                 cursor.close()
@@ -232,32 +222,28 @@ def get_bookmark_time_raw_data(start_time=None):
                 conn.close()
     
 def get_bookmark_per_user_raw_data(include_test=False):
-    locked = False;
+    '''为[用户收藏文章数排行]获取原始数据'''
     try:
-        if lock.acquire():
-            locked = True
-            conn = MySQLdb.connect(**c.db_config)
-            cursor = conn.cursor()
-            
-            ret = []
-            for i in range(64):
-                cursor.execute("select user_id, count(*) from bookmark_bookmark_%s group by user_id" % i)
-                results = cursor.fetchall()
-                for d in results:
-                    kv = {}
-                    kv['user_id'] = int(d[0])
-                    kv['count'] = int(d[1])
-                    if include_test or not _is_test(kv['user_id']):
-                        ret.append(kv)
-                                
-            ret.sort(key=lambda x:x['count'], reverse=True)
-            return ret;
+        conn = MySQLdb.connect(**c.db_config)
+        cursor = conn.cursor()
+        
+        ret = []
+        for i in range(64):
+            cursor.execute("select user_id, count(*) from bookmark_bookmark_%s group by user_id" % i)
+            results = cursor.fetchall()
+            for d in results:
+                kv = {}
+                kv['user_id'] = int(d[0])
+                kv['count'] = int(d[1])
+                if include_test or not _is_test(kv['user_id']):
+                    ret.append(kv)
+                            
+        ret.sort(key=lambda x:x['count'], reverse=True)
+        return ret;
     except Exception, e:
         c.logger.error(e)
         return str(e)
     finally:
-        if locked:
-            lock.release()
         try:
             if cursor:
                 cursor.close()
@@ -268,7 +254,10 @@ def get_bookmark_per_user_raw_data(include_test=False):
                 conn.close()
 
 def calc_app_available(duration='day'):
-    '''duration=hour, day, week, month, sixmonths, year'''
+    '''
+    计算系统可用率
+    duration=hour, day, week, month, sixmonths, year
+    '''
     
     now = datetime.datetime.now()
 
@@ -341,36 +330,31 @@ def appAvailableData_to_json(data):
     return anyjson.dumps(s)   
 
 def tmp_raw_data(include_test=False):
-    locked = False;
     try:
-        if lock.acquire():
-            locked = True
-            conn = MySQLdb.connect(**c.db_config)
-            cursor = conn.cursor()
-            
-            ret = []
-            for i in range(64):
-                cursor.execute("select user_id, url from bookmark_bookmark_%s where gmt_create > '2012-07-04 20:00:00' \
-                and gmt_create < '2012-07-04 22:20:00'" % i)
-                results = cursor.fetchall()
-                for d in results:
-                    if d[0]:
-                        kv = {}
-                        kv['user_id'] = int(d[0])
-                        kv['url'] = str(d[1])
-                        kv['bookmark'] = i
-                        print kv['user_id'], kv['url']
-    #                    if include_test or not _is_test(kv['user_id']):
-    #                        ret.append(kv)
-                        ret.append(kv)
-            ret.sort(key=lambda x:x['user_id'], reverse=True)
-            return ret;
+        conn = MySQLdb.connect(**c.db_config)
+        cursor = conn.cursor()
+        
+        ret = []
+        for i in range(64):
+            cursor.execute("select user_id, url from bookmark_bookmark_%s where gmt_create > '2012-07-04 20:00:00' \
+            and gmt_create < '2012-07-04 22:20:00'" % i)
+            results = cursor.fetchall()
+            for d in results:
+                if d[0]:
+                    kv = {}
+                    kv['user_id'] = int(d[0])
+                    kv['url'] = str(d[1])
+                    kv['bookmark'] = i
+                    print kv['user_id'], kv['url']
+#                    if include_test or not _is_test(kv['user_id']):
+#                        ret.append(kv)
+                    ret.append(kv)
+        ret.sort(key=lambda x:x['user_id'], reverse=True)
+        return ret;
     except Exception, e:
         c.logger.error(e)
         return str(e)
     finally:
-        if locked:
-            lock.release()
         try:
             if cursor:
                 cursor.close()
