@@ -6,8 +6,6 @@ Created on Jun 18, 2012
 '''
 import logging
 import os
-import threading
-import syslog
 
 class Config:
     ROOT_PATH = os.path.dirname(os.path.dirname(__file__))
@@ -39,7 +37,6 @@ class DevConfig(Config):
     logger = logging.getLogger("SohukanHealth")
     
     def do(self):
-#        handler = logging.FileHandler('../../sohukan.log')
         handler = logging.FileHandler(self.log_file)
         self.logger.addHandler(handler)
         self.logger.setLevel(logging.ERROR)
@@ -52,7 +49,6 @@ class ProdConfig(Config):
     logger = logging.getLogger("SohukanHealth")
 
     def do(self):
-#        handler = logging.FileHandler('../../sohukan.log')
         handler = logging.FileHandler(self.log_file)
         self.logger.addHandler(handler)
         self.logger.setLevel(logging.ERROR)
@@ -81,11 +77,3 @@ if __name__ == '__main__':
     print a
     b = os.path.dirname(a)
     print b
-    
-#    syslog.openlog("test.py")
-#    syslog.syslog("The process is test.py")
-#    syslog.syslog("i am liubida")
-    
-    syslog.openlog('',syslog.LOG_PID, syslog.LOG_LOCAL2)
-    syslog.syslog('E-mail processing initiated...')
-        
