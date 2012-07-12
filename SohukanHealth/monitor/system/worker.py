@@ -48,7 +48,6 @@ class add_worker():
         self._add_bookmark()
         expire_time = datetime.datetime.now() + datetime.timedelta(seconds=c.add_time_limit)
         while True:
-            self.url +='liubidaliubida'
             add_result = self._check_bookmark(self.url, self.cookie)
 
             if expire_time < datetime.datetime.now():
