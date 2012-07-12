@@ -81,6 +81,22 @@ function clearElement(element){
 
 // ------------------
 
+var create_link = function(url, text, value, onclick) {
+	var a = document.createElement('a');
+	var a_text = document.createTextNode(text);
+
+	a.setAttribute('href', url);
+	a.setAttribute('value', value);
+	addClass(a, 'normal_a');
+
+	if (onclick && typeof onclick == 'function') {
+		a.onclick = onclick
+	}
+	
+	a.appendChild(a_text);
+	return a;
+};
+
 var chart_date_handler = function(time_str) {
 	time = new Date(time_str);
 	return time.format('MM.dd hh:mm');

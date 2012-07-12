@@ -32,7 +32,7 @@ var load_user_bookmark_percent = function(params, callback) {
 	var loading_text = document.createTextNode('数据加载中...')
 	loading.appendChild(loading_text);
 	e.appendChild(loading);
-	
+
 	myAjax(url, params, function(obj) {
 				if (callback && typeof callback == 'function') {
 					callback();
@@ -50,42 +50,65 @@ var load_user_bookmark_percent = function(params, callback) {
 			});
 };
 
+var create_ul_for_percent = function() {
+	var today = new Date();
+	var tmp = new Date();
+	var time_array = [{
+		'text' : '昨天',
+		'value' : tmp.setDate(today.getDate() - 1) ? tmp
+				.format('yyyy.MM.dd hh:mm:ss') : null
+	}, {
+		'text' : '7天前',
+		'value' : tmp.setDate(today.getDate() - 7) ? tmp
+				.format('yyyy.MM.dd hh:mm:ss') : null
+	}, {
+		'text' : '30天前',
+		'value' : tmp.setMonth(today.getMonth() - 1) ? tmp
+				.format('yyyy.MM.dd hh:mm:ss') : null
+	}, {
+		'text' : '3个月前',
+		'value' : tmp.setMonth(today.getMonth() - 3) ? tmp
+				.format('yyyy.MM.dd hh:mm:ss') : null
+	}, {
+		'text' : '6个月前',
+		'value' : tmp.setMonth(today.getMonth() - 6) ? tmp
+				.format('yyyy.MM.dd hh:mm:ss') : null
+	}, {
+		'text' : '1年前',
+		'value' : tmp.setFullYear(today.getFullYear() - 1) ? tmp
+				.format('yyyy.MM.dd hh:mm:ss') : null
+	}];
+	var ul = document.createElement('ul');
+	for (var i = 0; i < time_array.length; i++) {
+		var li = document.createElement('li');
+		addClass(li, 'heng_li');
+
+		var a = create_link(i, time_array[i]['text'], time_array[i]['value'],
+				function() {
+					var t = this.firstChild;
+					var old_nodeValue = t.nodeValue;
+					t.nodeValue = '请求数据中';
+
+					load_user_bookmark_percent({
+								before_time : this.getAttribute('value')
+							}, function() {
+								t.nodeValue = old_nodeValue;
+							});
+					return false;
+				});
+		li.appendChild(a);
+		ul.appendChild(li)
+	}
+	return ul;
+};
 var prepare_user_bookmark_percent = function() {
 	var div = document.getElementById('user_bookmark_percent_div');
 
-	var a1 = create_link('', '真实用户');
-	a1.onclick = function() {
-		var t = a1.firstChild;
-		var old_nodeValue = t.nodeValue;
-		t.nodeValue = '请求数据中...';
-
-		load_user_bookmark_percent({
-					includeTest : false
-				}, function() {
-					t.nodeValue = old_nodeValue;
-				});
-		return false;
-	};
-
-	var a2 = create_link('', '所有用户');
-	a2.onclick = function() {
-		var t = a2.firstChild;
-		var old_nodeValue = t.nodeValue;
-		t.nodeValue = '请求数据中...';
-
-		load_user_bookmark_percent({
-					includeTest : true
-				}, function() {
-					t.nodeValue = old_nodeValue;
-				});
-		return false;
-	};
-	var link_div = document.createElement('div');
-	link_div.style.float = 'left';
-	link_div.appendChild(a1);
-	link_div.appendChild(a2);
-
-	insertAfter(link_div, div);
+	// var ul = create_ul_for_percent();
+	// var link_div = document.createElement('div');
+	// link_div.style.float = 'left';
+	// link_div.appendChild(ul);
+	// insertAfter(link_div, div);
 	load_user_bookmark_percent();
 };
 

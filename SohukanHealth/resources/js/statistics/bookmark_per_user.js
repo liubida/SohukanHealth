@@ -1,7 +1,7 @@
 var make_bookmark_per_user_chart = function(chartData) {
 	var e = document.getElementById('bookmark_per_user_div')
 	clearElement(e);
-	
+
 	// SERIAL CHART
 	var chart = new AmCharts.AmSerialChart();
 	chart.dataProvider = chartData;
@@ -42,7 +42,7 @@ var make_bookmark_per_user_chart = function(chartData) {
 
 var load_bookmark_per_user = function(params, callback) {
 	url = '/statistics/bookmark/per_user';
-	
+
 	var e = document.getElementById('bookmark_per_user_div')
 	clearElement(e);
 
@@ -50,7 +50,7 @@ var load_bookmark_per_user = function(params, callback) {
 	var loading_text = document.createTextNode('数据加载中...')
 	loading.appendChild(loading_text);
 	e.appendChild(loading);
-	
+
 	myAjax(url, params, function(obj) {
 				data = obj.list;
 				len = data.length;
@@ -69,52 +69,65 @@ var load_bookmark_per_user = function(params, callback) {
 			});
 };
 
-var create_link = function(url, text) {
-	var a = document.createElement('a');
-	var a_text = document.createTextNode(text);
+var create_ul_for_per_user = function() {
+	var today = new Date();
+	var tmp = new Date();
+	var time_array = [{
+		'text' : '昨天',
+		'value' : tmp.setDate(today.getDate() - 1) ? tmp
+				.format('yyyy.MM.dd hh:mm:ss') : null
+	}, {
+		'text' : '7天',
+		'value' : tmp.setDate(today.getDate() - 7) ? tmp
+				.format('yyyy.MM.dd hh:mm:ss') : null
+	}, {
+		'text' : '30天',
+		'value' : tmp.setMonth(today.getMonth() - 1) ? tmp
+				.format('yyyy.MM.dd hh:mm:ss') : null
+	}, {
+		'text' : '3个月',
+		'value' : tmp.setMonth(today.getMonth() - 3) ? tmp
+				.format('yyyy.MM.dd hh:mm:ss') : null
+	}, {
+		'text' : '6个月',
+		'value' : tmp.setMonth(today.getMonth() - 6) ? tmp
+				.format('yyyy.MM.dd hh:mm:ss') : null
+	}, {
+		'text' : '1年',
+		'value' : tmp.setFullYear(today.getFullYear() - 1) ? tmp
+				.format('yyyy.MM.dd hh:mm:ss') : null
+	}];
+	var ul = document.createElement('ul');
+	for (var i = 0; i < time_array.length; i++) {
+		var li = document.createElement('li');
+		addClass(li, 'heng_li');
 
-	a.setAttribute('href', url);
-	addClass(a, 'normal_a');
+		var a = create_link(i, time_array[i]['text'], time_array[i]['value'],
+				function() {
+					var t = this.firstChild;
+					var old_nodeValue = t.nodeValue;
+					t.nodeValue = '请求数据中';
 
-	a.appendChild(a_text);
-	return a;
+					load_bookmark_per_user({
+								start_time : this.getAttribute('value')
+							}, function() {
+								t.nodeValue = old_nodeValue;
+							});
+					return false;
+				});
+		li.appendChild(a);
+		ul.appendChild(li)
+	}
+	return ul;
 };
 
 var prepare_bookmark_per_user = function() {
 	var div = document.getElementById('bookmark_per_user_div');
 
-	var a1 = create_link('', '真实用户');
-	a1.onclick = function() {
-		var t = a1.firstChild;
-		var old_nodeValue = t.nodeValue;
-		t.nodeValue = '请求数据中...';
-
-		load_bookmark_per_user({
-					includeTest : false
-				}, function() {
-					t.nodeValue = old_nodeValue;
-				});
-		return false;
-	};
-
-	var a2 = create_link('', '所有用户');
-	a2.onclick = function() {
-		var t = a2.firstChild;
-		var old_nodeValue = t.nodeValue;
-		t.nodeValue = '请求数据中...';
-
-		load_bookmark_per_user({
-					includeTest : true
-				}, function() {
-					t.nodeValue = old_nodeValue;
-				});
-		return false;
-	};
+	var ul = create_ul_for_per_user();
 	var link_div = document.createElement('div');
 	link_div.style.float = 'left';
-	link_div.appendChild(a1);
-	link_div.appendChild(a2);
-
+	link_div.appendChild(ul);
 	insertAfter(link_div, div);
 	load_bookmark_per_user();
 };

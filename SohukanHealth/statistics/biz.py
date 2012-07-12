@@ -43,8 +43,8 @@ def _which_index(count):
     
     return None;
 
-def get_bookmark_per_user(include_test=False):
-    dd = get_bookmark_per_user_raw_data(include_test)
+def get_bookmark_per_user(start_time=None):
+    dd = get_bookmark_per_user_raw_data(start_time)
 
     s = {}
     s['success'] = True
@@ -80,8 +80,8 @@ def get_bookmark_time(start_time=None):
     
     return anyjson.dumps(s)
 
-def get_bookmark_percent(include_test=False):
-    dd = get_bookmark_percent_raw_data(include_test);
+def get_bookmark_percent(before_time=None):
+    dd = get_bookmark_percent_raw_data(before_time);
     
     s = {}
     s['success'] = True
@@ -122,7 +122,8 @@ def calc_bookmark_time(start_time=None):
     
     return ret
 
-def get_bookmark_percent_raw_data(include_test=False):
+def get_bookmark_percent_raw_data(before_time=None):
+    '''为[用户收藏文章数统计]获取原始数据'''
     try:
         conn = MySQLdb.connect(**c.db_config)
         cursor = conn.cursor()
@@ -134,21 +135,19 @@ def get_bookmark_percent_raw_data(include_test=False):
                {'name':'101-200篇', 'count':0},
                {'name':'>200篇', 'count':0}]
         
-#            if start_time:
-#                prefix = "where create_time > '%s'" % start_time
-#            else:
-#                prefix = ''
-        prefix = ''
-        print include_test
-        
-        if include_test:
-            sql_total = "select count(*) from account_user"
+        #时间约束, 即某个时间之前的非测试用户数
+        if before_time:
+            prefix = "having create_time < '%s'" % before_time
+            time_limit = "and gmt_create < '%s'" % before_time
         else:
-            tmp = ' and id !='
-            tmp += ' and id !='.join(map(lambda x:str(x), test_id))
-            print tmp
-            sql_total = "select count(*) from account_user where id > 100 %s" % tmp
-            print sql_total
+            prefix = ''
+            time_limit = ''
+        
+        #去掉测试用户的id
+        tmp = ' and id !='
+        tmp += ' and id !='.join(map(lambda x:str(x), test_id))
+        
+        sql_total = "select count(*) from account_user where id > 100 %s %s" % (tmp, time_limit)        
             
         cursor.execute(sql_total)
         result = cursor.fetchone()
@@ -156,14 +155,14 @@ def get_bookmark_percent_raw_data(include_test=False):
         print user_total
         
         for i in range(64):
-#                cursor.execute("select id, create_time from bookmark_bookmark_%s %s" % (i, prefix))
-            cursor.execute("select user_id, count(*) from bookmark_bookmark_%s group by user_id %s" % (i, prefix))
+            cursor.execute("select user_id, count(*), create_time from bookmark_bookmark_%s group by user_id %s" % (i, prefix))
             results = cursor.fetchall()
             for d in results:
-                if include_test or not _is_test(int(d[0])):
+                if not _is_test(int(d[0])):
+                    '''根据用户的文章数情况, 把相应的范围数+1'''
                     ret[_which_index(int(d[1]))]['count'] += 1
-        
-# TODO:     a = reduce(lambda x, y:x['count'] + y['count'], ret)
+
+# TODO: it is not work a = reduce(lambda x, y:x['count'] + y['count'], ret)
 
         user_used = 0
         for r in ret:
@@ -198,13 +197,14 @@ def get_bookmark_time_raw_data(start_time=None):
             prefix = ''
         ret = []
         for i in range(64):
-            cursor.execute("select id, create_time from bookmark_bookmark_%s %s" % (i, prefix))
+            cursor.execute("select id, create_time, user_id from bookmark_bookmark_%s %s" % (i, prefix))
             results = cursor.fetchall()
             for d in results:
                 kv = {}
                 kv['id'] = '%d_%d' % (i, int(d[0]))
                 kv['time'] = d[1]
-                ret.append(kv)
+                if not _is_test(int(d[2])):
+                    ret.append(kv)
                             
         ret.sort(key=lambda x:x['time'], reverse=True)
         return ret;
@@ -221,21 +221,25 @@ def get_bookmark_time_raw_data(start_time=None):
             if conn:
                 conn.close()
     
-def get_bookmark_per_user_raw_data(include_test=False):
+def get_bookmark_per_user_raw_data(start_time=None):
     '''为[用户收藏文章数排行]获取原始数据'''
     try:
         conn = MySQLdb.connect(**c.db_config)
         cursor = conn.cursor()
         
+        if start_time:
+            prefix = "having create_time > '%s'" % start_time
+        else:
+            prefix = ''
         ret = []
         for i in range(64):
-            cursor.execute("select user_id, count(*) from bookmark_bookmark_%s group by user_id" % i)
+            cursor.execute("select user_id, count(*), create_time from bookmark_bookmark_%s group by user_id %s" % (i, prefix))
             results = cursor.fetchall()
             for d in results:
                 kv = {}
                 kv['user_id'] = int(d[0])
                 kv['count'] = int(d[1])
-                if include_test or not _is_test(kv['user_id']):
+                if not _is_test(kv['user_id']):
                     ret.append(kv)
                             
         ret.sort(key=lambda x:x['count'], reverse=True)
@@ -379,5 +383,6 @@ if __name__ == '__main__':
 ##        tmp += 'or id='.join(str(i))
 #    print tmp        
 
-    a = tmp_raw_data()
+    a = get_bookmark_percent_raw_data('2012.06.05 16:54:10')
+#    a = tmp_raw_data()
     print a

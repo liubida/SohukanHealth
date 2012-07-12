@@ -19,27 +19,19 @@ def user_total(request):
     data = SomeTotal.objects.filter(name='user').values('time', 'count')
     return HttpResponse(someTotal_to_json(data))
 
-def user_bookmark_percent(request):
-    o = request.GET.get('includeTest', 'false')
-    if 'true' == o:
-        include_test = True
-    elif 'false' == o:
-        include_test = False
-        
-    jsondata = get_bookmark_percent(include_test)
-    return HttpResponse(jsondata)
     
 def bookmark_total(request):
     data = SomeTotal.objects.filter(name='bookmark').values('time', 'count')
     return HttpResponse(someTotal_to_json(data))
 
+def user_bookmark_percent(request):
+    o = request.GET.get('before_time', '')
+    jsondata = get_bookmark_percent(str(o))
+    return HttpResponse(jsondata)
+
 def bookmark_per_user(request):
-    o = request.GET.get('includeTest', 'false')
-    if 'true' == o:
-        include_test = True
-    elif 'false' == o:
-        include_test = False
-    jsondata = get_bookmark_per_user(include_test);
+    o = request.GET.get('start_time', '')
+    jsondata = get_bookmark_per_user(str(o))
     return HttpResponse(jsondata)
 
 def bookmark_time(request):

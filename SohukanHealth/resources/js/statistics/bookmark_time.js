@@ -69,33 +69,7 @@ var load_bookmark_time = function(params, callback) {
 			});
 };
 
-var create_link = function(url, text, value) {
-	var a = document.createElement('a');
-	var a_text = document.createTextNode(text);
-
-	a.setAttribute('href', url);
-	a.setAttribute('value', value);
-	addClass(a, 'normal_a');
-
-	a.onclick = function() {
-		var t = a.firstChild;
-		var old_nodeValue = t.nodeValue;
-		t.nodeValue = '请求数据中';
-
-		load_bookmark_time({
-					start_time : this.getAttribute('value')
-				}, function() {
-					t.nodeValue = old_nodeValue;
-				});
-		return false;
-	};
-
-	a.appendChild(a_text);
-
-	return a;
-};
-
-var create_ul = function() {
+var create_ul_for_time = function() {
 	var today = new Date();
 	var tmp = new Date();
 	var time_array = [{
@@ -128,7 +102,19 @@ var create_ul = function() {
 		var li = document.createElement('li');
 		addClass(li, 'heng_li');
 
-		var a = create_link(i, time_array[i]['text'], time_array[i]['value']);
+		var a = create_link(i, time_array[i]['text'], time_array[i]['value'],
+				function() {
+					var t = this.firstChild;
+					var old_nodeValue = t.nodeValue;
+					t.nodeValue = '请求数据中';
+
+					load_bookmark_time({
+								start_time : this.getAttribute('value')
+							}, function() {
+								t.nodeValue = old_nodeValue;
+							});
+					return false;
+				});
 		li.appendChild(a);
 		ul.appendChild(li)
 	}
@@ -141,7 +127,7 @@ var prepare_bookmark_time = function() {
 	var link_div = document.createElement('div');
 	link_div.style.float = 'left';
 
-	var ul = create_ul();
+	var ul = create_ul_for_time();
 	link_div.appendChild(ul)
 	insertAfter(link_div, div);
 	load_bookmark_time(null, null);
