@@ -9,8 +9,6 @@ import syslog
 
 
 class SyslogHandler(logging.Handler, object):
-    def __init__(self):
-        logging.Handler.__init__(self)
 
     def emit(self, record):
         r = str(record)

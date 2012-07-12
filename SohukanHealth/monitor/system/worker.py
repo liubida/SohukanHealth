@@ -9,6 +9,8 @@ from exception import MonitorException
 from lxml import etree
 from monitor.system.s3.mod_storage_helper import get_expire_data_url
 from util import mytimer, request
+from util.random_spider import RandomSpider
+import datetime
 import threading
 import time
 import urllib
@@ -44,40 +46,32 @@ class add_worker():
     @mytimer
     def add(self):
         self._add_bookmark()
-        add_result = self._check_add()
-        if not add_result:
-            raise MonitorException('add_bookmark_error, url:%s' % self.url)
-    
-    def _check_add(self):
-        '''
-        create a thread to test whether the page is added successful
-        '''
-        self.result = False
-        self.flag = True
-        read_thread = threading.Thread(target=self._get_bookmark, args=(self.url, self.cookie))
-        read_thread.start()
-        
-        self.event.wait(c.add_time_limit)
-        self.flag = False
-        return self.result            
-        
-    def _get_bookmark(self, check_url, cookie):
+        expire_time = datetime.datetime.now() + datetime.timedelta(seconds=c.add_time_limit)
+        while True:
+            add_result = self._check_bookmark(self.url, self.cookie)
+
+            if expire_time < datetime.datetime.now():
+                raise MonitorException('add_bookmark_timeout, url:%s' % self.url)
+            
+            if add_result : 
+                break
+                
+            time.sleep(0.5)
+
+    def _check_bookmark(self, check_url, cookie):
         url_bookmarks_list = "http://kan.sohu.com/api/2/bookmarks/list/";
         data = urllib.urlencode({"order_by":"-create_time", "limit":1, "submit":"提交"});
-        while self.flag:
+        try:
             response = request(url_bookmarks_list, data, cookie);
             s = response.read()
             
             node = etree.fromstring(s, parser=etree.XMLParser(remove_blank_text=True))
             bookmark = node.find('bookmark')
             bookmark_url = bookmark.findtext('url')
-            if bookmark_url == check_url:
-                self.result = True
-                self.event.set()
-                return
-            else:
-                time.sleep(1)
-        print 'interrupt'
+            return bookmark_url == check_url
+        except Exception, e:
+            c.logger.error(e)
+            return False
     
     def _add_bookmark(self):
         url_add = "http://kan.sohu.com/api/2/bookmarks/add/"
@@ -190,17 +184,17 @@ class read_worker():
 
 if __name__ == '__main__':
     cookie = ["Cookie", "access_token = eeeb8e686a2a148de62b2352ea88b9c6d4b8bd24"]
-#    for i in range(20):
-#        url = RandomSpider().get_valid_url()
-#        print url
-#        a = add_worker(url, cookie)
-#        try:
-#            a.test()
-#            time.sleep(4)
-#        except Exception, e:
-#            print e
-#        print '...'
+    for i in range(20):
+        url = RandomSpider().get_valid_url()
+        print url
+        a = add_worker(url, cookie)
+        try:
+            a.test()
+            time.sleep(4)
+        except Exception, e:
+            print e
+        print '...'
 
-    b = read_worker(cookie)
-    print b.test()
+#    b = read_worker(cookie)
+#    print b.test()
     
