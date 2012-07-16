@@ -46,12 +46,7 @@ def index(request):
 def about(request):
     t = loader.get_template('about.html')
     c = Context()
-    return HttpResponse(t.render(c))
-
-def sched(request):
-    from timer import JobSchedule
-    ret = JobSchedule.start_job()
-    return HttpResponse(ret)        
+    return HttpResponse(t.render(c)) 
 
 def logtest(request):
     a = random.randint(0, 10)
