@@ -4,8 +4,9 @@ from django.conf.urls import patterns
 from djangorestframework.views import ListOrCreateModelView
 from monitor.views import read, add, monitor
 from statistics.views import user_total, user_bookmark_percent, bookmark_total, \
-    statistics, bookmark_per_user, bookmark_time, day_report, bookmark_percent, \
-    bookmark_website
+    statistics, bookmark_per_user, bookmark_time
+#    , day_report, bookmark_percent, \
+#    bookmark_website
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -24,9 +25,9 @@ urlpatterns = patterns('',
                        (r'^statistics/bookmark/per_user$', bookmark_per_user),
                        (r'^statistics/bookmark/time$', bookmark_time),
                        (r'^statistics/$', statistics),
-                       (r'^statistics/day_report$', day_report),
-                       (r'^statistics/day_report/bookmark_percent$', bookmark_percent),
-                       (r'^statistics/day_report/bookmark_website$', bookmark_website),
+#                       (r'^statistics/day_report$', day_report),
+#                       (r'^statistics/day_report/bookmark_percent$', bookmark_percent),
+#                       (r'^statistics/day_report/bookmark_website$', bookmark_website),
                        (r'^all/$', index),
                        (r'^about/$', about),
                        (r'^logtest/$', logtest),
