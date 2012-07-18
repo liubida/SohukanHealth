@@ -1,0 +1,110 @@
+body {
+	font-family: Tahoma, Arial, Verdana;
+	font-size: 16px;
+	color: black;
+}
+
+div {
+	margin: 2px;
+}
+
+table {
+	border-collapse: collapse;
+	border: solid #000;
+	border-width: 1px 0 0 1px;
+	margin: 5px;
+}
+
+table th,table td {
+	border: solid #000;
+	border-width: 0 1px 1px 0;
+	padding: 5px;
+	text-align: center;
+}
+
+a:visited {
+	color: #035A87
+}
+
+a:hover {
+	color: #F60;
+	text-decoration: underline;
+}
+
+.clearfix:after {
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+
+.clearfix {
+	*zoom: 1;
+}
+
+.container {
+	margin: 10 auto;
+	width: 1200px;
+	height: 1650px;
+}
+
+.right_navigate {
+	float: right;
+	width: 80px;
+	height: 600px;
+	margin: 5px;
+}
+
+.grid {
+	float: left;
+	width: 520px;
+	height: 325px;
+	margin: 5px 10px 15px 10px;
+}
+
+.grid_item {
+	width: 98%;
+	height: 95%;
+	margin: 2px;
+}
+
+.day_report_div {
+	display: block;
+}
+
+.firstPage,.lastPage,.prevPage,.nextPage,.morePages,.pageNum,.currentPage
+	{
+	margin: 2px;
+	/*background-image: url(../images/sprite_skin.png);*/
+	background-repeat: no-repeat;
+	text-align: center;
+}
+
+.pageNum {
+	padding: 1px 0;
+	border: 1px solid #C8E7F7;
+	width: 40px;
+	/*background-position: 0 -1200px;*/
+}
+
+.currentPage {
+	padding: 1px 0;
+	border: 1px solid #F60;
+	width: 40px;
+	color: #F60;
+	font-weight: bolder;
+	/*background-position: 0 -1216px;*/
+}
+
+.normal_a {
+	margin: 2px 10px 2px 10px;
+}
+
+.heng_li {
+	display: inline;
+	padding-right: 8px;
+	padding-left: 8px;
+	/*border-style: none solid none solid;
+	border-width: 1px;*/
+}

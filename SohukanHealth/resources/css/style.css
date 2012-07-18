@@ -1,26 +1,55 @@
-body {
-	font-family: Tahoma, Arial, Verdana;
-	font-size: 16px;
-	color: black;
+#day_report_date {
+	height: 20px;
 }
 
-.container {
-	margin: 10 auto;
-	width: 1200px;
-	height: 650px;
+#day_report_date a {
+	display: block;
+	float: left;
+	display: inline;
+	font-size: 12px;
 }
 
-.grid {
+#day_report_abstract{
+	width:1000px;
+	height:150px;
+}
+
+#day_report_user{
+	float:left;
+	width: 300px;
+}
+
+#day_report_bookmark{
+	float:left;
+	width: 600px;
+}
+
+#day_report_2{
+	height:300px;
+}
+
+#user_bookmark_percent_day_report_div {
+	float: left;
+	width: 400px;
+	height: 250px;
+}
+
+#user_bookmark_percent_day_report_raw_div {
+	float: left;
+	width: 400px;
+	height: 250px;
+}
+
+#user_bookmark_website_day_report_div {
 	float: left;
 	width: 550px;
-	height: 325px;
-	margin: 5px 10px 15px 10px;
+	height: 350px;
 }
 
-.grid_item {
-	width: 98%;
-	height: 95%;
-	margin: 2px;
+#user_bookmark_website_day_report_raw_div {
+	float: left;
+	width: 400px;
+	height: 350px;
 }
 
 .normal_a {

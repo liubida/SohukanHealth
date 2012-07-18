@@ -37,15 +37,15 @@ var myAjax = function(url, params, callback) {
 				},
 				success : function(data, textStatus) {
 					jsonData = jQuery.parseJSON(data)
-					if (jsonData.success == true) {
-						callback(jsonData);
-					} else {
-						alert('failed', "info:" + jsonData.info + " ,code:"
-										+ jsonData.code);
-					}
+					// if (jsonData.success == true) {
+					callback(jsonData);
+					// } else {
+					// alert('failed', "info:" + jsonData.info + " ,code:"
+					// + jsonData.code);
+					// }
 				},
 				error : function(XMLHttpRequest, textStatus, errorThrown) {
-					alert('没有响应', '服务器没有响应');
+					// alert('没有响应', '服务器没有响应');
 				}
 			});
 };
@@ -69,12 +69,23 @@ function addClass(element, value) {
 	}
 };
 
-function clearElement(element){
+function clearElement(element) {
 	var child_nodes = element.childNodes;
 
 	if (child_nodes) {
-		for (var i = 0; i < child_nodes.length; i++) {
+		for (var i = child_nodes.length - 1; i >= 0; i--) {
 			element.removeChild(child_nodes[i]);
+		}
+	}
+};
+function addLoadEvent(func) {
+	var old_onload = window.onload;
+	if (typeof old_onload != 'function') {
+		window.onload = func;
+	} else {
+		window.onload = function() {
+			old_onload();
+			func();
 		}
 	}
 };
@@ -92,7 +103,7 @@ var create_link = function(url, text, value, onclick) {
 	if (onclick && typeof onclick == 'function') {
 		a.onclick = onclick
 	}
-	
+
 	a.appendChild(a_text);
 	return a;
 };

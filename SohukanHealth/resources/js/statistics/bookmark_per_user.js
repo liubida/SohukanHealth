@@ -75,27 +75,27 @@ var create_ul_for_per_user = function() {
 	var time_array = [{
 		'text' : '昨天',
 		'value' : tmp.setDate(today.getDate() - 1) ? tmp
-				.format('yyyy.MM.dd hh:mm:ss') : null
+				.format('yyyy.MM.dd') : null
 	}, {
 		'text' : '7天',
 		'value' : tmp.setDate(today.getDate() - 7) ? tmp
-				.format('yyyy.MM.dd hh:mm:ss') : null
+				.format('yyyy.MM.dd') : null
 	}, {
 		'text' : '30天',
 		'value' : tmp.setMonth(today.getMonth() - 1) ? tmp
-				.format('yyyy.MM.dd hh:mm:ss') : null
+				.format('yyyy.MM.dd') : null
 	}, {
 		'text' : '3个月',
 		'value' : tmp.setMonth(today.getMonth() - 3) ? tmp
-				.format('yyyy.MM.dd hh:mm:ss') : null
+				.format('yyyy.MM.dd') : null
 	}, {
 		'text' : '6个月',
 		'value' : tmp.setMonth(today.getMonth() - 6) ? tmp
-				.format('yyyy.MM.dd hh:mm:ss') : null
+				.format('yyyy.MM.dd') : null
 	}, {
 		'text' : '1年',
 		'value' : tmp.setFullYear(today.getFullYear() - 1) ? tmp
-				.format('yyyy.MM.dd hh:mm:ss') : null
+				.format('yyyy.MM.dd') : null
 	}];
 	var ul = document.createElement('ul');
 	for (var i = 0; i < time_array.length; i++) {

@@ -8,10 +8,15 @@ Created on Jun 7, 2012
 from config.config import c
 from monitor.models import AppAvailableData, SomeTotal
 from monitor.system.worker import add_worker, read_worker
+from statistics.biz import get_userdata_for_day_report, \
+    get_bookmarkdata_for_day_report, get_bookmark_website_raw_data, \
+    get_bookmark_percent_raw_data, test_id, _is_test
+from statistics.models import DayReport
 from timer.sms import sms
 from util import print_info
 from util.random_spider import RandomSpider
 import MySQLdb
+import anyjson
 import datetime
 
 @print_info(name='read_job')
@@ -39,7 +44,12 @@ def user_total_job():
         # TODO: there should be a dbhelper
         conn = MySQLdb.connect(**c.db_config)
         cursor = conn.cursor()
-        cursor.execute('select count(*) from account_user')
+
+        #去掉测试用户的id
+        tmp = ' where id > 100 and id !='
+        tmp += ' and id !='.join(map(lambda x:str(x), test_id))
+        print tmp
+        cursor.execute('select count(*) from account_user %s' % tmp)
         result = cursor.fetchone()
         now = datetime.datetime.now()
         data = SomeTotal(name='user', time=now, count=result[0])
@@ -65,9 +75,13 @@ def bookmark_total_job():
         cursor = conn.cursor()
         sum = 0
         for i in range(64):
-            cursor.execute ("select count(*) from bookmark_bookmark_%s" % i)
-            result = cursor.fetchone()
-            sum += result[0]
+            cursor.execute ("select user_id, count(*) from bookmark_bookmark_%s group by user_id" % i)
+            results = cursor.fetchall()
+            for d in results:
+                user_id = int(d[0])
+                count = int(d[1])
+                if not _is_test(user_id):
+                    sum += count
         now = datetime.datetime.now()
         data = SomeTotal(name='bookmark', time=now, count=sum)
         data.save()
@@ -95,7 +109,6 @@ def add_and_read_alarm_job():
     add_failure_data = AppAvailableData.objects.filter(name='add', result=False, time__gte=start_time).count()
     read_failure_data = AppAvailableData.objects.filter(name='read', result=False, time__gte=start_time).count()
     
-    max_count = 2
     if add_failure_data >= 3 or read_failure_data >= 5:
         msg = 'add bookmark failure count(30min):%s' % str(add_failure_data)
         msg += '\nread bookmark failure count(30min):%s' % str(read_failure_data)
@@ -103,55 +116,38 @@ def add_and_read_alarm_job():
         c.logger.error(msg)
         print msg
 
-#sms(mobile_list=None, message_post=None)
-
-
-"select * from app_available_data where result=0 and gmt_create > '2012-07-04 18:20:00' and gmt_create < '2012-07-05 09:25:00'"
-
+@print_info(name='day_report_job')
+def day_report_job():
+    '''day_report created at 23:58:00'''
+    
+    # 今天
+    now = datetime.datetime.now()
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    today_end = now.replace(hour=23, minute=59, second=59, microsecond=0)
+    
+    user = get_userdata_for_day_report(today_start,today_end);
+    bookmark = get_bookmarkdata_for_day_report(today_start,today_end);
+    
+    bookmark_count = {}
+    bookmark_count['percent'], bookmark_count['data'] = get_bookmark_percent_raw_data(today_start, today_end)
+    
+    bookmark_website = {}
+    bookmark_website['data'] = get_bookmark_website_raw_data(today_start, today_end)
+    
+    jsondata = {}
+    jsondata['user'] = user
+    jsondata['bookmark'] = bookmark
+    jsondata['bookmark_website'] = bookmark_website
+    jsondata['bookmark_count'] = bookmark_count
+    
+    day_report = DayReport(time=datetime.datetime.now(), version=c.day_report_version, jsondata=anyjson.dumps(jsondata))
+    day_report.save();
+    
         
 if __name__ == '__main__':
+    day_report_job()
 #    mysql_ping_job();
 #    user_total_job()
 #    bookmark_total_job()
-    add_and_read_alarm_job()
+#    add_and_read_alarm_job()
 #    url = RandomSpider().get_valid_url()
-#        
-#    add = add_worker(url, c.cookie)
-#    add_value = add.test()
-    
-#    read = read_worker(c.cookie)
-#    read_value = read.test()
-#    monitor_read(c.cookie)
-    
-
-
-#def user_register_job():
-#    try:
-#        now = datetime.datetime.now()
-#        min_time = now - datetime.timedelta(minutes=12)
-#        delta = UserTotal.objects.filter(time__gte=min_time, time__lte=now)
-#        delta = delta.count()
-#        if delta > 0:
-#            data = 
-#        conn = config.conn;
-#        cursor = conn.cursor()
-#        cursor.execute('select passport_userid from account_user where gmt_create > ')
-#        count = cursor.fetchone()
-#        data = RegisterUser(passport=)
-#    data = AppAvailableData(name='add', category='', result=value.get('result', False), \
-#                            time=datetime.datetime.now(), time_used=value.get('time_used', constant.add_time_limit), comments=url)
-#    data.save()
-#        
-#        
-#        print 'count:', count[0]
-#    except JobException, e:
-#        logger.error(e)
-#    finally:
-#        try:
-#            if cursor:
-#                cursor.close()
-#        except JobException, e:
-#            logger.error(e)
-#        finally:
-#            if conn:
-#                conn.close()

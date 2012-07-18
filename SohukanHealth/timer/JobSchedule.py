@@ -16,8 +16,8 @@ from SohukanHealth import settings
 print settings
 setup_environ(settings)
 
-from monitor.system.job import add_job, read_job, user_total_job, \
-    bookmark_total_job, add_and_read_alarm_job
+from job import add_job, read_job, user_total_job, \
+    bookmark_total_job, add_and_read_alarm_job, day_report_job
 
 #class Sched(object):
 #    def __init__(self):
@@ -82,6 +82,7 @@ if __name__ == '__main__':
         elif method_name == 'add_and_read_alarm_job': add_and_read_alarm_job()
         elif method_name == 'user_total_job': user_total_job()
         elif method_name == 'bookmark_total_job': bookmark_total_job()
+        elif method_name == 'day_report_job': day_report_job()
         else: pass
 
 #  */5  *  *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py add_job
