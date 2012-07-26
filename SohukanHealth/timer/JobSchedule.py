@@ -4,20 +4,21 @@ Created on Jun 13, 2012
 @author: liubida
 '''
 
-from SohukanHealth import settings
-from django.core.management import setup_environ
-from job import add_job, read_job, user_total_job, bookmark_total_job, \
-    add_and_read_alarm_job, day_report_job
-from timer.job import fix_ua_job
-import os
 import sys
+import os
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print root_path
 sys.path.append(root_path)
 print sys.path
 
+from django.core.management import setup_environ
+from SohukanHealth import settings
 print settings
 setup_environ(settings)
+
+from job import add_job, read_job, user_total_job, \
+    bookmark_total_job, add_and_read_alarm_job, day_report_job,fix_ua_job
+
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
