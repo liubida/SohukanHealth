@@ -7,6 +7,7 @@ var make_bookmark_website_chart = function(chartData) {
 	chart.dataProvider = chartData;
 	chart.categoryField = "domain";
 	chart.startDuration = 1;
+	chart.addTitle('文章来源网站', 20);
 
 	// AXES
 	// category
