@@ -1,5 +1,5 @@
-var make_bookmark_time_chart = function(chartData) {
-	var e = document.getElementById('bookmark_time_div')
+var make_bookmark_time_chart = function(chartData, radio_type) {
+	var e = document.getElementById('statistics_bookmark_time_div')
 	clearElement(e);
 
 	// SERIAL CHART
@@ -7,7 +7,7 @@ var make_bookmark_time_chart = function(chartData) {
 	chart.dataProvider = chartData;
 	chart.categoryField = "hour";
 	chart.startDuration = 1;
-	chart.addTitle('添加文章数/分时段', 20);
+	chart.addTitle('收藏文章时段统计', 20);
 
 	// AXES
 	// category
@@ -19,33 +19,62 @@ var make_bookmark_time_chart = function(chartData) {
 	categoryAxis.fillColor = "#FAFAFA";
 	categoryAxis.gridPosition = "start";
 
-	// value
-	var valueAxis = new AmCharts.ValueAxis();
-	valueAxis.dashLength = 5;
-	valueAxis.title = "bookmark num"
-	valueAxis.axisAlpha = 0;
-	chart.addValueAxis(valueAxis);
+	// value1
+	var valueAxis1 = new AmCharts.ValueAxis();
+	valueAxis1.dashLength = 5;
+	valueAxis1.title = "num"
+	valueAxis1.axisAlpha = 0;
+	chart.addValueAxis(valueAxis1);
+
+	// value2
+	var valueAxis2 = new AmCharts.ValueAxis();
+	valueAxis2.position = "right";
+	valueAxis2.axisColor = "#FCD202";
+	valueAxis2.gridAlpha = 0;
+	valueAxis2.axisThickness = 1;
+	chart.addValueAxis(valueAxis2);
 
 	// GRAPH
-	var graph = new AmCharts.AmGraph();
-	graph.valueField = "count";
-	graph.colorField = "color";
-	graph.balloonText = "[[category]]: [[value]]";
-	graph.type = "column";
-	graph.lineAlpha = 0;
-	graph.fillAlphas = 1;
-	chart.addGraph(graph);
+	var graph1 = new AmCharts.AmGraph();
+	graph1.valueField = "count";
+	graph1.colorField = "color";
+	graph1.balloonText = "[[category]]: [[value]]";
+	graph1.type = "column";
+	graph1.lineAlpha = 0;
+	graph1.fillAlphas = 1;
+	chart.addGraph(graph1);
+
+	// second graph
+	var graph2 = new AmCharts.AmGraph();
+	graph2.title = "yellow line";
+	graph2.valueField = "percent";
+	graph2.bullet = "round";
+	graph2.valueAxis = valueAxis2;
+	graph2.hideBulletsCount = 50;
+	if (radio_type == 1) {
+		chart.addGraph(graph2);
+	}
 
 	// WRITE
-	chart.write("bookmark_time_div");
+	chart.write(e.getAttribute('id'));
 };
 
 var load_bookmark_time = function(params, callback) {
 	url = '/statistics/bookmark/time';
 
-	var e = document.getElementById('bookmark_time_div')
-	clearElement(e);
+	var from = $("#statistics_bookmark_time_from").val()
+	var to = $("#statistics_bookmark_time_to").val()
+	var radio_type = parseInt($("#table_bookmark_time :radio:checked").val(),
+			10);
 
+	var date_range = get_date_range(from, to);
+	params = {
+		start_time : date_range.start_time,
+		end_time : date_range.end_time
+	};
+
+	var e = document.getElementById('statistics_bookmark_time_div')
+	clearElement(e);
 	var loading = document.createElement('p')
 	var loading_text = document.createTextNode('数据加载中...')
 	loading.appendChild(loading_text);
@@ -59,80 +88,51 @@ var load_bookmark_time = function(params, callback) {
 					chartData.push({
 								hour : data[i].hour,
 								count : data[i].count,
-								color : data[i].color
+								color : data[i].color,
+								percent : data[i].percent
 							});
 				}
-				make_bookmark_time_chart(chartData);
+				make_bookmark_time_chart(chartData, radio_type);
+				prepare_bookmark_time.chartData = chartData;
 				if (callback && typeof callback == 'function') {
 					callback();
 				}
 			});
 };
-
-var create_ul_for_time = function() {
-	var today = new Date();
-	var tmp = new Date();
-	var time_array = [{
-		'text' : '昨天',
-		'value' : tmp.setDate(today.getDate() - 1) ? tmp
-				.format('yyyy.MM.dd hh:mm:ss') : null
-	}, {
-		'text' : '7天',
-		'value' : tmp.setDate(today.getDate() - 7) ? tmp
-				.format('yyyy.MM.dd hh:mm:ss') : null
-	}, {
-		'text' : '30天',
-		'value' : tmp.setMonth(today.getMonth() - 1) ? tmp
-				.format('yyyy.MM.dd hh:mm:ss') : null
-	}, {
-		'text' : '3个月',
-		'value' : tmp.setMonth(today.getMonth() - 3) ? tmp
-				.format('yyyy.MM.dd hh:mm:ss') : null
-	}, {
-		'text' : '6个月',
-		'value' : tmp.setMonth(today.getMonth() - 6) ? tmp
-				.format('yyyy.MM.dd hh:mm:ss') : null
-	}, {
-		'text' : '1年',
-		'value' : tmp.setFullYear(today.getFullYear() - 1) ? tmp
-				.format('yyyy.MM.dd hh:mm:ss') : null
-	}];
-	var ul = document.createElement('ul');
-	for (var i = 0; i < time_array.length; i++) {
-		var li = document.createElement('li');
-		addClass(li, 'heng_li');
-
-		var a = create_link(i, time_array[i]['text'], time_array[i]['value'],
-				function() {
-					var t = this.firstChild;
-					var old_nodeValue = t.nodeValue;
-					t.nodeValue = '请求数据中';
-
-					load_bookmark_time({
-								start_time : this.getAttribute('value')
-							}, function() {
-								t.nodeValue = old_nodeValue;
-							});
-					return false;
-				});
-		li.appendChild(a);
-		ul.appendChild(li)
-	}
-	return ul;
-};
-
 var prepare_bookmark_time = function() {
-	var div = document.getElementById('bookmark_time_div');
+	$("#statistics_bookmark_time_from").datepicker({
+		changeMonth : true,
+		numberOfMonths : 2,
+		dateFormat : "yy-mm-dd",
+		onSelect : function(selectedDate) {
+			$("#statistics_bookmark_time_to").datepicker("option", "minDate",
+					selectedDate);
+		}
+	});
+	$("#statistics_bookmark_time_to").datepicker({
+				changeMonth : true,
+				numberOfMonths : 2,
+				dateFormat : "yy-mm-dd"
+			});
+	$("#table_bookmark_time :radio").change(function() {
+		if (prepare_bookmark_time.chartData) {
+			var radio_type = parseInt($("#table_bookmark_time :radio:checked")
+							.val(), 10);
+			make_bookmark_time_chart(prepare_bookmark_time.chartData,
+					radio_type);
+		} else {
+			load_bookmark_time();
+		}
+	});
+	$("#table_bookmark_time #submit").click(load_bookmark_time);
+	$("#table_bookmark_time #reset").click(function() {
+				$("#statistics_bookmark_time_from").val('');
+				$("#statistics_bookmark_time_to").val('');
+			});
 
-	var link_div = document.createElement('div');
-	link_div.style.float = 'left';
-
-	var ul = create_ul_for_time();
-	link_div.appendChild(ul)
-	insertAfter(link_div, div);
-	load_bookmark_time(null, null);
+	load_bookmark_time();
 };
 
-AmCharts.ready(function() {
+$(document).ready(function() {
 			prepare_bookmark_time();
 		});

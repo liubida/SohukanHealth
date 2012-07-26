@@ -1,8 +1,8 @@
 {% extends "statistics/statistics_base.html" %} {% block title %} 统计信息
 {% endblock %} {% block content1 %}
-<div id="day_report_date">内测阶段, 数据仅供参考</div>
+<div id="day_report_date">敬请期待</div>
 
-<div id="day_report_content">
+<div id="day_report_content" style="display:none">
 	<div class="clearfix" style="height:120px;">
 			<h2>1. 用户数</h2>
 			<table>
@@ -49,10 +49,10 @@
 	</div>
 	{% endblock %} {% block js%}
 	<script type="text/javascript"
-		src="/static/js/statistics/day_report/day_report.js"></script>
-	<script type="text/javascript"
+		src="/static/js/statistics/week_report/week_report.js"></script>
+	<!-- script type="text/javascript"
 		src="/static/js/statistics/day_report/user_bookmark_percent_day_report.js"></script>
 	<script type="text/javascript"
 		src="/static/js/statistics/day_report/user_bookmark_website_day_report.js"></script>
-
+ -->
 	{% endblock %}

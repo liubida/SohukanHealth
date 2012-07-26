@@ -1,7 +1,7 @@
-var make_bookmark_total_chart = function(chartData) {
-	var e = document.getElementById('bookmark_total_div')
+var make_bookmark_total_chart = function(chartData, radio_type) {
+	var e = document.getElementById('statistics_bookmark_total')
 	clearElement(e);
-	
+
 	// SERIAL CHART
 	var chart = new AmCharts.AmSerialChart();
 	chart.pathToImages = "/static/images/";
@@ -12,16 +12,12 @@ var make_bookmark_total_chart = function(chartData) {
 	chart.dataProvider = chartData;
 	chart.categoryField = "date";
 
-	// listen for "dataUpdated" event (fired when chart is rendered) and call
-	// zoomChart method when it happens
-	chart.addListener("dataUpdated", function() {
-				// different zoom methods can be used - zoomToIndexes,
-				// zoomToDates,
-				// zoomToCategoryValues
-				chart
-						.zoomToIndexes(chartData.length - 48, chartData.length
-										- 1);
-			});
+	if (chartData.length > 300) {
+		chart.addListener("dataUpdated", function() {
+					chart.zoomToIndexes(chartData.length - 100,
+							chartData.length - 1);
+				});
+	}
 	chart.addTitle('添加文章数', 20);
 
 	// AXES
@@ -37,27 +33,45 @@ var make_bookmark_total_chart = function(chartData) {
 	// categoryAxis.labelsEnabled=false;
 	categoryAxis.labelFrequency = 0.1;
 
-	// value
-	var valueAxis = new AmCharts.ValueAxis();
-	valueAxis.axisAlpha = 0.2;
-	valueAxis.dashLength = 1;
-	chart.addValueAxis(valueAxis);
+	// value1
+	var valueAxis1 = new AmCharts.ValueAxis();
+	valueAxis1.axisAlpha = 0.2;
+	valueAxis1.dashLength = 1;
+	chart.addValueAxis(valueAxis1);
+
+	// value2
+	var valueAxis2 = new AmCharts.ValueAxis();
+	valueAxis2.position = "right";
+	valueAxis2.axisColor = "#FCD202";
+	valueAxis2.gridAlpha = 0;
+	valueAxis2.axisThickness = 1;
+	chart.addValueAxis(valueAxis2);
 
 	// GRAPH
-	var graph = new AmCharts.AmGraph();
-	graph.title = "red line";
-	graph.valueField = "count";
-	graph.bullet = "round";
-	graph.bulletBorderColor = "#FFFFFF";
-	graph.bulletBorderThickness = 2;
-	graph.lineThickness = 2;
-	graph.lineColor = "#b5030d";
-	graph.negativeLineColor = "#0352b5";
-	graph.hideBulletsCount = 50; // this makes the chart to hide bullets when
-	// there are more than 50 series in
-	// selection
-	graph.negativeBase = 0
-	chart.addGraph(graph);
+	var graph1 = new AmCharts.AmGraph();
+	graph1.valueAxis = valueAxis1;
+	graph1.title = "red line";
+	graph1.valueField = "count";
+	graph1.bullet = "round";
+	graph1.bulletBorderColor = "#FFFFFF";
+	graph1.bulletBorderThickness = 2;
+	graph1.lineThickness = 3;
+	graph1.lineColor = "#b5030d";
+	graph1.negativeLineColor = "#0352b5";
+	graph1.hideBulletsCount = 50;
+	graph1.negativeBase = 0
+	chart.addGraph(graph1);
+
+	// second graph
+	var graph2 = new AmCharts.AmGraph();
+	graph2.title = "yellow line";
+	graph2.valueField = "inc";
+	graph2.bullet = "round";
+	graph2.valueAxis = valueAxis2;
+	graph2.hideBulletsCount = 50;
+	if (radio_type == 1) {
+		chart.addGraph(graph2);
+	}
 
 	// CURSOR
 	var chartCursor = new AmCharts.ChartCursor();
@@ -67,18 +81,39 @@ var make_bookmark_total_chart = function(chartData) {
 
 	// SCROLLBAR
 	var chartScrollbar = new AmCharts.ChartScrollbar();
-	chartScrollbar.graph = graph;
+	chartScrollbar.graph = graph1;
 	chartScrollbar.scrollbarHeight = 40;
 	chartScrollbar.color = "#FFFFFF";
 	chartScrollbar.autoGridCount = true;
 	chart.addChartScrollbar(chartScrollbar);
 
 	// WRITE
-	chart.write("bookmark_total_div");
+	chart.write(e.getAttribute('id'));
 };
 
 var load_bookmark_total = function(params, callback) {
 	url = '/statistics/bookmark/total'
+
+	var from = $("#statistics_bookmark_total_from").val()
+	var to = $("#statistics_bookmark_total_to").val()
+
+	var date_range = get_date_range(from, to);
+	var data_grain = $("#table_bookmark_total #data_grain").val();
+	var radio_type = parseInt($("#table_bookmark_total :radio:checked").val(),
+			10);
+
+	params = {
+		start_time : date_range.start_time,
+		end_time : date_range.end_time,
+		data_grain : data_grain
+	};
+
+	var e = document.getElementById('statistics_bookmark_total');
+	clearElement(e);
+	var loading = document.createElement('p')
+	var loading_text = document.createTextNode('数据加载中...')
+	loading.appendChild(loading_text);
+	e.appendChild(loading);
 
 	myAjax(url, params, function(obj) {
 				if (callback && typeof callback == 'function') {
@@ -89,14 +124,51 @@ var load_bookmark_total = function(params, callback) {
 				chartData = [];
 				for (var i = 0; i < len; i++) {
 					chartData.push({
-								date : chart_date_handler(data[i].time),
-								count : data[i].count
+								date : data[i].time,
+								count : data[i].count,
+								inc : data[i].inc
 							});
 				}
-				make_bookmark_total_chart(chartData);
+				make_bookmark_total_chart(chartData, radio_type);
+				prepare_bookmark_total.chartData = chartData;
 			});
 };
 
-AmCharts.ready(function() {
-			load_bookmark_total(null, null);
-		});
+var prepare_bookmark_total = function() {
+	$("#statistics_bookmark_total_from").datepicker({
+		changeMonth : true,
+		numberOfMonths : 2,
+		dateFormat : "yy-mm-dd",
+		onSelect : function(selectedDate) {
+			$("#statistics_bookmark_total_to").datepicker("option", "minDate",
+					selectedDate);
+		}
+	});
+	$("#statistics_bookmark_total_to").datepicker({
+				changeMonth : true,
+				numberOfMonths : 2,
+				dateFormat : "yy-mm-dd"
+			});
+	$("#table_bookmark_total #data_grain").change(load_bookmark_total);
+	$("#table_bookmark_total :radio").change(function() {
+
+		if (prepare_bookmark_total.chartData) {
+			var radio_type = parseInt($("#table_bookmark_total :radio:checked")
+							.val(), 10);
+			make_bookmark_total_chart(prepare_bookmark_total.chartData,
+					radio_type);
+		} else {
+			load_bookmark_total();
+		}
+	});
+	$("#table_bookmark_total #bookmark_total_submit")
+			.click(load_bookmark_total);
+	$("#table_bookmark_total #reset").click(function() {
+				$("#statistics_bookmark_total_from").val('');
+				$("#statistics_bookmark_total_to").val('');
+			});
+	load_bookmark_total();
+};
+$(document).ready(function() {
+			prepare_bookmark_total();
+		});		

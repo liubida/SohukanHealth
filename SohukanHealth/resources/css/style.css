@@ -5,27 +5,7 @@
 #day_report_date a {
 	display: block;
 	float: left;
-	display: inline;
 	font-size: 12px;
-}
-
-#day_report_abstract{
-	width:1000px;
-	height:150px;
-}
-
-#day_report_user{
-	float:left;
-	width: 300px;
-}
-
-#day_report_bookmark{
-	float:left;
-	width: 600px;
-}
-
-#day_report_2{
-	height:300px;
 }
 
 #user_bookmark_percent_day_report_div {
@@ -74,6 +54,16 @@
 	padding-left: 8px;
 	border-style: none solid none solid;
 	border-width: 1px;
+}
+
+.table_1 {
+	border-width: 0px;
+	margin: 2px;
+}
+
+.table_1 th,.table_1 td {
+	border-width: 0;
+	text-align: left;
 }
 
 .heng_li {

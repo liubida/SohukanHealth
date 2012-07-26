@@ -1,4 +1,6 @@
+import anyjson
 import datetime
+import urllib
 import urllib2
 
 def mytimer(func):
@@ -32,6 +34,21 @@ def request(url, data=None, cookie=None):
     except Exception, e:
         raise e
 
+def query_ua(ua_string):
+    ua_query_url = 'http://www.useragentstring.com'
+    data = urllib.urlencode({"uas":ua_string, "getJSON":"agent_type-agent_name-os_type"});
+    try:
+        response = request(ua_query_url, data);
+        
+        if response.code == 200:
+            s = response.read()
+            j = anyjson.loads(s)
+            return j
+        else:
+            return None 
+    except Exception, e:
+        raise e
+    
 def get_date_and_time():
     day_format = "%Y.%m.%d"
     time_format = "%H:%M:%S"

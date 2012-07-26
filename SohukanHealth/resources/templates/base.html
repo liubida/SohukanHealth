@@ -4,6 +4,8 @@
 <title>{% block title %} 标题 {% endblock %}</title>
 <link rel="stylesheet" href="/static/css/common.css">
 <link rel="stylesheet" href="/static/css/style.css">
+<link rel="stylesheet" href="/static/css/jqueryui/jquery.ui.all.css">
+{% block css %}{% endblock %}
 </head>
 <body>
 	<div class="container">
@@ -20,6 +22,10 @@
 <script type="text/javascript" src="/static/js/amcharts/amcharts.js"></script>
 <script type="text/javascript" src="/static/js/jquery-1.7.2.min.js"></script>
 <script type="text/javascript" src="/static/js/util.js"></script>
+<script type="text/javascript" src="/static/js/jquery.ui.core.js"></script>
+<script type="text/javascript" src="/static/js/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/static/js/jquery.ui.datepicker.js"></script>
+
 
 {% block js%}
 {% endblock %}

@@ -1,0 +1,119 @@
+{% extends "statistics/statistics_base.html" %} {% block title %} 统计信息
+{% endblock %} {% block content1 %}
+<div id="note"></div>
+
+<div class="clearfix" style="height: 420px">
+	<div id="depth_activate_user" class="statistics_div"></div>
+	<div style="padding-top: 60px">
+		<table id="table_activate_user" class="table_1">
+			<tr>
+				<td colspan=2><strong>活跃用户:有一次API请求的用户</strong></td>
+			</tr>
+			<tr>
+				<td colspan=2><strong>此统计从07-16开始</strong></td>
+			</tr>
+			<tr>
+				<td>开始时间:</td>
+				<td><input type="text" id="depth_activate_user_from"
+					style="width: 120px" /><input type="submit" id="reset"
+					value="reset" /></td>
+			</tr>
+			<tr>
+				<td>结束时间:</td>
+				<td><input type="text" id="depth_activate_user_to"
+					style="width: 120px" /></td>
+			</tr>
+			<!-- tr>
+				<td><input type="radio" name="user_total_items" value="0"
+					checked="checked">默认</input></td>
+				<td><input type="radio" name="user_total_items" value="1">活跃用户占比</input></td>
+			</tr> -->
+			<tr>
+				<td>数据粒度:</td>
+				<td><select id="data_grain"><option value="day"
+							selected='selected'>日</option>
+						<option value="week">周</option>
+						<option value="month">月</option></select></td>
+			</tr>
+			<tr>
+				<td><input type="submit" id="submit" /></td>
+			</tr>
+		</table>
+	</div>
+</div>
+<div class="clearfix" style="height: 420px">
+	<div id="depth_bookmark_website" class="statistics_div"></div>
+	<div style="padding-top: 60px">
+		<table id="table_bookmark_website" class="table_1">
+			<tr>
+				<td>开始时间:</td>
+				<td><input type="text" id="depth_bookmark_website_from"
+					style="width: 120px" /><input type="submit" id="reset"
+					value="reset" /></td>
+			</tr>
+			<tr>
+				<td>结束时间:</td>
+				<td><input type="text" id="depth_bookmark_website_to"
+					style="width: 120px" /></td>
+			</tr>
+			<tr>
+				<td>网站数量:&nbsp前</td>
+				<td><input type="text" id="size" style="width: 120px"
+					value="20" />个</td>
+			</tr>
+			<!-- tr>
+				<td><input type="radio" name="bookmark_website_items" value="0"
+					checked="checked">柱状图</input></td>
+				<td><input type="radio" name="bookmark_website_items" value="1">表格</input></td>
+			</tr> -->
+			<tr>
+				<td><input type="submit" id="submit" /></td>
+			</tr>
+		</table>
+	</div>
+</div>
+<div class="clearfix" style="height: 420px">
+	<div id="depth_platform" class="statistics_div"></div>
+	<div style="padding-top: 60px">
+		<table id="table_platform" class="table_1">
+			<tr>
+				<td>开始时间:</td>
+				<td><input type="text" id="depth_platform_from"
+					style="width: 120px" /><input type="submit" id="reset"
+					value="reset" /></td>
+			</tr>
+			<tr>
+				<td>结束时间:</td>
+				<td><input type="text" id="depth_platform_to"
+					style="width: 120px" /></td>
+			</tr>
+			<!-- tr>
+				<td>网站数量:&nbsp前</td>
+				<td><input type="text" id="size" style="width: 120px"
+					value="20" />个</td>
+			</tr>
+			<tr>
+				<td><input type="radio" name="platform_items" value="0"
+					checked="checked">柱状图</input></td>
+				<td><input type="radio" name="platform_items" value="1">表格</input></td>
+			</tr> -->
+			<tr>
+				<td><input type="submit" id="submit" /></td>
+			</tr>
+		</table>
+	</div>
+</div>
+<div class="clearfix" style="height: 5px">
+	<h2>3. 收藏文章类型统计</h2>
+</div>
+<div class="clearfix" style="height: 420px">
+	<h2>5. 用户地域统计</h2>
+</div>
+{% endblock %} {% block js%}
+<script type="text/javascript"
+	src="/static/js/statistics/depth/activate_user.js"></script>
+<script type="text/javascript"
+	src="/static/js/statistics/depth/bookmark_website.js"></script>
+<script type="text/javascript"
+	src="/static/js/statistics/depth/platform.js"></script>
+{% endblock %}

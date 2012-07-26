@@ -23,6 +23,8 @@ class Config:
     log_file = ROOT_PATH + '/sohukan.log' 
     day_report_version = 0
     
+    MIN_TIME = '2012-01-01 00:00:00';
+    MAX_TIME = '2222-06-10 00:00:00';
     add_time_limit = 15
     read_time_limit = 20
     
@@ -34,6 +36,7 @@ class Config:
 class DevConfig(Config):
     cookie = ["Cookie", "access_token = 0381d220305f5acc8dab9a2ab9692a9d09be5e1d"]
     db_config = {'host':'10.10.58.17', 'port':3306, 'user':'sohupocketlib', 'passwd':'SejJGGk2', 'db':'sohupocketlib'}
+    db_self_config = {'host':'10.10.69.53', 'port':3306, 'user':'sohukan', 'passwd':'sohukan', 'db':'sohukanhealth'}
     mobile_list = '13476852610,18627839148,13545257885'
     logger = logging.getLogger("SohukanHealth")
     

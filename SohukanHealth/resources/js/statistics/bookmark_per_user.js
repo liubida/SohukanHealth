@@ -1,5 +1,5 @@
 var make_bookmark_per_user_chart = function(chartData) {
-	var e = document.getElementById('bookmark_per_user_div')
+	var e = document.getElementById('statistics_bookmark_per_user')
 	clearElement(e);
 
 	// SERIAL CHART
@@ -7,7 +7,7 @@ var make_bookmark_per_user_chart = function(chartData) {
 	chart.dataProvider = chartData;
 	chart.categoryField = "user_id";
 	chart.startDuration = 1;
-	chart.addTitle('文章数/用户ID(前100名)', 20);
+	chart.addTitle('用户收藏文章排行', 20);
 
 	// AXES
 	// category
@@ -37,15 +37,26 @@ var make_bookmark_per_user_chart = function(chartData) {
 	chart.addGraph(graph);
 
 	// WRITE
-	chart.write("bookmark_per_user_div");
+	chart.write(e.getAttribute('id'));
 };
 
 var load_bookmark_per_user = function(params, callback) {
 	url = '/statistics/bookmark/per_user';
 
-	var e = document.getElementById('bookmark_per_user_div')
-	clearElement(e);
+	var from = $("#statistics_bookmark_per_user_from").val()
+	var to = $("#statistics_bookmark_per_user_to").val()
 
+	var date_range = get_date_range(from, to);
+	var data_size = $("#table_bookmark_per_user #size").val();
+
+	var params = {
+		start_time : date_range.start_time,
+		end_time : date_range.end_time,
+		data_size : data_size
+	};
+
+	var e = document.getElementById('statistics_bookmark_per_user')
+	clearElement(e);
 	var loading = document.createElement('p')
 	var loading_text = document.createTextNode('数据加载中...')
 	loading.appendChild(loading_text);
@@ -69,69 +80,31 @@ var load_bookmark_per_user = function(params, callback) {
 			});
 };
 
-var create_ul_for_per_user = function() {
-	var today = new Date();
-	var tmp = new Date();
-	var time_array = [{
-		'text' : '昨天',
-		'value' : tmp.setDate(today.getDate() - 1) ? tmp
-				.format('yyyy.MM.dd') : null
-	}, {
-		'text' : '7天',
-		'value' : tmp.setDate(today.getDate() - 7) ? tmp
-				.format('yyyy.MM.dd') : null
-	}, {
-		'text' : '30天',
-		'value' : tmp.setMonth(today.getMonth() - 1) ? tmp
-				.format('yyyy.MM.dd') : null
-	}, {
-		'text' : '3个月',
-		'value' : tmp.setMonth(today.getMonth() - 3) ? tmp
-				.format('yyyy.MM.dd') : null
-	}, {
-		'text' : '6个月',
-		'value' : tmp.setMonth(today.getMonth() - 6) ? tmp
-				.format('yyyy.MM.dd') : null
-	}, {
-		'text' : '1年',
-		'value' : tmp.setFullYear(today.getFullYear() - 1) ? tmp
-				.format('yyyy.MM.dd') : null
-	}];
-	var ul = document.createElement('ul');
-	for (var i = 0; i < time_array.length; i++) {
-		var li = document.createElement('li');
-		addClass(li, 'heng_li');
-
-		var a = create_link(i, time_array[i]['text'], time_array[i]['value'],
-				function() {
-					var t = this.firstChild;
-					var old_nodeValue = t.nodeValue;
-					t.nodeValue = '请求数据中';
-
-					load_bookmark_per_user({
-								start_time : this.getAttribute('value')
-							}, function() {
-								t.nodeValue = old_nodeValue;
-							});
-					return false;
-				});
-		li.appendChild(a);
-		ul.appendChild(li)
-	}
-	return ul;
-};
-
 var prepare_bookmark_per_user = function() {
-	var div = document.getElementById('bookmark_per_user_div');
+	$("#statistics_bookmark_per_user_from").datepicker({
+		changeMonth : true,
+		numberOfMonths : 2,
+		dateFormat : "yy-mm-dd",
+		onSelect : function(selectedDate) {
+			$("#statistics_bookmark_per_user_to").datepicker("option",
+					"minDate", selectedDate);
+		}
+	});
+	$("#statistics_bookmark_per_user_to").datepicker({
+				changeMonth : true,
+				numberOfMonths : 2,
+				dateFormat : "yy-mm-dd"
+			});
+	$("#table_bookmark_per_user #bookmark_per_user_submit")
+			.click(load_bookmark_per_user);
+	$("#table_bookmark_per_user #reset").click(function() {
+				$("#statistics_bookmark_per_user_from").val('');
+				$("#statistics_bookmark_per_user_to").val('');
+			});
 
-	var ul = create_ul_for_per_user();
-	var link_div = document.createElement('div');
-	link_div.style.float = 'left';
-	link_div.appendChild(ul);
-	insertAfter(link_div, div);
 	load_bookmark_per_user();
 };
 
-AmCharts.ready(function() {
+$(document).ready(function() {
 			prepare_bookmark_per_user();
 		});

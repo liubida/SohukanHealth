@@ -29,15 +29,6 @@ def now_plus(request, offset):
     dt = datetime.datetime.now() + datetime.timedelta(hours=offset)
     return HttpResponse("now + %s is : %s " % (offset, dt))
 
-def demo(request):
-#    latest_poll_list = Poll.objects.all().order_by('-pub_date')[:5]
-    
-    t = loader.get_template('JSCharts3_demo/examples/line-charts/example-1/index.html')
-    c = Context({
-        'name': 'liubida&&zww',
-    })
-    return HttpResponse(t.render(c))
-
 def index(request):
     t = loader.get_template('index.html')
     c = Context()

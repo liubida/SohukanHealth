@@ -1,28 +1,31 @@
-{% extends "base.html" %} {% block title %} 综合页面 {% endblock %}
-
-{%block js %}
+{% extends "base.html" %} {% block title %} 综合页面 {% endblock %} {%block js %}
 <link rel="stylesheet" href="/static/css/style.css" type="text/css">
 <script type="text/javascript" src="/static/js/statistics/user_total.js"></script>
-<script type="text/javascript" src="/static/js/statistics/bookmark_total.js"></script>
+<script type="text/javascript"
+	src="/static/js/statistics/bookmark_total.js"></script>
 <script type="text/javascript" src="/static/js/monitor/monitor.js"></script>
 
-{% endblock %} 
-
-{% block content %}
-<div class="grid">
-<div id="user_total_div" class="grid_item"></div>
+{% endblock %} {% block content %} 
+<div
+	style="float: left; width: 520px; height: 325px; margin: 5px 10px 15px 10px;">
+	<div id="statistics_user_total"
+		style="width: 98%; height: 95%; margin: 2px;"></div>
 </div>
 
-<div class="grid">
-<div id="bookmark_total_div" class="grid_item"></div>
+<div
+	style="float: left; width: 520px; height: 325px; margin: 5px 10px 15px 10px;">
+	<div id="statistics_bookmark_total"
+		style="width: 98%; height: 95%; margin: 2px;"></div>
 </div>
 
-<div class="grid">
-<div id="add_div" class="grid_item"></div>
+<div
+	style="float: left; width: 520px; height: 325px; margin: 5px 10px 15px 10px;">
+	<div id="add_div" style="width: 98%; height: 95%; margin: 2px;"></div>
 </div>
 
-<div class="grid">
-<div id="read_div" class="grid_item"></div>
+<div
+	style="float: left; width: 520px; height: 325px; margin: 5px 10px 15px 10px;">
+	<div id="read_div" style="width: 98%; height: 95%; margin: 2px;"></div>
 </div>
 
 {% endblock %}

@@ -80,12 +80,13 @@ var load_day_report_abstract = function(params) {
 	myAjax(url, params, function(obj) {
 				data = obj;
 
-//				var inc = document.createTextNode('[' + data['user_total_inc']
-//						+ ']');
-//				inc.style.color = '#c00';
-//				user_total.appendChild(value);
-//				user_total.appendChild(inc);
-				
+				// var inc = document.createTextNode('[' +
+				// data['user_total_inc']
+				// + ']');
+				// inc.style.color = '#c00';
+				// user_total.appendChild(value);
+				// user_total.appendChild(inc);
+
 				var value = document.createTextNode(data['user_total'] + ' ');
 				var inc = document.createElement('font');
 				inc.style.color = '#c00';
@@ -125,4 +126,6 @@ var load_day_report_abstract = function(params) {
 			});
 }
 
-addLoadEvent(prepare_day_report);
+$(document).ready(function() {
+			prepare_day_report();
+		});

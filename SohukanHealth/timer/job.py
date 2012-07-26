@@ -11,9 +11,9 @@ from monitor.system.worker import add_worker, read_worker
 from statistics.biz import get_userdata_for_day_report, \
     get_bookmarkdata_for_day_report, get_bookmark_website_raw_data, \
     get_bookmark_percent_raw_data, test_id, _is_test
-from statistics.models import DayReport
+from statistics.models import DayReport, UA
 from timer.sms import sms
-from util import print_info
+from util import print_info, query_ua
 from util.random_spider import RandomSpider
 import MySQLdb
 import anyjson
@@ -80,6 +80,7 @@ def bookmark_total_job():
             for d in results:
                 user_id = int(d[0])
                 count = int(d[1])
+                # 去掉测试用户添加的文章
                 if not _is_test(user_id):
                     sum += count
         now = datetime.datetime.now()
@@ -125,8 +126,8 @@ def day_report_job():
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = now.replace(hour=23, minute=59, second=59, microsecond=0)
     
-    user = get_userdata_for_day_report(today_start,today_end);
-    bookmark = get_bookmarkdata_for_day_report(today_start,today_end);
+    user = get_userdata_for_day_report(today_start, today_end);
+    bookmark = get_bookmarkdata_for_day_report(today_start, today_end);
     
     bookmark_count = {}
     bookmark_count['percent'], bookmark_count['data'] = get_bookmark_percent_raw_data(today_start, today_end)
@@ -143,9 +144,30 @@ def day_report_job():
     day_report = DayReport(time=datetime.datetime.now(), version=c.day_report_version, jsondata=anyjson.dumps(jsondata))
     day_report.save();
     
-        
+
+@print_info(name='fix_ua_job')
+def fix_ua_job():
+    ua = UA.objects.filter(is_crawler=False)
+    for u in ua:
+        if str(u.ua_string).startswith('搜狐随身看'):
+            u.platform = 'Darwin'
+            u.is_crawler = True
+        else:
+            ret = query_ua(u.ua_string)
+            if ret:
+                u.platform = ret['os_type']
+                u.is_crawler = True
+        u.save()
+
 if __name__ == '__main__':
-    day_report_job()
+#    day_report_job()
+#    today = datetime.date.today()
+#    today = today.replace(day=31)
+#    print today
+#    d = datetime.timedelta(days=1)
+#    print today + d
+#    
+    fix_ua_job()
 #    mysql_ping_job();
 #    user_total_job()
 #    bookmark_total_job()

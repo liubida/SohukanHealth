@@ -101,7 +101,7 @@ var prepare_user_bookmark_percent = function() {
 	var da = day_str.split("-");
 	var da_int = [];
 	for (var i = 0; i < da.length; i++) {
-		da_int[i] = parseInt(da[i]);
+		da_int[i] = parseInt(da[i],10);
 	}
 	var day = new Date(da_int[0], da_int[1] - 1, da_int[2], 0, 0, 0);
 	var tmp = new Date(da_int[0], da_int[1] - 1, da_int[2] + 1, 0, 0, 0);

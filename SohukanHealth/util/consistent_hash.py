@@ -161,7 +161,7 @@ class HashRing(object):
 
 def main():
     ring = HashRing([str(i) for i in range(64)])
-    print ring.get_node('25')
+    print ring.get_node('1834')
     
 
 if __name__ == '__main__':

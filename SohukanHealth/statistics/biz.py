@@ -19,6 +19,31 @@ color = ['#FF0F00', '#FF9E01', '#FCD202', '#F8FF01', '#B0DE09', \
          '#04D215', '#0D8ECF', '#0D52D1', '#2A0CD0', '#8A0CCF', '#CD0D74']
 test_id = [108, 165, 591]
 
+def get_data_interval(raw_data, delta=datetime.timedelta(days=1), time_format='str'):
+    ret = []
+    day_start = raw_data[0]['time']
+    for d in raw_data:
+            if d['time'].hour == 23 and \
+               d['time'].year == day_start.year and \
+               d['time'].month == day_start.month and \
+               d['time'].day == day_start.day:
+                if time_format == 'str':
+                    ret.append({'time':d['time'].strftime('%m-%d'), 'count':d['count']})
+                else:
+                    ret.append({'time':d['time'], 'count':d['count']})
+                day_start += delta
+    return ret
+
+def add_inc_for_data(data):
+    list = data['list']
+    if not list:
+        return
+    list[0]['inc'] = 0
+    for i in range(1, len(list)):
+        origin = list[i - 1]['count']
+        later = list[i]['count']
+        list[i]['inc'] = round(((later - origin) + 0.0000001) / origin, 4)
+            
 def _is_test(user_id):
     
     if user_id < 100 or user_id in test_id:
@@ -52,112 +77,189 @@ def _get_fix(start_time, end_time):
     having_fix = ''
     and_fix = ''
     
-    #时间约束, 即某个时间之前的非测试用户数
+    #时间约束, 即某个时间区间
     if start_time:
-        having_fix += "having create_time >= '%s'" % start_time
-        and_fix += "and gmt_create >= '%s'" % start_time
+        having_fix += " having create_time >= '%s' " % start_time
+        and_fix += " and gmt_create >= '%s' " % start_time
     
     if end_time:
         if having_fix:
-            having_fix += " and create_time <='%s'" % end_time
+            having_fix += " and create_time <='%s' " % end_time
         else:
-            having_fix = "having create_time <='%s'" % end_time
+            having_fix = " having create_time <='%s' " % end_time
         
-        and_fix += "and gmt_create <= '%s'" % end_time
+        and_fix += " and gmt_create <= '%s' " % end_time
     
     return having_fix, and_fix    
 
-def get_bookmark_per_user(start_time=None):
-    dd = get_bookmark_per_user_raw_data(start_time)
-
-    s = {}
-    s['success'] = True
-    s['info'] = 'get_bookmark_per_user'
-    s['code'] = 0
-    s['total'] = len(dd)
-    s['list'] = []
+def get_bookmark_per_user(start_time=None, end_time=None, limit=100):
+    '''返回jsondata'''
+    raw_data = get_bookmark_per_user_raw_data(start_time, end_time, limit)
     
+    # dd是获取的原始数据, 加入颜色值等其他信息
+    i = 0 
+    max = len(color) - 1
+    for d in raw_data:
+        d['color'] = color[i if i <= max else max]
+        i += 1
+        
+    ret = {'list':raw_data}
+    return anyjson.dumps(ret)
+
+def get_bookmark_time(start_time=None, end_time=None):
+    raw_data = get_bookmark_time_raw_data(start_time, end_time);
+    
+    # 按照时间段进行统计, 先设定24小时的count都为0
+    # 这样做的目的, 避免因有的时段没有文章而无法展现
+    data = [];
+    for i in range(24):
+        data.append({'hour':i, 'count':0})
+    for d in raw_data:
+        data[d['time'].hour]['count'] += 1
+    
+    # 先按照count排序, 目的是为了上色; 顺便计算下总文章数, 目的是为了后面计算percent
+    data.sort(key=lambda x:x['count'], reverse=True)
     i = 0
     max = len(color) - 1
-    for d in dd:
-        tmp = {}
-        tmp['user_id'] = d['user_id']
-        tmp['count'] = d['count']
-        if i >= max:
-            tmp['color'] = color[max]
-        else:
-            tmp['color'] = color[i]
-        s['list'].append(tmp)
+    sum_count = 0
+    for d in data:
+        d['color'] = color[i if i <= max else max]
+        sum_count += d['count']
         i += 1
+    # 再按照hour排序, 最后的展现顺序
+    data.sort(key=lambda x:x['hour'], reverse=False)
 
-    return anyjson.dumps(s)
+    # 计算percent    
+    for d in data:
+        d['percent'] = round((d['count'] + 0.0000001) / sum_count, 4)
+        
+    ret = {'list':data}
+    return anyjson.dumps(ret)
 
-def get_bookmark_time(start_time=None):
-    dd = calc_bookmark_time(start_time);
-    
-    s = {}
-    s['success'] = True
-    s['info'] = 'get_bookmark_time'
-    s['code'] = 0
-    s['total'] = len(dd)
-    s['list'] = dd
-    
-    return anyjson.dumps(s)
-
-def get_bookmark_percent(start_time=None, end_time=None):
+def get_bookmark_percent(start_time=None, end_time=None, raw=True):
     data, raw_data = get_bookmark_percent_raw_data(start_time, end_time);
     
-    s = {}
-    s['success'] = True
-    s['info'] = 'get_bookmark_percent'
-    s['code'] = 0
-    s['total'] = len(data)
-    s['list'] = data
-    s['raw'] = raw_data
-    
-    return anyjson.dumps(s)
+    ret = {'list':data}
+    if raw:
+        ret['raw'] = raw_data
+    return anyjson.dumps(ret)
 
-def get_bookmark_website(start_time=None, end_time=None):
-    data = get_bookmark_website_raw_data(start_time, end_time);
+def get_bookmark_website(start_time=None, end_time=None, limit=100):
+    data = get_bookmark_website_raw_data(start_time, end_time, limit);
     
-    s = {}
-    s['success'] = True
-    s['info'] = 'get_bookmark_website'
-    s['code'] = 0
-    s['total'] = len(data)
-    s['list'] = data
-    
-    return anyjson.dumps(s)
+    ret = {'list':data}
+    return anyjson.dumps(ret)
 
-def calc_bookmark_time(start_time=None):
-    raw_data = get_bookmark_time_raw_data(start_time);
+def get_user_platform(start_time=None, end_time=None):
+    data = get_user_platform_raw_data(start_time, end_time)
     
-#    filter(lambda x: x['time']>=start_time and x['time']<=end_time, raw_data)
-    
-    ret = [];
-    for i in range(24):
-        kv = {};
-        kv['hour'] = i;
-        kv['count'] = 0;
-        ret.append(kv)
+    ret = {'list':data}
+    return anyjson.dumps(ret)
         
-    for d in raw_data:
-        ret[d['time'].hour]['count'] += 1
+def get_activate_user(start_time=None, end_time=None, data_grain='day'):
+
+    # 获取注册用户数, 图中对比用
+    raw_data = SomeTotal.objects.filter(name='user', time__gte=start_time, time__lte=end_time).values('time', 'count')
+    # 每天取一个23点的数据
+    reg_user = get_data_interval(raw_data, datetime.timedelta(days=1), time_format='datetime')
     
-    # fix the color
-    ret.sort(key=lambda x:x['count'], reverse=True)
+#    new_user = []
+#    raw_data = DayReport.objects.filter(time__gte=start_time, time__lte=end_time).values('time', 'jsondata')
+#    for d in raw_data:
+#        jsondata = anyjson.loads(d['jsondata'])
+#        new_user.append({'time':d['time'], 'new':jsondata['user']['total'] - jsondata['user']['total_yd']})
+#    print 'new_user', new_user
+    au_user = get_activate_user_raw_data(start_time, end_time, data_grain)
+
+    data = []
+    if data_grain == 'day':
+        for a in au_user:
+            for r in reg_user:
+                if r['time'].year == a['time'].year and r['time'].month == a['time'].month and r['time'].day == a['time'].day:
+                    percent = round((a['count'] + 0.00001) / r['count'], 4)
+                    data.append({'time':a['time'].strftime("%m-%d"), 'reg':r['count'], 'au':a['count'], 'percent':percent})
+            
+    if data_grain == 'month':
+        # 注意, 这里是 len(reg_user)-1    
+        for i in range(0, len(reg_user) - 1):
+            r = reg_user[i]
+            r_n = reg_user[i + 1] 
+            # 要保证是本月的最后一天的注册用户总数
+            if r['time'].month == r_n['time'].month:
+                continue
+            else :
+                for a in au_user:
+                    if r['time'].year == a['time'].year and r['time'].month == a['time'].month:
+                        percent = round((a['count'] + 0.00001) / r['count'], 4)
+                        data.append({'time':a['time'].strftime("%Y-%m-%d"), 'reg':r['count'], 'au':a['count'], 'percent':percent})
+        
+    if data_grain == 'week':
+        for a in au_user:
+            au_week_num = int(a['time'].split('-')[1])
+            for i in range(0, len(reg_user) - 1):
+                r = reg_user[i]
+                r_n = reg_user[i + 1] 
+                # 要保证是本周的最后一天的注册用户总数
+                if _get_week_num(r['time']) == _get_week_num(r_n['time']):
+                    continue
+                elif _get_week_num(r['time']) == au_week_num:
+                    percent = round((a['count'] + 0.00001) / r['count'], 4)
+                    data.append({'time':r['time'].strftime("%Y-%m-%d"), 'reg':r['count'], 'au':a['count'], 'percent':percent})
+                
+    data.sort(key=lambda x:x['time'], reverse=False)
+    ret = {'list':data}
+    return anyjson.dumps(ret)
     
-    i = 0
-    max = len(color) - 1
-    for d in ret:
-        if i >= max:
-            d['color'] = color[max]
+def get_activate_user_raw_data(start_time=None, end_time=None, data_grain='day'):
+    '''为[活跃用户统计]获取原始数据'''
+    try:
+        print start_time, end_time
+        conn = MySQLdb.connect(**c.db_self_config)
+        cursor = conn.cursor()
+
+        ret = []
+        # 去掉测试用户的id
+        tmp = ' and user_id > 100 and user_id !='
+        tmp += ' and user_id !='.join(map(lambda x:str(x), test_id))
+
+        if data_grain == 'week':
+            data_grain_format = r'%Y-%u'
+        elif data_grain == 'month':
+            data_grain_format = r'%Y-%m'
         else:
-            d['color'] = color[i]
-        i += 1
-    ret.sort(key=lambda x:x['hour'], reverse=False)
-    
-    return ret
+            data_grain_format = r'%Y-%m-%d'
+
+        sql = "select count(u_id), tmp.data_grain from \
+               (select distinct(user_id) as u_id, date_format(gmt_create,'%s') as data_grain from stats_oper \
+               where gmt_create >= '%s' and gmt_create <='%s' %s) tmp group by tmp.data_grain" \
+                % (data_grain_format, start_time, end_time, tmp)
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        
+        if data_grain == 'day' or data_grain == 'month':
+            for d in results:
+                au = int(d[0])
+                time = datetime.datetime.strptime(str(d[1]), data_grain_format)
+                ret.append({'time':time, 'count':au})
+
+        if data_grain == 'week':
+            for d in results:
+                au = int(d[0])
+                time = str(d[1])
+                ret.append({'time':time, 'count':au})
+        return ret
+    except Exception, e:
+        c.logger.error(e)
+        raise e
+    finally:
+        try:
+            if cursor:
+                cursor.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()
 
 def get_bookmark_percent_raw_data(start_time=None, end_time=None, limit=100):
     '''为[用户收藏文章数统计]获取原始数据'''
@@ -173,53 +275,107 @@ def get_bookmark_percent_raw_data(start_time=None, end_time=None, limit=100):
                {'name':'51-100篇', 'count':0},
                {'name':'101-200篇', 'count':0},
                {'name':'>200篇', 'count':0}]
-        mm = {}
+        raw = {}
         
         having_fix, and_fix = _get_fix(start_time, end_time)
         
-        #去掉测试用户的id
+        # 去掉测试用户的id, 因为要查询用户总数, 所以单独指定tmp
         tmp = ' and id !='
         tmp += ' and id !='.join(map(lambda x:str(x), test_id))
         
         sql_total = "select count(*) from account_user where id > 100 %s %s" % (tmp, and_fix)        
-        print 'sql_total:', sql_total
-        
         cursor.execute(sql_total)
         result = cursor.fetchone()
         user_total = result[0]
-        print user_total
+        print 'user_total:', user_total
         
+        and_fix = and_fix.replace('gmt_create', 'create_time')
         for i in range(64):
-            cursor.execute("select user_id, count(*), create_time from bookmark_bookmark_%s group by user_id %s" % (i, having_fix))
+            sql = "select user_id, count(*) from bookmark_bookmark_%s where 1=1 %s group by user_id" % (i, and_fix)
+            print sql
+            cursor.execute(sql)
             results = cursor.fetchall()
             for d in results:
                 user_id = int(d[0])
                 count = int(d[1])
                 if not _is_test(user_id):
-                    '''根据用户的文章数情况, 把相应的范围数+1'''
+                    '''根据用户的文章数情况, 把相应的范围数的用户数+1'''
                     ret[_which_index(count)]['count'] += 1
                     
-                    if count in mm.keys():
-                        mm[count] += 1
+                    if count in raw.keys():
+                        raw[count] += 1
                     else:
-                        mm[count] = 1
-        ret_mm = []
-        for k in mm.keys():
+                        raw[count] = 1
+        # 原始的数值
+        ret_raw = []
+        for k in raw.keys():
             tmp = {}
             tmp['p_count'] = k
-            tmp['u_count'] = mm[k]
-            ret_mm.append(tmp)
+            tmp['u_count'] = raw[k]
+            ret_raw.append(tmp)
         
+        # 为了计算为文章数为0的用户数
         user_used = 0
         for r in ret:
             user_used += r['count']
 
-        ret_mm.append({'p_count':0, 'u_count':user_total - user_used})        
+        ret_raw.append({'p_count':0, 'u_count':user_total - user_used})        
         ret.append({'name':'0篇', 'count':user_total - user_used})
         
-        ret_mm.sort(key=lambda x:x['p_count'], reverse=True)
+        ret_raw.sort(key=lambda x:x['p_count'], reverse=True)
         ret.sort(key=lambda x:x['count'], reverse=True)
-        return ret[:limit], ret_mm[:limit];
+        return ret, ret_raw[:limit];
+    except Exception, e:
+        c.logger.error(e)
+        raise e
+    finally:
+        try:
+            if cursor:
+                cursor.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()
+
+def get_user_platform_raw_data(start_time=None, end_time=None):
+    '''为[收藏文章的域名统计]获取原始数据'''
+    try:
+        conn = MySQLdb.connect(**c.db_self_config)
+        cursor = conn.cursor()
+        
+        having_fix, and_fix = _get_fix(start_time, end_time)
+        and_fix = and_fix.replace('gmt_create', 'o.gmt_create')
+        
+        # 去掉测试用户的id
+        tmp = ' user_id > 100 and user_id !='
+        tmp += ' and user_id !='.join(map(lambda x:str(x), test_id))
+
+        ret = []
+        data_grain_format = r'%Y-%m-%d'
+        
+        sql = '''select o.data_grain, u.platform, count(u.platform) from (
+           select user_id, ua_id, date_format(gmt_create,'%s') as data_grain from stats_oper
+           where gmt_create >= '%s' and gmt_create <='%s' and  %s ) o 
+           left join stats_ua u on o.ua_id = u.id group by u.platform, o.data_grain order by o.data_grain''' \
+           % (data_grain_format, start_time, end_time, tmp)
+        print sql
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        mm = {'time':''};
+        print results
+        for d in results:
+            time = str(d[0])
+            platform = str(d[1])
+            count = int(d[2])
+            if mm['time'] != time:
+                if mm['time']:
+                    ret.append(mm)
+                mm = {'time':time};
+            mm[platform] = count
+        ret.append(mm)
+        
+        return ret
     except Exception, e:
         c.logger.error(e)
         raise e
@@ -233,7 +389,7 @@ def get_bookmark_percent_raw_data(start_time=None, end_time=None, limit=100):
             if conn:
                 conn.close()
                 
-def get_bookmark_website_raw_data(start_time=None, end_time=None, limit=20):
+def get_bookmark_website_raw_data(start_time=None, end_time=None, limit=100):
     '''为[收藏文章的域名统计]获取原始数据'''
     try:
         conn = MySQLdb.connect(**c.db_config)
@@ -256,15 +412,10 @@ def get_bookmark_website_raw_data(start_time=None, end_time=None, limit=20):
                         mm[domain] += 1
                     else:
                         mm[domain] = 1
-        print mm
-
         for k in mm.keys():
-            tmp = {}
-            tmp['domain'] = k
-            tmp['count'] = mm[k]
-            ret.append(tmp)
+            ret.append({'domain':k, 'count':mm[k]})
+            
         ret.sort(key=lambda x:x['count'], reverse=True)
-
         return ret[:limit];
     except Exception, e:
         c.logger.error(e)
@@ -279,26 +430,24 @@ def get_bookmark_website_raw_data(start_time=None, end_time=None, limit=20):
             if conn:
                 conn.close()
                         
-def get_bookmark_time_raw_data(start_time=None):
+def get_bookmark_time_raw_data(start_time=None, end_time=None):
     '''为[收藏文章时间段]获取原始数据'''
     try:
         conn = MySQLdb.connect(**c.db_config)
         cursor = conn.cursor()
         
-        if start_time:
-            prefix = "where create_time > '%s'" % start_time
-        else:
-            prefix = ''
+        having_fix, and_fix = _get_fix(start_time, end_time)
+        and_fix = and_fix.replace('gmt_create', 'create_time')
+        
         ret = []
         for i in range(64):
-            cursor.execute("select id, create_time, user_id from bookmark_bookmark_%s %s" % (i, prefix))
+            sql = "select create_time, user_id from bookmark_bookmark_%s where 1=1 %s" % (i, and_fix)
+            print sql
+            cursor.execute(sql)
             results = cursor.fetchall()
             for d in results:
-                kv = {}
-                kv['id'] = '%d_%d' % (i, int(d[0]))
-                kv['time'] = d[1]
-                if not _is_test(int(d[2])):
-                    ret.append(kv)
+                if not _is_test(int(d[1])):
+                    ret.append({'time':d[0]})
                             
         ret.sort(key=lambda x:x['time'], reverse=True)
         return ret;
@@ -315,19 +464,20 @@ def get_bookmark_time_raw_data(start_time=None):
             if conn:
                 conn.close()
     
-def get_bookmark_per_user_raw_data(start_time=None, limit=100):
+def get_bookmark_per_user_raw_data(start_time=None, end_time=None, limit=100):
     '''为[用户收藏文章数排行]获取原始数据'''
     try:
         conn = MySQLdb.connect(**c.db_config)
         cursor = conn.cursor()
         
-        if start_time:
-            prefix = "having create_time > '%s'" % start_time
-        else:
-            prefix = ''
+        having_fix, and_fix = _get_fix(start_time, end_time)    
+        and_fix = and_fix.replace('gmt_create', 'create_time')
+            
         ret = []
         for i in range(64):
-            cursor.execute("select user_id, count(*), create_time from bookmark_bookmark_%s group by user_id %s" % (i, prefix))
+            sql = "select user_id, count(*) from bookmark_bookmark_%s where 1=1 %s group by user_id " % (i, and_fix)
+            print sql
+            cursor.execute(sql)
             results = cursor.fetchall()
             for d in results:
                 kv = {}
@@ -427,7 +577,7 @@ def appAvailableData_to_json(data):
         s['list'].append(tmp)
     return anyjson.dumps(s)   
 
-def get_userdata_for_day_report(today_start,today_end):
+def get_userdata_for_day_report(today_start, today_end):
     
     # 昨天
     yd_start = today_start - datetime.timedelta(days=1)
@@ -463,7 +613,6 @@ def get_userdata_for_day_report(today_start,today_end):
     # 今日用户总数_增长率
     user_total_inc = (abs(user_new) + 0.00000001) / user_total_yd
     user_total_inc = round(user_total_inc, 4)
-#    user_total_inc_color = '#c00' if user_new > 0  else '#008000'
     
     # 昨日用户总数_增长率
     user_total_inc_yd = (abs(user_new_yd) + 0.00000001) / user_total_b_yd
@@ -472,7 +621,6 @@ def get_userdata_for_day_report(today_start,today_end):
     # 环比新增用户_增长率_百分点
     user_new_inc = user_total_inc - user_total_inc_yd 
     user_new_inc = round(user_new_inc, 4)
-#    user_new_inc_color = '#c00' if user_new_inc > 0  else '#008000'
     
     ret = {}
     ret['total'] = user_total;
@@ -485,7 +633,7 @@ def get_userdata_for_day_report(today_start,today_end):
     return ret
 
 
-def get_bookmarkdata_for_day_report(today_start,today_end):
+def get_bookmarkdata_for_day_report(today_start, today_end):
     
     # 昨天
     yd_start = today_start - datetime.timedelta(days=1)
@@ -494,13 +642,6 @@ def get_bookmarkdata_for_day_report(today_start,today_end):
     # 前天
     b_yd_start = today_start - datetime.timedelta(days=2)
     b_yd_end = today_end - datetime.timedelta(days=2)
-    
-    print today_start
-    print today_end
-    print yd_start
-    print yd_end
-    print b_yd_start
-    print b_yd_end
     
     # 今日文章总数
     bookmark_total = int(SomeTotal.objects.filter(name='bookmark', time__gte=today_start, time__lte=today_end).values('count').\
@@ -521,17 +662,14 @@ def get_bookmarkdata_for_day_report(today_start,today_end):
     # 今日文章总数_增长率
     bookmark_total_inc = (abs(bookmark_new) + 0.00000001) / bookmark_total_yd
     bookmark_total_inc = round(bookmark_total_inc, 4)
-#    bookmark_total_inc_color = '#c00' if bookmark_new > 0  else '#008000'
     
     # 昨日文章总数_增长率
     bookmark_total_inc_yd = (abs(bookmark_new_yd) + 0.00000001) / bookmark_total_b_yd
     bookmark_total_inc_yd = round(bookmark_total_inc_yd, 4)
-#    bookmark_total_inc_yd_color = '#c00' if bookmark_new_yd > 0  else '#008000'
         
     # 环比新增文章_增长率_百分点
     bookmark_new_inc = bookmark_total_inc - bookmark_total_inc_yd 
     bookmark_new_inc = round(bookmark_new_inc, 4)
-#    bookmark_new_inc_color = '#c00' if bookmark_new_inc > 0  else '#008000'
     
     ret = {}
     ret['total'] = bookmark_total;
@@ -577,6 +715,19 @@ def tmp_raw_data(include_test=False):
         finally:
             if conn:
                 conn.close()
+
+def _get_week_num(date):
+    '''获得给定日期是这一年的第几周。
+    每周以周一为一周的开始，但1月1日不是周一时,算作上一年的最后一周,返回0'''
+    year = date.year
+    wd = date.replace(month=1, day=1).weekday()
+    days = (date - datetime.datetime(year, 1, 1)).days
+    nweek = 0
+    if wd:
+        nweek = (days + wd) / 7
+    else:
+        nweek = days / 7 + 1
+    return nweek
     
 if __name__ == '__main__':
 #    a = get_app_available()
@@ -595,5 +746,34 @@ if __name__ == '__main__':
 
 #    a = get_bookmark_percent_raw_data('2012.06.05 16:54:10')
 #    a = tmp_raw_data()
-    b = get_bookmark_website_raw_data('2012.07.10', '2012.07.12')
+#    b = get_bookmark_per_user_raw_data('2012.07.10', '2012.07.12', 2)
+#    b = get_bookmark_time_raw_data('2012.07.10', '2012.07.12')
+#    b = get_bookmark_time('2012-07-10', '2012-07-12')
+#    b = get_activate_user('2012-01-01 00:00:00', '2222-06-10 00:00:00')
+#    b = get_bookmark_per_user('2012-07-23 00:00:00', '2012-07-24 23:59:00')
+#    b = get_bookmark_percent_raw_data('2012-07-23 00:00:00', '2012-07-24 23:59:00')
+
+#    b = get_activate_user('2012-07-16 00:00:00', '2012-07-24 23:59:59', data_grain='day')
+#    print b
+#    b = get_activate_user('2012-06-15 00:00:00', '2012-07-28 23:59:59', data_grain='week')
+    b = get_user_platform_raw_data('2012-07-22 00:00:00', '2012-07-23 23:59:59')
     print b
+#    num = 29
+#    today = datetime.date.today()
+#    first_day = datetime.date.today().replace(month=1, day=1)
+##    first_day = datetime.date.today().replace(year=2011, month=1, day=1)
+#    sec_day = datetime.date.today().replace(month=1, day=2)
+#    first_weekday = first_day.isoweekday()
+#    print first_day
+#    print first_weekday
+##    if first_weekday == 7:
+#    delta = datetime.timedelta(weeks=(num-1))
+#    mon = first_day + delta
+#    print mon
+#    
+#    print today
+#    print '今周是今年的第%s周 ' % first_day.strftime('%W')
+#    print '今周是今年的第%s周 ' % sec_day.strftime('%W')
+#    print '今周是今年的第%s周 ' % today.strftime('%W')
+#    print _get_week_num(datetime.datetime.now().replace(day=23))
+#    print datetime.datetime(2006,9,4).isocalendar()[1]

@@ -70,6 +70,8 @@ function addClass(element, value) {
 };
 
 function clearElement(element) {
+	if (!element)
+		return;
 	var child_nodes = element.childNodes;
 
 	if (child_nodes) {
@@ -111,4 +113,27 @@ var create_link = function(url, text, value, onclick) {
 var chart_date_handler = function(time_str) {
 	time = new Date(time_str);
 	return time.format('MM.dd hh:mm');
+};
+
+var get_date_range = function(from, to) {
+	var from_array = from ? from.split('-') : [];
+	var from_int_array = [];
+	for (var i = 0; i < from_array.length; i++) {
+		from_int_array[i] = parseInt(from_array[i], 10);
+	}
+	var from_time = new Date(from_int_array[0], from_int_array[1] - 1,
+			from_int_array[2], 0, 0, 0);
+
+	var to_array = to ? to.split('-') : [];
+	var to_int_array = [];
+	for (var i = 0; i < to_array.length; i++) {
+		to_int_array[i] = parseInt(to_array[i], 10);
+	}
+	var to_time = new Date(to_int_array[0], to_int_array[1] - 1,
+			to_int_array[2], 23, 59, 59);
+
+	return {
+		'start_time' : from_time.format('yyyy-MM-dd hh:mm:ss'),
+		'end_time' : to_time.format('yyyy-MM-dd hh:mm:ss')
+	}
 };

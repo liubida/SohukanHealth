@@ -4,10 +4,6 @@ body {
 	color: black;
 }
 
-div {
-	margin: 2px;
-}
-
 table {
 	border-collapse: collapse;
 	border: solid #000;
@@ -51,26 +47,15 @@ a:hover {
 
 .right_navigate {
 	float: right;
-	width: 80px;
+	width: 100px;
 	height: 600px;
 	margin: 5px;
 }
 
-.grid {
-	float: left;
-	width: 520px;
-	height: 325px;
-	margin: 5px 10px 15px 10px;
-}
-
-.grid_item {
-	width: 98%;
-	height: 95%;
-	margin: 2px;
-}
-
-.day_report_div {
-	display: block;
+.statistics_div {
+	width: 800px;
+	height: 400px;
+	float:left;
 }
 
 .firstPage,.lastPage,.prevPage,.nextPage,.morePages,.pageNum,.currentPage
