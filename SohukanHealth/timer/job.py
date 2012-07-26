@@ -144,20 +144,22 @@ def day_report_job():
     day_report = DayReport(time=datetime.datetime.now(), version=c.day_report_version, jsondata=anyjson.dumps(jsondata))
     day_report.save();
     
-
 @print_info(name='fix_ua_job')
 def fix_ua_job():
-    ua = UA.objects.filter(is_crawler=False)
-    for u in ua:
-        if str(u.ua_string).startswith('搜狐随身看'):
-            u.platform = 'Darwin'
-            u.is_crawler = True
-        else:
-            ret = query_ua(u.ua_string)
-            if ret:
-                u.platform = ret['os_type']
+    try:
+        ua = UA.objects.filter(is_crawler=False)
+        for u in ua:
+            if u.ua_string.startswith(u'搜狐随身看'):
+                u.platform = 'Darwin'
                 u.is_crawler = True
-        u.save()
+            else:
+                ret = query_ua(u.ua_string)
+                if ret:
+                    u.platform = ret['os_type']
+                    u.is_crawler = True
+            u.save()
+    except Exception, e:
+        c.logger.error(e)
 
 if __name__ == '__main__':
 #    day_report_job()
