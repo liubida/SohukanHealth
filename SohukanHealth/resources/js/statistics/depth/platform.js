@@ -65,8 +65,8 @@ var make_platform_chart = function(chartData) {
 	// fifth graph
 	var graph = new AmCharts.AmGraph();
 	graph.type = "line";
-	graph.title = "Linux";
-	graph.valueField = "Linux 平台PC";
+	graph.title = "Linux  平台PC";
+	graph.valueField = "Linux";
 	graph.balloonText = "[[value]] ([[percents]]%)";
 	graph.lineAlpha = 0;
 	graph.fillAlphas = 0.6;
