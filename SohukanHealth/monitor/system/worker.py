@@ -47,17 +47,14 @@ class add_worker():
     def add(self):
         self._add_bookmark()
         expire_time = datetime.datetime.now() + datetime.timedelta(seconds=c.add_time_limit)
-        while True:
-            add_result = self._check_bookmark(self.url, self.cookie)
+        add_result = self._check_bookmark(self.url, self.cookie)
 
-            if expire_time < datetime.datetime.now():
-                raise MonitorException('add_bookmark_timeout, url:%s' % self.url)
+        if expire_time < datetime.datetime.now():
+            raise MonitorException('add_bookmark_timeout, url:%s' % self.url)
+        
+        if not add_result:
+            raise MonitorException('add_bookmark_error, url:%s' % self.url)
             
-            if add_result : 
-                break
-                
-            time.sleep(0.5)
-
     def _check_bookmark(self, check_url, cookie):
         url_bookmarks_list = "http://kan.sohu.com/api/2/bookmarks/list/";
         data = urllib.urlencode({"order_by":"-create_time", "limit":1, "submit":"提交"});
@@ -104,15 +101,12 @@ class read_worker():
     @mytimer
     def read(self):
         expire_time = datetime.datetime.now() + datetime.timedelta(seconds=c.read_time_limit)
-        while True:
-            bookmark_id = self._get_bookmark_id()
-            self._get_text(bookmark_id)
-            self._get_resource(bookmark_id)
+        bookmark_id = self._get_bookmark_id()
+        self._get_text(bookmark_id)
+        self._get_resource(bookmark_id)
 
-            if expire_time < datetime.datetime.now():
-                raise MonitorException('read_bookmark_timeout')
-            
-            time.sleep(0.5)
+        if expire_time < datetime.datetime.now():
+            raise MonitorException('read_bookmark_timeout')
     
     def _get_bookmark_id(self):
         '''

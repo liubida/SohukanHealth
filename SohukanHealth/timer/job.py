@@ -162,6 +162,7 @@ def fix_ua_job():
         c.logger.error(e)
 
 if __name__ == '__main__':
+    read_job()
 #    day_report_job()
 #    today = datetime.date.today()
 #    today = today.replace(day=31)
@@ -169,7 +170,7 @@ if __name__ == '__main__':
 #    d = datetime.timedelta(days=1)
 #    print today + d
 #    
-    fix_ua_job()
+#    fix_ua_job()
 #    mysql_ping_job();
 #    user_total_job()
 #    bookmark_total_job()
