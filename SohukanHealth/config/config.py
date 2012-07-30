@@ -25,8 +25,8 @@ class Config:
     
     MIN_TIME = '2012-01-01 00:00:00';
     MAX_TIME = '2222-06-10 00:00:00';
-    add_time_limit = 15
-    read_time_limit = 20
+    add_time_limit = 60
+    read_time_limit = 45
     
     '''read worker'''
     bucket_name = 'sohukan'
