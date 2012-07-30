@@ -103,9 +103,16 @@ class read_worker():
         
     @mytimer
     def read(self):
-        bookmark_id = self._get_bookmark_id()
-        self._get_text(bookmark_id)
-        self._get_resource(bookmark_id)
+        expire_time = datetime.datetime.now() + datetime.timedelta(seconds=c.read_time_limit)
+        while True:
+            bookmark_id = self._get_bookmark_id()
+            self._get_text(bookmark_id)
+            self._get_resource(bookmark_id)
+
+            if expire_time < datetime.datetime.now():
+                raise MonitorException('read_bookmark_timeout')
+            
+            time.sleep(0.5)
     
     def _get_bookmark_id(self):
         '''
