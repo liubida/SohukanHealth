@@ -36,7 +36,7 @@ def request(url, data=None, cookie=None):
 
 def query_ua(ua_string):
     ua_query_url = 'http://www.useragentstring.com'
-    data = urllib.urlencode({"uas":ua_string, "getJSON":"agent_type-agent_name-os_type"});
+    data = urllib.urlencode({"uas":ua_string.encode('utf8'), "getJSON":"agent_type-agent_name-os_type"});
     try:
         response = request(ua_query_url, data);
         
