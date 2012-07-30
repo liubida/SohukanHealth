@@ -163,6 +163,7 @@ def fix_ua_job():
 
 if __name__ == '__main__':
     read_job()
+#    add_job()
 #    day_report_job()
 #    today = datetime.date.today()
 #    today = today.replace(day=31)

@@ -47,14 +47,18 @@ class add_worker():
     def add(self):
         self._add_bookmark()
         expire_time = datetime.datetime.now() + datetime.timedelta(seconds=c.add_time_limit)
-        add_result = self._check_bookmark(self.url, self.cookie)
-
-        if expire_time < datetime.datetime.now():
-            raise MonitorException('add_bookmark_timeout, url:%s' % self.url)
-        
-        if not add_result:
-            raise MonitorException('add_bookmark_error, url:%s' % self.url)
+        while True:
+            # 我需要等待其添加完成, 但我只等待add_time_limit秒
+            time.sleep(0.5)
+            if expire_time < datetime.datetime.now():
+                raise MonitorException('add_bookmark_timeout, url:%s' % self.url)
             
+            add_result = self._check_bookmark(self.url, self.cookie)
+            
+            if add_result : 
+                break
+                
+    
     def _check_bookmark(self, check_url, cookie):
         url_bookmarks_list = "http://kan.sohu.com/api/2/bookmarks/list/";
         data = urllib.urlencode({"order_by":"-create_time", "limit":1, "submit":"提交"});
@@ -156,6 +160,8 @@ class read_worker():
                     key = i.get("key", None)
                     self._get_img_1(key)
                     self._get_img_2(key)
+                    # 只需要取其中的一张图片即可
+                    break
         else:
             raise MonitorException('get_resource_error, bookmark_id:%s' % str(bookmark_id))
         
@@ -184,18 +190,20 @@ class read_worker():
             raise MonitorException('get_image_2_error, url:%s, response.code:%d' % (url_bookmarks_get_raw_s3, response.code))
 
 if __name__ == '__main__':
-    cookie = ["Cookie", "access_token = eeeb8e686a2a148de62b2352ea88b9c6d4b8bd24"]
-    for i in range(20):
-        url = RandomSpider().get_valid_url()
-        print url
-        a = add_worker(url, cookie)
-        try:
-            a.test()
-            time.sleep(4)
-        except Exception, e:
-            print e
-        print '...'
+#    cookie = ["Cookie", "access_token = eeeb8e686a2a148de62b2352ea88b9c6d4b8bd24"]
+    cookie = ["Cookie", "access_token = 0381d220305f5acc8dab9a2ab9692a9d09be5e1d"]
+#    for i in range(2):
+#        url = RandomSpider().get_valid_url()
+#        print url
+#        a = add_worker(url, cookie)
+#        try:
+#            ret = a.test()
+#            print ret
+#            time.sleep(4)
+#        except Exception, e:
+#            print e
+#        print '...'
 
-#    b = read_worker(cookie)
-#    print b.test()
+    b = read_worker(cookie).test()
+    print b
     
