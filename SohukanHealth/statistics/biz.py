@@ -73,9 +73,14 @@ def _which_index(count):
     
     return None;
 
-def _get_fix(start_time, end_time):
+def _get_fix(start_time, end_time, start_delta=None, end_delta=None):
     having_fix = ''
     and_fix = ''
+    
+    if start_delta:
+        start_time = start_time + start_delta
+    if end_delta:
+        end_time = end_time + end_delta
     
     #时间约束, 即某个时间区间
     if start_time:
@@ -277,22 +282,22 @@ def get_bookmark_percent_raw_data(start_time=None, end_time=None, limit=100):
                {'name':'>200篇', 'count':0}]
         raw = {}
         
-        having_fix, and_fix = _get_fix(start_time, end_time)
         
         # 去掉测试用户的id, 因为要查询用户总数, 所以单独指定tmp
         tmp = ' and id !='
         tmp += ' and id !='.join(map(lambda x:str(x), test_id))
-        
-        sql_total = "select count(*) from account_user where id > 100 %s %s" % (tmp, and_fix)        
-        cursor.execute(sql_total)
-        result = cursor.fetchone()
-        user_total = result[0]
-        print 'user_total:', user_total
+
+        having_fix, and_fix = _get_fix(start_time, end_time)
+#        if not user_total:        
+#            sql_total = "select count(*) from account_user where id > 100 %s %s" % (tmp, and_fix)
+#            cursor.execute(sql_total)
+#            result = cursor.fetchone()
+#            user_total = result[0]
+#        print 'user_total:', user_total
         
         and_fix = and_fix.replace('gmt_create', 'create_time')
         for i in range(64):
             sql = "select user_id, count(*) from bookmark_bookmark_%s where 1=1 %s group by user_id" % (i, and_fix)
-            print sql
             cursor.execute(sql)
             results = cursor.fetchall()
             for d in results:
@@ -315,12 +320,12 @@ def get_bookmark_percent_raw_data(start_time=None, end_time=None, limit=100):
             ret_raw.append(tmp)
         
         # 为了计算为文章数为0的用户数
-        user_used = 0
-        for r in ret:
-            user_used += r['count']
+#        user_used = 0
+#        for r in ret:
+#            user_used += r['count']
 
-        ret_raw.append({'p_count':0, 'u_count':user_total - user_used})        
-        ret.append({'name':'0篇', 'count':user_total - user_used})
+#        ret_raw.append({'p_count':0, 'u_count':user_total - user_used})        
+#        ret.append({'name':'0篇', 'count':user_total - user_used})
         
         ret_raw.sort(key=lambda x:x['p_count'], reverse=True)
         ret.sort(key=lambda x:x['count'], reverse=True)
@@ -343,9 +348,6 @@ def get_user_platform_raw_data(start_time=None, end_time=None):
     try:
         conn = MySQLdb.connect(**c.db_self_config)
         cursor = conn.cursor()
-        
-        having_fix, and_fix = _get_fix(start_time, end_time)
-        and_fix = and_fix.replace('gmt_create', 'o.gmt_create')
         
         # 去掉测试用户的id
         tmp = ' user_id > 100 and user_id !='
@@ -396,7 +398,6 @@ def get_bookmark_website_raw_data(start_time=None, end_time=None, limit=100):
         cursor = conn.cursor()
         
         having_fix, and_fix = _get_fix(start_time, end_time)
-
         mm = {}
         ret = []
         
@@ -578,6 +579,10 @@ def appAvailableData_to_json(data):
     return anyjson.dumps(s)   
 
 def get_userdata_for_day_report(today_start, today_end):
+    # 针对some_total的机制对时间做点处理
+    # 用户总数是在整点时间+5分钟统计的, 当天的最后一个数据需要在第二天的00:06:00取得
+    # 因为是取最后一个总数数据, 所以只需要对today_end进行处理即可
+    today_end = today_end + datetime.timedelta(minutes=8)
     
     # 昨天
     yd_start = today_start - datetime.timedelta(days=1)
@@ -587,12 +592,12 @@ def get_userdata_for_day_report(today_start, today_end):
     b_yd_start = today_start - datetime.timedelta(days=2)
     b_yd_end = today_end - datetime.timedelta(days=2)
     
-    print today_start
-    print today_end
-    print yd_start
-    print yd_end
-    print b_yd_start
-    print b_yd_end
+#    print today_start
+#    print today_end
+#    print yd_start
+#    print yd_end
+#    print b_yd_start
+#    print b_yd_end
     
     # 今日用户总数
     user_total = int(SomeTotal.objects.filter(name='user', time__gte=today_start, time__lte=today_end).values('count').\
@@ -634,7 +639,11 @@ def get_userdata_for_day_report(today_start, today_end):
 
 
 def get_bookmarkdata_for_day_report(today_start, today_end):
-    
+    # 针对some_total的机制对时间做点处理
+    # 文章总数是在整点时间+10分钟统计的, 当天的最后一个数据需要在第二天的00:10:00取得
+    # 因为是取最后一个总数数据, 所以只需要对today_end进行处理即可
+    today_end = today_end + datetime.timedelta(minutes=15)
+        
     # 昨天
     yd_start = today_start - datetime.timedelta(days=1)
     yd_end = today_end - datetime.timedelta(days=1)
@@ -752,12 +761,13 @@ if __name__ == '__main__':
 #    b = get_activate_user('2012-01-01 00:00:00', '2222-06-10 00:00:00')
 #    b = get_bookmark_per_user('2012-07-23 00:00:00', '2012-07-24 23:59:00')
 #    b = get_bookmark_percent_raw_data('2012-07-23 00:00:00', '2012-07-24 23:59:00')
-
+     b = get_userdata_for_day_report(1, 2)
+     print b
 #    b = get_activate_user('2012-07-16 00:00:00', '2012-07-24 23:59:59', data_grain='day')
 #    print b
 #    b = get_activate_user('2012-06-15 00:00:00', '2012-07-28 23:59:59', data_grain='week')
-    b = get_user_platform_raw_data('2012-07-22 00:00:00', '2012-07-23 23:59:59')
-    print b
+#    b = get_user_platform_raw_data('2012-07-22 00:00:00', '2012-07-23 23:59:59')
+#    print b
 #    num = 29
 #    today = datetime.date.today()
 #    first_day = datetime.date.today().replace(month=1, day=1)

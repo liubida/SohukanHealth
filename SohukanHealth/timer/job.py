@@ -5,6 +5,18 @@ Created on Jun 7, 2012
 @author: liubida
 '''
 
+import sys
+import os
+root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print root_path
+sys.path.append(root_path)
+print sys.path
+
+from django.core.management import setup_environ
+from SohukanHealth import settings
+print settings
+setup_environ(settings)
+
 from config.config import c
 from monitor.models import AppAvailableData, SomeTotal
 from monitor.system.worker import add_worker, read_worker
@@ -117,12 +129,14 @@ def add_and_read_alarm_job():
         c.logger.error(msg)
         print msg
 
-@print_info(name='day_report_job')
-def day_report_job():
+#@print_info(name='day_report_job')
+def day_report_job(now=None):
     '''day_report created at 23:58:00'''
     
     # 今天
-    now = datetime.datetime.now()
+    if not now:
+        now = datetime.datetime.now()
+    
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = now.replace(hour=23, minute=59, second=59, microsecond=0)
     
@@ -130,10 +144,9 @@ def day_report_job():
     bookmark = get_bookmarkdata_for_day_report(today_start, today_end);
     
     bookmark_count = {}
-    bookmark_count['percent'], bookmark_count['data'] = get_bookmark_percent_raw_data(today_start, today_end)
-    
+    bookmark_count['percent'], bookmark_count['data'] = get_bookmark_percent_raw_data(today_start, today_end, limit=20)
     bookmark_website = {}
-    bookmark_website['data'] = get_bookmark_website_raw_data(today_start, today_end)
+    bookmark_website['data'] = get_bookmark_website_raw_data(today_start, today_end, limit=20)
     
     jsondata = {}
     jsondata['user'] = user
@@ -162,9 +175,14 @@ def fix_ua_job():
         c.logger.error(e)
 
 if __name__ == '__main__':
-    read_job()
+#    read_job()
 #    add_job()
-#    day_report_job()
+    now = datetime.datetime.now()
+    start = datetime.datetime(2012, 7, 16, 23, 58, 4)
+    while start < now:
+        print start
+        day_report_job(start)
+        start += datetime.timedelta(days=1)
 #    today = datetime.date.today()
 #    today = today.replace(day=31)
 #    print today
