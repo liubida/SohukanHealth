@@ -44,15 +44,18 @@ class SomeTotal(models.Model):
         ordering = ['time', 'gmt_create']
         get_latest_by = "gmt_modify" # Entry.objects.latest()
     
-class UserRegister(models.Model):
-    passport = models.CharField(max_length=128, db_index=True)
-    time = models.DateTimeField(blank=True, null=True)
+class SysAlarm(models.Model):
+    
+    type = models.CharField(max_length=64, db_index=True)
+    start_time = models.DateTimeField(blank=True, null=True)
+    end_time = models.DateTimeField(blank=True, null=True)
+    reason = models.CharField(max_length=512, blank=True, null=True)
+    wiki_url = models.CharField(max_length=256, blank=True, null=True) 
     comments = models.CharField(max_length=512, blank=True, null=True)
     gmt_create = models.DateTimeField(auto_now_add=True, null=True)
     gmt_modify = models.DateTimeField(auto_now=True, null=True)
     
     class Meta:
-        db_table = 'user_register'
-        ordering = ['-time', '-gmt_create']
+        db_table = 'sys_alarm'
+        ordering = ['-start_time', '-gmt_create']
         get_latest_by = "gmt_modify" # Entry.objects.latest()
-    

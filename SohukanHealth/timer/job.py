@@ -18,7 +18,7 @@ print settings
 setup_environ(settings)
 
 from config.config import c
-from monitor.models import AppAvailableData, SomeTotal
+from monitor.models import AppAvailableData, SomeTotal, SysAlarm
 from monitor.system.worker import add_worker, read_worker
 from statistics.biz import get_userdata_for_day_report, \
     get_bookmarkdata_for_day_report, get_bookmark_website_raw_data, \
@@ -112,24 +112,73 @@ def bookmark_total_job():
             if conn:
                 conn.close()
 
-@print_info(name='add_and_read_alarm_job')
-def add_and_read_alarm_job():
-    now = datetime.datetime.now()
-    delta = datetime.timedelta(hours=0.5)
-    start_time = now - delta
-    print start_time
+@print_info(name='add_alarm_job')
+def add_alarm_job():
+    start_time = datetime.datetime.now() - datetime.timedelta(hours=0.5) 
+    add_failure_data = AppAvailableData.objects.filter(name='add', result=False, time__gte=start_time).values('time')
+    failure_count = len(add_failure_data)
     
-    add_failure_data = AppAvailableData.objects.filter(name='add', result=False, time__gte=start_time).count()
-    read_failure_data = AppAvailableData.objects.filter(name='read', result=False, time__gte=start_time).count()
-    
-    if add_failure_data >= 3 or read_failure_data >= 3:
-        msg = 'add bookmark failure count(30min):%s' % str(add_failure_data)
-        msg += '\nread bookmark failure count(30min):%s' % str(read_failure_data)
-        sms(mobile_list=c.mobile_list, message_post=msg)
-        c.logger.error(msg)
-        print msg
+    if failure_count >= c.add_alarm_time: 
+        try:
+            start_time = add_failure_data[0]['time']
+            end_time = add_failure_data[failure_count - 1]['time']
+            type = 'add_bookmark'
+            msg = 'add failure count(30min):%s' % str(failure_count)
+            sms(mobile_list=c.mobile_list, message_post=msg)
 
-#@print_info(name='day_report_job')
+            latest = SysAlarm.objects.order_by('-gmt_create')[0]
+            if (not latest) or start_time > latest.end_time and (start_time - latest.end_time).seconds > 600:
+                # 一次新故障
+                alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
+                alarm.save()
+            else:
+                # 添加-报警的定时任务是每10min执行一次, 如果本次报警的时间和上次开始的时间<10min, 则认为是同一次故障
+                # 同一次故障的持续报警, 只需修改上次的结束时间即可
+                latest.end_time = end_time
+                latest.save()
+        except Exception, e:
+            c.logger.error(e)
+            c.logger.error(msg)
+            print msg
+
+@print_info(name='read_alarm_job')
+def read_alarm_job():
+    start_time = datetime.datetime.now() - datetime.timedelta(hours=0.5) 
+    read_failure_data = AppAvailableData.objects.filter(name='read', result=False, time__gte=start_time).values('time')
+    failure_count = len(read_failure_data)
+    
+    if failure_count >= c.read_alarm_time: 
+        try:
+            start_time = read_failure_data[0]['time']
+            end_time = read_failure_data[failure_count - 1]['time']
+            print start_time
+            print end_time
+            type = 'read_bookmark'
+            msg = 'read failure count(30min):%s' % str(failure_count)
+            sms(mobile_list=c.mobile_list, message_post=msg)
+
+            # 获取上一次的报警信息
+            latest = SysAlarm.objects.order_by('-gmt_create')[0]
+            if (not latest) or start_time > latest.end_time and (start_time - latest.end_time).seconds > 600:
+                # 一次新故障
+                alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
+                alarm.save()
+            else:
+                # 添加-报警的定时任务是每10min执行一次, 如果本次报警的时间和上次开始的时间<10min, 则认为是同一次故障
+                # 同一次故障的持续报警, 只需修改上次的结束时间即可
+                latest.end_time = end_time
+                latest.save()
+        except Exception, e:
+            c.logger.error(e)
+            c.logger.error(msg)
+            print msg
+        
+#    read_failure_data = AppAvailableData.objects.filter(name='read', result=False, time__gte=start_time)
+#        if len(read_failure_data) >= c.read_alarm_time:
+#            msg = 'read failure count(30min):%s' % str(len(read_failure_data))
+#            type = 'read_bookmark'
+
+@print_info(name='day_report_job')
 def day_report_job(now=None):
     '''day_report created at 23:58:00'''
     
@@ -175,14 +224,16 @@ def fix_ua_job():
         c.logger.error(e)
 
 if __name__ == '__main__':
+    add_alarm_job()
+    read_alarm_job()
 #    read_job()
 #    add_job()
-    now = datetime.datetime.now()
-    start = datetime.datetime(2012, 7, 16, 23, 58, 4)
-    while start < now:
-        print start
-        day_report_job(start)
-        start += datetime.timedelta(days=1)
+#    now = datetime.datetime.now()
+#    start = datetime.datetime(2012, 7, 16, 23, 58, 4)
+#    while start < now:
+#        print start
+#        day_report_job(start)
+#        start += datetime.timedelta(days=1)
 #    today = datetime.date.today()
 #    today = today.replace(day=31)
 #    print today

@@ -18,7 +18,7 @@ print settings
 setup_environ(settings)
 
 from job import add_job, read_job, user_total_job, \
-    bookmark_total_job, add_and_read_alarm_job, day_report_job,fix_ua_job
+    bookmark_total_job, add_alarm_job, read_alarm_job, day_report_job,fix_ua_job
 
 
 if __name__ == '__main__':
@@ -28,7 +28,8 @@ if __name__ == '__main__':
         method_name = sys.argv[1]
         if method_name == 'add_job': add_job()
         elif method_name == 'read_job': read_job()
-        elif method_name == 'add_and_read_alarm_job': add_and_read_alarm_job()
+        elif method_name == 'add_alarm_job': add_alarm_job()
+        elif method_name == 'read_alarm_job': read_alarm_job()
         elif method_name == 'user_total_job': user_total_job()
         elif method_name == 'bookmark_total_job': bookmark_total_job()
         elif method_name == 'day_report_job': day_report_job()
@@ -37,7 +38,8 @@ if __name__ == '__main__':
 
 # */5  *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py add_job
 # */5  *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py read_job
-# */10 *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py add_and_read_alarm_job
+# */10 *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py add_alarm_job
+# */10 *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py read_alarm_job
 # 5    */1  *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py user_total_job
 # 10   */1  *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py bookmark_total_job
 # 58   23   *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py day_report_job
