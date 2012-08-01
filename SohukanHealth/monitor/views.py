@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from config.config import c
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.template import loader
 from django.template.context import Context
@@ -9,6 +10,7 @@ from monitor.models import AppAvailableData, SysAlarm
 from util import get_start_end_for_month, timediff
 import datetime
 
+@login_required
 def monitor(request):
     t = loader.get_template('monitor/monitor.html')
     
@@ -33,6 +35,7 @@ def monitor(request):
         'av':av
     })))
 
+@login_required
 def sys_alarm(request, month=0):
     t = loader.get_template('monitor/sys_alarm_table.html')
     month = int(month)
@@ -52,10 +55,12 @@ def sys_alarm(request, month=0):
     
     return HttpResponse(t.render(Context({'alarm':alarm})))
     
+@login_required
 def read(request):
     data = AppAvailableData.objects.filter(name='read').values('name', 'time_used', 'time')
     return HttpResponse(appAvailableData_to_json(data))
 
+@login_required
 def add(request):
     data = AppAvailableData.objects.filter(name='add').values('name', 'time_used', 'time')
     return HttpResponse(appAvailableData_to_json(data))

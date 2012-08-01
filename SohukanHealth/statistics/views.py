@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Create your views here.
 from config.config import c
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.template import loader
 from django.template.context import Context
@@ -15,6 +16,7 @@ import datetime
 '''综合'''
 
 # 综合页面首页
+@login_required
 def statistics(request):
     t = loader.get_template('statistics/statistics.html')
     c = Context({
@@ -23,6 +25,7 @@ def statistics(request):
     return HttpResponse(t.render(c))
 
 # 综合 注册用户数统计
+@login_required
 def user_total(request):
     start_time = request.GET.get('start_time', c.MIN_TIME)
     end_time = request.GET.get('end_time', c.MAX_TIME)
@@ -58,6 +61,7 @@ def user_total(request):
     return HttpResponse(anyjson.dumps(data))
 
 # 综合 收藏文章数统计
+@login_required
 def bookmark_total(request):
     start_time = request.GET.get('start_time', c.MIN_TIME)
     end_time = request.GET.get('end_time', c.MAX_TIME)
@@ -92,6 +96,7 @@ def bookmark_total(request):
     return HttpResponse(anyjson.dumps(data))
 
 # 综合 收藏文章排行统计  
+@login_required
 def bookmark_per_user(request):
     start_time = request.GET.get('start_time', c.MIN_TIME)
     end_time = request.GET.get('end_time', c.MAX_TIME)
@@ -107,6 +112,7 @@ def bookmark_per_user(request):
     return HttpResponse(jsondata)
 
 # 综合 收藏文章时段统计
+@login_required
 def bookmark_time(request):
     start_time = request.GET.get('start_time', c.MIN_TIME)
     end_time = request.GET.get('end_time', c.MAX_TIME)
@@ -120,6 +126,7 @@ def bookmark_time(request):
     return HttpResponse(jsondata)
 
 # 综合 收藏文章百分比(pie)统计
+@login_required
 def user_bookmark_percent(request):
     start_time = request.GET.get('start_time', c.MIN_TIME)
     end_time = request.GET.get('end_time', c.MAX_TIME)
@@ -135,6 +142,7 @@ def user_bookmark_percent(request):
 '''深度统计'''
 
 # 深度统计页面首页
+@login_required
 def depth(request):
     template = loader.get_template('statistics/depth.html')
     c = Context({
@@ -143,6 +151,7 @@ def depth(request):
     return HttpResponse(template.render(c))
 
 # 深度 活跃用户统计    
+@login_required
 def activate_user(request):
     start_time = request.GET.get('start_time', c.MIN_TIME)
     end_time = request.GET.get('end_time', c.MAX_TIME)
@@ -158,6 +167,7 @@ def activate_user(request):
     return HttpResponse(jsondata)
 
 # 深度 收藏文章来源网站统计
+@login_required
 def bookmark_website(request):
     start_time = request.GET.get('start_time', c.MIN_TIME)
     end_time = request.GET.get('end_time', c.MAX_TIME)
@@ -172,6 +182,7 @@ def bookmark_website(request):
     return HttpResponse(jsondata)
 
 # 深度 用户使用平台统计
+@login_required
 def user_platform(request):
     start_time = request.GET.get('start_time', c.MIN_TIME)
     end_time = request.GET.get('end_time', c.MAX_TIME)
@@ -187,6 +198,7 @@ def user_platform(request):
 
 '''日报'''
 # 日报首页页面
+@login_required
 def day_report(request):
     template = loader.get_template('statistics/day_report.html')
     c = Context({
@@ -195,6 +207,7 @@ def day_report(request):
     return HttpResponse(template.render(c))
 
 # 日报日期
+@login_required
 def day_report_date(request):
     time_array = DayReport.objects.filter().values('time')
     
@@ -214,6 +227,7 @@ def day_report_date(request):
     return HttpResponse(anyjson.dumps(s))
 
 # 日报概要信息    
+@login_required
 def day_report_abstract(request):
     start_time = request.GET.get('start_time', '')
     end_time = request.GET.get('end_time', '')
@@ -240,6 +254,7 @@ def day_report_abstract(request):
         return HttpResponse(anyjson.dumps(s))
     
 # 日报收藏文章比例        
+@login_required
 def day_report_bookmark_percent(request):
     start_time = request.GET.get('start_time', '')
     end_time = request.GET.get('end_time', '')
@@ -252,6 +267,7 @@ def day_report_bookmark_percent(request):
         return HttpResponse(anyjson.dumps(data['bookmark_count']))        
 
 # 日报收藏文章来源网站    
+@login_required
 def day_report_bookmark_website(request):
     start_time = request.GET.get('start_time', '')
     end_time = request.GET.get('end_time', '')
@@ -266,6 +282,7 @@ def day_report_bookmark_website(request):
 '''周报'''
   
 # 周报首页
+@login_required
 def week_report(request):
     template = loader.get_template('statistics/week_report.html')
     c = Context({
@@ -274,6 +291,7 @@ def week_report(request):
     return HttpResponse(template.render(c))
 
 # 编码时测试用
+@login_required
 def test(start_time, end_time, data_grain='day'):
     if start_time == 'NaN-aN-aN aN:aN:aN': 
         start_time = c.MIN_TIME
@@ -313,7 +331,6 @@ def test(start_time, end_time, data_grain='day'):
         # 每隔4周天取一个23点的数据
         delta = datetime.timedelta(weeks=4)
         data['list'] = get_data_interval(raw_data, delta)
-
     
 if __name__ == '__main__':
     test('NaN-aN-aN aN:aN:aN', 'NaN-aN-aN aN:aN:aN', 'week')

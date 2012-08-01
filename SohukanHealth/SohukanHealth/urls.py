@@ -1,6 +1,7 @@
 from SohukanHealth.views import about, index, logtest
 from api.v1.app_available_data import LineItemResource
-from django.conf.urls import patterns
+from django.conf.urls import patterns, include
+from django.contrib import admin
 from djangorestframework.views import ListOrCreateModelView
 from monitor.views import read, add, monitor, sys_alarm
 from statistics.views import user_total, user_bookmark_percent, bookmark_total, \
@@ -10,8 +11,7 @@ from statistics.views import user_total, user_bookmark_percent, bookmark_total, 
     user_platform
 
 # Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+admin.autodiscover()
 
 urlpatterns = patterns('',
                        (r'^$', index),
@@ -36,21 +36,19 @@ urlpatterns = patterns('',
                        (r'^statistics/day_report/bookmark_percent$', day_report_bookmark_percent),
                        (r'^statistics/day_report/bookmark_website$', day_report_bookmark_website),
                        (r'^statistics/week_report$', week_report),
-                       (r'^all/$', index),
                        (r'^about/$', about),
                        (r'^logtest/$', logtest),
-#                       (r'^now/$', now),
-#                       (r'^now/plus/(\d{1,2})/$', now_plus),
-#                       (r'^hello/$', hello),
-#                       (r'^dbo/$', dbo_page),
-                        
-    # Examples:
-    # url(r'^$', 'SohukanHealth.views.home', name='home'),
-    # url(r'^SohukanHealth/', include('SohukanHealth.foo.urls')),
-
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
+                       (r'^admin/', include(admin.site.urls)),
 )
+
+urlpatterns += patterns('django.contrib.auth.views',
+                        (r'^login/$', 'login', {'template_name': 'login.html'}),
+                        (r'^logout/?$', 'logout', {'template_name': 'logout.html', 'next_page': '/'}),
+)
+
+#urlpatterns += patterns('django.contrib.auth.views', 
+#                        (r'^internal/accounts/login/$', 'login', {'template_name': 'internal/auth/login.html'}),
+#                        (r'^internal/accounts/logout/?$', 'logout', {'template_name': 'internal/auth/logout.html', 'next_page': '/internal/'}),
+#)
+
+
