@@ -249,14 +249,15 @@ var get_avg_time_used = function(chartData) {
 };
 var prepare_monitor = function() {
 	$('#app_available tr').mouseover(function() {
-				// this.style.fontWeight = 'bold';
 				this.style.backgroundColor = '#DFF7F8';
 			});
 	$('#app_available tr').mouseout(function() {
 				this.style.backgroundColor = 'white';
 			});
 	$('#app_available tr').click(function() {
-				load_sys_alarm(this.id.split('_')[2]);
+				if(this.id){
+					load_sys_alarm(this.id.split('_')[2]);
+				}
 			});
 };
 AmCharts.ready(function() {
