@@ -13,6 +13,10 @@ import datetime
 @login_required
 def monitor(request):
     t = loader.get_template('monitor/monitor.html')
+
+    username = str(request.user)
+    if username not in c.monitor_user:
+        return HttpResponse("<strong>Sry, u can not see this page</strong>", status=403)
     
     av = []
     this_month = datetime.datetime.now().month

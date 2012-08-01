@@ -23,9 +23,10 @@ class Config:
     log_file = ROOT_PATH + '/sohukan.log' 
     day_report_version = 0
 
-
     red = '#c00'
     green = '#008000'
+    
+    monitor_user=['supersohukan',]
     
     MIN_TIME = '2012-01-01 00:00:00';
     MAX_TIME = '2222-06-10 00:00:00';
@@ -83,7 +84,8 @@ if __name__ == '__main__':
 #    d = c.getConfig()
 #    print d.conn
 #    print d.db_config['host']
-    a = os.path.dirname(__file__)
-    print a
-    b = os.path.dirname(a)
-    print b
+    print 'supersohukan' in c.monitor_user
+#    a = os.path.dirname(__file__)
+#    print a
+#    b = os.path.dirname(a)
+#    print b
