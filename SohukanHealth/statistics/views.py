@@ -229,12 +229,12 @@ def day_report_abstract(request):
             'user_total_inc': data['user']['total_inc'],
             'user_new'      : data['user']['total'] - data['user']['total_yd'],
             'user_new_inc'  : data['user']['new_inc'],
-            'user_new_inc_color': '#c00' if data['user']['new_inc'] > 0  else '#008000',
+            'user_new_inc_color': c.red if data['user']['new_inc'] > 0  else c.green,
             'bookmark_total'    : data['bookmark']['total'],
             'bookmark_total_inc': data['bookmark']['total_inc'],
             'bookmark_new'      : data['bookmark']['total'] - data['bookmark']['total_yd'],
             'bookmark_new_inc'  : data['bookmark']['new_inc'],
-            'bookmark_new_inc_color': '#c00' if data['bookmark']['new_inc'] > 0  else '#008000',
+            'bookmark_new_inc_color': c.red if data['bookmark']['new_inc'] > 0  else c.green,
         }
         
         return HttpResponse(anyjson.dumps(s))

@@ -1,0 +1,20 @@
+<table style="font-size:12px">
+	<th>类型</th>
+	<th>时长</th>
+	<th>开始时间</th>
+	<th>结束时间</th>
+	<th>故障简述</th>
+	<th>wiki_url</th>
+	<th>备注</th>
+	{% for a in alarm %}
+	<tr>
+		<td>{{a.type}}</td>
+		<td>{{a.duration}}</td>
+		<td>{{a.start_time}}</td>
+		<td>{{a.end_time}}</td>
+		<td>{{a.reason}}</td>
+		<td><a href='{{a.wiki_url}}' target='_blank'>{{a.wiki_url}}</a></td>
+		<td>{{a.comments}}</td>
+	</tr>
+	{% endfor %}
+</table>

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import anyjson
 import datetime
 import urllib
@@ -59,5 +60,31 @@ def get_date_and_time():
     
     return date, time
 
+def get_start_end_for_month(month=1):
+    now = datetime.datetime.now()
+    
+    # 这个月的第一天
+    start = now.replace(month=month, day=1, hour=0, minute=0, second=0)
+    
+    # 下个月的第一天
+    if month + 1 > 12:
+        end = now.replace(month=month, day=31, hour=23, minute=59, second=59)
+    else:
+        next_month_first = now.replace(month=month + 1, day=1, hour=23, minute=59, second=59)
+        end = next_month_first - datetime.timedelta(days=1)
+
+    return start, end
+
+def timediff(start, end, ft='second'):
+    diff = end - start
+    seconds = diff.days * 24 * 3600 + diff.seconds
+     
+    if ft == 'second':
+        return seconds
+    if ft == 'minute':
+        return round((diff.days * 24 * 60 + diff.seconds / 60), -1)
+#        return round((diff.days * 24 * 60 + diff.seconds / 60), 0)
+#        return round(seconds / 60, 0) 
+     
 if __name__ == '__main__':
-    get_date_and_time()
+    get_start_end_for_month(1)

@@ -1,23 +1,28 @@
-{% extends "base.html" %} {% block title %} 监控指标 {% endblock %}
-
-{%block js %}
+{% extends "base.html" %} {% block title %} 监控指标 {% endblock %} {%block js %}
 <script type="text/javascript" src="/static/js/monitor/monitor.js"></script>
 
-{% endblock %} 
-{% block content %}
-<div>
-<h2>系统可用率</h2>
-<ul id='app_available'>
-<li>前1h:{{app_available.hour}}%</li>
-<li>前1天:{{app_available.day}}%</li>
-<li>前7天:{{app_available.week}}%</li>
-<li>前30天:{{app_available.month}}%</li>
-<li>前90天:{{app_available.sixmonths}}%</li>
-<li>前365天:{{app_available.year}}%</li>
-</ul>
+{% endblock %} {% block content %}
+
+<div class="clearfix" style="height: 350px">
+	<h2>系统可用率</h2>
+	<div id='app_available' style="width: 280px; float: left">
+		<table style="cursor:pointer">
+			<th>月份</th>
+			<th>可用时间(min)</th>
+			<th>可用率</th> {% for a in av %}
+			<tr id=av_month_{{a.month}} style="color: {{a.color}}">
+				<td>{{a.month}}月份</td>
+				<td>{{a.time}}</td>
+				<td>{{a.percent}}</td>
+			</tr>
+			{% endfor%}
+		</table>
+	</div>
+	<div id='sys_alarm' style="width: 890px;float:left"'>
+	</div>
 </div>
 <div>
-<div id="add_div" style="width: 100%; height: 300px;"></div>
-<div id="read_div" style="width: 100%; height: 300px;"></div>
+	<div id="add_div" style="width: 100%; height: 300px;"></div>
+	<div id="read_div" style="width: 100%; height: 300px;"></div>
 </div>
 {% endblock %}

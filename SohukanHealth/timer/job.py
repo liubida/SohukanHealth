@@ -127,7 +127,7 @@ def add_alarm_job():
             sms(mobile_list=c.mobile_list, message_post=msg)
 
             latest = SysAlarm.objects.order_by('-gmt_create')[0]
-            if (not latest) or start_time > latest.end_time and (start_time - latest.end_time).seconds > 600:
+            if (not latest) or start_time > latest.end_time and (start_time - latest.end_time).total_seconds() > 600:
                 # 一次新故障
                 alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
                 alarm.save()
@@ -159,7 +159,7 @@ def read_alarm_job():
 
             # 获取上一次的报警信息
             latest = SysAlarm.objects.order_by('-gmt_create')[0]
-            if (not latest) or start_time > latest.end_time and (start_time - latest.end_time).seconds > 600:
+            if (not latest) or start_time > latest.end_time and (start_time - latest.end_time).total_seconds() > 600:
                 # 一次新故障
                 alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
                 alarm.save()

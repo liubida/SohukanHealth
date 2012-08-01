@@ -43,7 +43,7 @@ var make_add_chart = function(chartData) {
 	valueAxis.axisAlpha = 0.2;
 	valueAxis.dashLength = 1;
 	chart.addValueAxis(valueAxis);
-	
+
 	// GUIDE for average
 	var guide = new AmCharts.Guide();
 	guide.value = avg;
@@ -53,7 +53,7 @@ var make_add_chart = function(chartData) {
 	guide.inside = true;
 	guide.lineAlpha = 1;
 	valueAxis.addGuide(guide);
-	
+
 	// GRAPH
 	var graph = new AmCharts.AmGraph();
 	graph.title = "red line";
@@ -218,7 +218,22 @@ var load_chart_data = function(name, params, callback) {
 					callback();
 				}
 			});
+};
 
+var load_sys_alarm = function(params, callback) {
+	var url = '/monitor/sys_alarm'
+	var e = document.getElementById('sys_alarm')
+
+	if (e) {
+		clearElement(e);
+
+		var loading = document.createElement('p')
+		var loading_text = document.createTextNode('数据加载中...')
+		loading.appendChild(loading_text);
+		e.appendChild(loading);
+	}
+	url = url + '/' + params + '/'
+	$('#sys_alarm').load(url);
 };
 
 var get_avg_time_used = function(chartData) {
@@ -232,8 +247,20 @@ var get_avg_time_used = function(chartData) {
 	}
 	return sum / len;
 };
-
+var prepare_monitor = function() {
+	$('#app_available tr').mouseover(function() {
+				// this.style.fontWeight = 'bold';
+				this.style.backgroundColor = '#DFF7F8';
+			});
+	$('#app_available tr').mouseout(function() {
+				this.style.backgroundColor = 'white';
+			});
+	$('#app_available tr').click(function() {
+				load_sys_alarm(this.id.split('_')[2]);
+			});
+};
 AmCharts.ready(function() {
+			prepare_monitor();
 			load_chart_data('read');
 			load_chart_data('add');
 		});

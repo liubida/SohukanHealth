@@ -22,6 +22,10 @@ class Config:
     cookie = ["Cookie", "access_token = 0381d220305f5acc8dab9a2ab9692a9d09be5e1d"]
     log_file = ROOT_PATH + '/sohukan.log' 
     day_report_version = 0
+
+
+    red = '#c00'
+    green = '#008000'
     
     MIN_TIME = '2012-01-01 00:00:00';
     MAX_TIME = '2222-06-10 00:00:00';
@@ -30,7 +34,6 @@ class Config:
     read_time_limit = 25
     read_alarm_time = 3
     
-    '''read worker'''
     bucket_name = 'sohukan'
     expires_seconds = 300
 
