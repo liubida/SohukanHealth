@@ -82,9 +82,9 @@ def timediff(start, end, ft='second'):
     if ft == 'second':
         return seconds
     if ft == 'minute':
-        return round((diff.days * 24 * 60 + diff.seconds / 60), -1)
-#        return round((diff.days * 24 * 60 + diff.seconds / 60), 0)
-#        return round(seconds / 60, 0) 
+        return round((diff.days * 24 * 60 + (diff.seconds + 0.0000000001) / 60), 0)
      
 if __name__ == '__main__':
-    get_start_end_for_month(1)
+    a = 12.3
+    print round(a, -1)
+    
