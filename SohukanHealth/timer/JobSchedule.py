@@ -38,8 +38,8 @@ if __name__ == '__main__':
 
 # */5  *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py add_job
 # */5  *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py read_job
-# */10 *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py add_alarm_job
-# */10 *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py read_alarm_job
+# */5  *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py add_alarm_job
+# */5  *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py read_alarm_job
 # 5    */1  *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py user_total_job
 # 10   */1  *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py bookmark_total_job
 # 58   23   *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py day_report_job

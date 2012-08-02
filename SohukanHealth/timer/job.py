@@ -114,7 +114,7 @@ def bookmark_total_job():
 
 @print_info(name='add_alarm_job')
 def add_alarm_job():
-    start_time = datetime.datetime.now() - datetime.timedelta(hours=0.5) 
+    start_time = datetime.datetime.now() - datetime.timedelta(minutes=36) 
     add_failure_data = AppAvailableData.objects.filter(name='add', result=False, time__gte=start_time).values('time')
     failure_count = len(add_failure_data)
     
@@ -123,20 +123,26 @@ def add_alarm_job():
             start_time = add_failure_data[0]['time']
             end_time = add_failure_data[failure_count - 1]['time']
             type = 'add_bookmark'
-            msg = 'add failure count(30min):%s' % str(failure_count)
+            msg = 'add failure count(30min): %s' % str(failure_count)
             sms(mobile_list=c.mobile_list, message_post=msg)
 
-            latest = SysAlarm.objects.order_by('-gmt_create')[0]
-            tdiff = timediff(start_time, latest.end_time)
-            if (not latest) or start_time > latest.end_time and tdiff > 600:
-                # 一次新故障
+            latest = SysAlarm.objects.filter(type=type).order_by('-gmt_create')
+            if latest:
+                latest = latest[0]
+                tdiff = timediff(start_time, latest.end_time)
+                if (not latest) or start_time > latest.end_time and tdiff > 600:
+                    # 一次新故障
+                    alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
+                    alarm.save()
+                else:
+                    # 添加-报警的定时任务是每10min执行一次, 如果本次报警的时间和上次开始的时间<10min, 则认为是同一次故障
+                    # 同一次故障的持续报警, 只需修改上次的结束时间即可
+                    latest.end_time = end_time
+                    latest.save()
+            else:
+                # 以前没有过这样类型的故障
                 alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
                 alarm.save()
-            else:
-                # 添加-报警的定时任务是每10min执行一次, 如果本次报警的时间和上次开始的时间<10min, 则认为是同一次故障
-                # 同一次故障的持续报警, 只需修改上次的结束时间即可
-                latest.end_time = end_time
-                latest.save()
         except Exception, e:
             c.logger.error(e)
             c.logger.error(msg)
@@ -144,7 +150,7 @@ def add_alarm_job():
 
 @print_info(name='read_alarm_job')
 def read_alarm_job():
-    start_time = datetime.datetime.now() - datetime.timedelta(hours=0.5) 
+    start_time = datetime.datetime.now() - datetime.timedelta(minutes=36) 
     read_failure_data = AppAvailableData.objects.filter(name='read', result=False, time__gte=start_time).values('time')
     failure_count = len(read_failure_data)
     
@@ -155,33 +161,32 @@ def read_alarm_job():
             print start_time
             print end_time
             type = 'read_bookmark'
-            msg = 'read failure count(30min):%s' % str(failure_count)
+            msg = 'read failure count(30min): %s' % str(failure_count)
             sms(mobile_list=c.mobile_list, message_post=msg)
 
             # 获取上一次的报警信息
-            latest = SysAlarm.objects.order_by('-gmt_create')[0]
-#            if latest:
-#                latest = latest[0]
-            tdiff = timediff(start_time, latest.end_time)
-            if (not latest) or start_time > latest.end_time and tdiff > 600:
-                # 一次新故障
+            latest = SysAlarm.objects.filter(type=type).order_by('-gmt_create')
+            if latest:
+                latest = latest[0]
+                tdiff = timediff(start_time, latest.end_time)
+                if (not latest) or start_time > latest.end_time and tdiff > 600:
+                    # 一次新的故障
+                    alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
+                    alarm.save()
+                else:
+                    # 添加-报警的定时任务是每10min执行一次, 如果本次报警的时间和上次开始的时间<10min, 则认为是同一次故障
+                    # 同一次故障的持续报警, 只需修改上次的结束时间即可
+                    latest.end_time = end_time
+                    latest.save()
+            else:
+                # 以前没有过这样类型的故障
                 alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
                 alarm.save()
-            else:
-                # 添加-报警的定时任务是每10min执行一次, 如果本次报警的时间和上次开始的时间<10min, 则认为是同一次故障
-                # 同一次故障的持续报警, 只需修改上次的结束时间即可
-                latest.end_time = end_time
-                latest.save()
         except Exception, e:
             c.logger.error(e)
             c.logger.error(msg)
             print msg
         
-#    read_failure_data = AppAvailableData.objects.filter(name='read', result=False, time__gte=start_time)
-#        if len(read_failure_data) >= c.read_alarm_time:
-#            msg = 'read failure count(30min):%s' % str(len(read_failure_data))
-#            type = 'read_bookmark'
-
 @print_info(name='day_report_job')
 def day_report_job(now=None):
     '''day_report created at 23:58:00'''
@@ -229,11 +234,22 @@ def fix_ua_job():
 
 if __name__ == '__main__':
 #    add_alarm_job()
-#    read_alarm_job()
-    read_job()
-    add_job()
+    read_alarm_job()
+#    read_job()
+#    add_job()
 #    now = datetime.datetime.now()
-#    start_time = datetime.datetime(2012, 8, 2, 8, 13, 0)
+#    start_time = datetime.datetime(2012, 8, 2, 7, 50, 1)
+#    end_time = datetime.datetime(2012, 8, 2, 7, 50, 0)
+#    start_time = start_time - datetime.timedelta(hours=0.5)
+##    start_time = datetime.datetime.now() - datetime.timedelta(minutes=35) 
+#    print start_time
+#    
+#    read_failure_data = AppAvailableData.objects.filter(name='read', result=False, time__gte=start_time, time__lte=end_time).values('time')
+#    failure_count = len(read_failure_data)
+#    print failure_count
+    
+    
+    
 #    end_time = datetime.datetime.now()
 #    print (start_time - end_time).total_seconds()
     

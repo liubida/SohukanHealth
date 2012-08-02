@@ -7,7 +7,7 @@ from django.template import loader
 from django.template.context import Context
 from monitor.biz import appAvailableData_to_json
 from monitor.models import AppAvailableData, SysAlarm
-from util import get_start_end_for_month, timediff
+from util import get_start_end_for_month, timediff, to_percent
 import datetime
 
 @login_required
@@ -31,8 +31,9 @@ def monitor(request):
         for a in alarm:
             av_time = av_time - timediff(a.start_time, a.end_time, 'minute')
         
-        av_percent = round(((av_time + 0.0000000000001) / all_min), 6)
+        av_percent = round(((av_time + 0.0000000000001) / all_min), 6) 
         av_color = c.green if av_percent > 0.9999 else c.red
+        av_percent = to_percent(av_percent)
         av.append({'month':i, 'time':av_time, 'percent':av_percent, 'color':av_color})
         
     return HttpResponse(t.render(Context({

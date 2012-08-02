@@ -32,7 +32,7 @@ var prepare_day_report = function() {
 							var da = day_str.split("-");
 							var da_int = [];
 							for (var i = 0; i < da.length; i++) {
-								da_int[i] = parseInt(da[i]);
+								da_int[i] = parseInt(da[i],10);
 							}
 							var day = new Date(da_int[0], da_int[1] - 1,
 									da_int[2], 0, 0, 0);
@@ -91,7 +91,7 @@ var load_day_report_abstract = function(params) {
 				var inc = document.createElement('font');
 				inc.style.color = '#c00';
 				var inc_text = document.createTextNode('['
-						+ data['user_total_inc'] + ']');
+						+ (parseFloat(data['user_total_inc'])*100).toFixed(2) + '%]');
 				inc.appendChild(inc_text);
 				user_total.appendChild(value);
 				user_total.appendChild(inc);
@@ -100,7 +100,7 @@ var load_day_report_abstract = function(params) {
 				var inc = document.createElement('font');
 				inc.style.color = data['user_new_inc_color'];
 				var inc_text = document.createTextNode('['
-						+ data['user_new_inc'] + ']');
+						+ (parseFloat(data['user_new_inc'])*100).toFixed(2) + '%]');
 				inc.appendChild(inc_text);
 				user_new.appendChild(value);
 				user_new.appendChild(inc);
@@ -110,7 +110,7 @@ var load_day_report_abstract = function(params) {
 				var inc = document.createElement('font');
 				inc.style.color = '#c00';
 				var inc_text = document.createTextNode('['
-						+ data['bookmark_total_inc'] + ']');
+						+ (parseFloat(data['bookmark_total_inc'])*100).toFixed(2) + '%]');
 				inc.appendChild(inc_text);
 				bookmark_total.appendChild(value);
 				bookmark_total.appendChild(inc);
@@ -119,7 +119,7 @@ var load_day_report_abstract = function(params) {
 				var inc = document.createElement('font');
 				inc.style.color = data['bookmark_new_inc_color'];
 				var inc_text = document.createTextNode('['
-						+ data['bookmark_new_inc'] + ']');
+						+ (parseFloat(data['bookmark_new_inc'])*100).toFixed(2) + '%]');
 				inc.appendChild(inc_text);
 				bookmark_new.appendChild(value);
 				bookmark_new.appendChild(inc);

@@ -9,7 +9,6 @@ from exception import MonitorException
 from lxml import etree
 from monitor.system.s3.mod_storage_helper import get_expire_data_url
 from util import mytimer, request
-from util.random_spider import RandomSpider
 import datetime
 import threading
 import time
