@@ -86,9 +86,6 @@ def timediff(start, end, ft='second'):
     
 def to_percent(p):
     return '%.4f%%' % (p*100)
-         
+     
 if __name__ == '__main__':
     a = 0.123
-    print round(a, -1)
-    print to_percent(a)
-    
