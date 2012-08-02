@@ -20,7 +20,7 @@ import datetime
 def statistics(request):
     t = loader.get_template('statistics/statistics.html')
     c = Context({
-        'name': 'liubida',
+        'user': request.user
     })
     return HttpResponse(t.render(c))
 

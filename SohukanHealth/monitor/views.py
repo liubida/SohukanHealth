@@ -14,6 +14,9 @@ import datetime
 def monitor(request):
     t = loader.get_template('monitor/monitor.html')
 
+    username1 = str(request.user.username)
+    print username1
+    
     username = str(request.user)
     if username not in c.monitor_user:
         return HttpResponse("<strong>Sry, u can not see this page</strong>", status=403)
@@ -37,7 +40,8 @@ def monitor(request):
         av.append({'month':i, 'time':av_time, 'percent':av_percent, 'color':av_color})
         
     return HttpResponse(t.render(Context({
-        'av':av
+        'av':av,
+        'user':request.user
     })))
 
 @login_required

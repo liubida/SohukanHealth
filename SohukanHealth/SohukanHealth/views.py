@@ -13,7 +13,9 @@ import random
 @login_required
 def index(request):
     t = loader.get_template('index.html')
-    c = Context()
+    c = Context({
+        'user': request.user
+    })
     return HttpResponse(t.render(c))
 
 @login_required
