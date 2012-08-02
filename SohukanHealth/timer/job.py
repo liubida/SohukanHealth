@@ -127,7 +127,7 @@ def add_alarm_job():
             sms(mobile_list=c.mobile_list, message_post=msg)
 
             latest = SysAlarm.objects.order_by('-gmt_create')[0]
-            tdiff = timediff(latest.end_time, start_time)
+            tdiff = timediff(start_time, latest.end_time)
             if (not latest) or start_time > latest.end_time and tdiff > 600:
                 # 一次新故障
                 alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
@@ -162,7 +162,7 @@ def read_alarm_job():
             latest = SysAlarm.objects.order_by('-gmt_create')[0]
 #            if latest:
 #                latest = latest[0]
-            tdiff = timediff(latest.end_time, start_time)
+            tdiff = timediff(start_time, latest.end_time)
             if (not latest) or start_time > latest.end_time and tdiff > 600:
                 # 一次新故障
                 alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
