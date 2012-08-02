@@ -5,19 +5,9 @@ Created on Jun 7, 2012
 @author: liubida
 '''
 
-import sys
-import os
-root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print root_path
-sys.path.append(root_path)
-print sys.path
-
-from django.core.management import setup_environ
 from SohukanHealth import settings
-print settings
-setup_environ(settings)
-
 from config.config import c
+from django.core.management import setup_environ
 from monitor.models import AppAvailableData, SomeTotal, SysAlarm
 from monitor.system.worker import add_worker, read_worker
 from statistics.biz import get_userdata_for_day_report, \
@@ -25,11 +15,21 @@ from statistics.biz import get_userdata_for_day_report, \
     get_bookmark_percent_raw_data, test_id, _is_test
 from statistics.models import DayReport, UA
 from timer.sms import sms
-from util import print_info, query_ua
+from util import print_info, query_ua, timediff
 from util.random_spider import RandomSpider
 import MySQLdb
 import anyjson
 import datetime
+import os
+import sys
+root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print root_path
+sys.path.append(root_path)
+print sys.path
+
+print settings
+setup_environ(settings)
+
 
 @print_info(name='read_job')
 def read_job():
@@ -127,7 +127,8 @@ def add_alarm_job():
             sms(mobile_list=c.mobile_list, message_post=msg)
 
             latest = SysAlarm.objects.order_by('-gmt_create')[0]
-            if (not latest) or start_time > latest.end_time and (start_time - latest.end_time).total_seconds() > 600:
+            tdiff = timediff(latest.end_time, start_time)
+            if (not latest) or start_time > latest.end_time and tdiff > 600:
                 # 一次新故障
                 alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
                 alarm.save()
@@ -159,7 +160,10 @@ def read_alarm_job():
 
             # 获取上一次的报警信息
             latest = SysAlarm.objects.order_by('-gmt_create')[0]
-            if (not latest) or start_time > latest.end_time and (start_time - latest.end_time).total_seconds() > 600:
+#            if latest:
+#                latest = latest[0]
+            tdiff = timediff(latest.end_time, start_time)
+            if (not latest) or start_time > latest.end_time and tdiff > 600:
                 # 一次新故障
                 alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
                 alarm.save()
@@ -224,12 +228,17 @@ def fix_ua_job():
         c.logger.error(e)
 
 if __name__ == '__main__':
-    add_alarm_job()
+#    add_alarm_job()
     read_alarm_job()
 #    read_job()
 #    add_job()
 #    now = datetime.datetime.now()
-#    start = datetime.datetime(2012, 7, 16, 23, 58, 4)
+#    start_time = datetime.datetime(2012, 8, 2, 8, 13, 0)
+#    end_time = datetime.datetime.now()
+#    print (start_time - end_time).total_seconds()
+    
+#    timediff = timediff(start_time, end_time)
+#    print timediff
 #    while start < now:
 #        print start
 #        day_report_job(start)
