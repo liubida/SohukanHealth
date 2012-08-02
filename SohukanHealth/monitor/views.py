@@ -20,7 +20,7 @@ def monitor(request):
     
     av = []
     this_month = datetime.datetime.now().month
-    for i in range(5, this_month):
+    for i in range(5, this_month + 1):
         start_time, end_time = get_start_end_for_month(i)
 
         alarm = SysAlarm.objects.filter(start_time__gte=start_time, start_time__lte=end_time)

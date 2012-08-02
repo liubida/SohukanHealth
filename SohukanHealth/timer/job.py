@@ -229,9 +229,9 @@ def fix_ua_job():
 
 if __name__ == '__main__':
 #    add_alarm_job()
-    read_alarm_job()
-#    read_job()
-#    add_job()
+#    read_alarm_job()
+    read_job()
+    add_job()
 #    now = datetime.datetime.now()
 #    start_time = datetime.datetime(2012, 8, 2, 8, 13, 0)
 #    end_time = datetime.datetime.now()
