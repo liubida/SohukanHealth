@@ -5,9 +5,19 @@ Created on Jun 7, 2012
 @author: liubida
 '''
 
-from SohukanHealth import settings
-from config.config import c
+import sys
+import os
+root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print root_path
+sys.path.append(root_path)
+print sys.path
+
 from django.core.management import setup_environ
+from SohukanHealth import settings
+print settings
+setup_environ(settings)
+
+from config.config import c
 from monitor.models import AppAvailableData, SomeTotal, SysAlarm
 from monitor.system.worker import add_worker, read_worker
 from statistics.biz import get_userdata_for_day_report, \
@@ -20,16 +30,6 @@ from util.random_spider import RandomSpider
 import MySQLdb
 import anyjson
 import datetime
-import os
-import sys
-root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print root_path
-sys.path.append(root_path)
-print sys.path
-
-print settings
-setup_environ(settings)
-
 
 @print_info(name='read_job')
 def read_job():
