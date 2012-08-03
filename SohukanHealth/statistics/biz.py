@@ -218,7 +218,6 @@ def get_activate_user(start_time=None, end_time=None, data_grain='day'):
 def get_activate_user_raw_data(start_time=None, end_time=None, data_grain='day'):
     '''为[活跃用户统计]获取原始数据'''
     try:
-        print start_time, end_time
         conn = MySQLdb.connect(**c.db_self_config)
         cursor = conn.cursor()
 
@@ -361,11 +360,9 @@ def get_user_platform_raw_data(start_time=None, end_time=None):
            where gmt_create >= '%s' and gmt_create <='%s' and  %s ) o 
            left join stats_ua u on o.ua_id = u.id group by u.platform, o.data_grain order by o.data_grain''' \
            % (data_grain_format, start_time, end_time, tmp)
-        print sql
         cursor.execute(sql)
         results = cursor.fetchall()
         mm = {'time':''};
-        print results
         for d in results:
             time = str(d[0])
             platform = str(d[1])
@@ -443,7 +440,6 @@ def get_bookmark_time_raw_data(start_time=None, end_time=None):
         ret = []
         for i in range(64):
             sql = "select create_time, user_id from bookmark_bookmark_%s where 1=1 %s" % (i, and_fix)
-            print sql
             cursor.execute(sql)
             results = cursor.fetchall()
             for d in results:
@@ -477,7 +473,6 @@ def get_bookmark_per_user_raw_data(start_time=None, end_time=None, limit=100):
         ret = []
         for i in range(64):
             sql = "select user_id, count(*) from bookmark_bookmark_%s where 1=1 %s group by user_id " % (i, and_fix)
-            print sql
             cursor.execute(sql)
             results = cursor.fetchall()
             for d in results:
@@ -523,7 +518,6 @@ def calc_app_available(duration='day'):
     elif 'year' == duration:
         delta = datetime.timedelta(weeks=4 * 52)
     start_time = now - delta
-    print start_time
     
     success_data = AppAvailableData.objects.filter(result=True, time__gte=start_time).count()
     failure_data = AppAvailableData.objects.filter(result=False, time__gte=start_time).count()
@@ -706,7 +700,6 @@ def tmp_raw_data(include_test=False):
                     kv['user_id'] = int(d[0])
                     kv['url'] = str(d[1])
                     kv['bookmark'] = i
-                    print kv['user_id'], kv['url']
 #                    if include_test or not _is_test(kv['user_id']):
 #                        ret.append(kv)
                     ret.append(kv)

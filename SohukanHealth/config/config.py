@@ -6,7 +6,6 @@ Created on Jun 18, 2012
 '''
 import logging
 import os
-from django.middleware.gzip import GZipMiddleware
 
 class Config:
     ROOT_PATH = os.path.dirname(os.path.dirname(__file__))
@@ -38,8 +37,6 @@ class Config:
     
     bucket_name = 'sohukan'
     expires_seconds = 300
-
-    gzip_middleware = GZipMiddleware()
 
 class DevConfig(Config):
     cookie = ["Cookie", "access_token = 0381d220305f5acc8dab9a2ab9692a9d09be5e1d"]
