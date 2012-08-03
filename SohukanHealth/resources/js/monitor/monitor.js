@@ -180,11 +180,11 @@ var load_chart_data = function(name, params, callback) {
 	var e = null;
 	var url = null;
 	if (name == 'read') {
-		url = '/monitor/read'
+		url = '/monitor/read/'
 		e = document.getElementById('read_div')
 	}
 	if (name == 'add') {
-		url = '/monitor/add'
+		url = '/monitor/add/'
 		e = document.getElementById('add_div')
 	}
 
@@ -221,7 +221,7 @@ var load_chart_data = function(name, params, callback) {
 };
 
 var load_sys_alarm = function(params, callback) {
-	var url = '/monitor/sys_alarm'
+	var url = '/monitor/sys_alarm/'
 	var e = document.getElementById('sys_alarm')
 
 	if (e) {
@@ -232,7 +232,7 @@ var load_sys_alarm = function(params, callback) {
 		loading.appendChild(loading_text);
 		e.appendChild(loading);
 	}
-	url = url + '/' + params + '/'
+	url = url + params + '/'
 	$('#sys_alarm').load(url);
 };
 

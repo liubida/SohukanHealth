@@ -36,7 +36,8 @@ DATABASES = {
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
 #TIME_ZONE = 'America/Chicago'
-TIME_ZONE = None
+#TIME_ZONE = None
+TIME_ZONE = 'Asia/Shanghai'
 
 
 # Language code for this installation. All choices can be found here:
@@ -102,6 +103,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.gzip.GZipMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
 #    'django.middleware.csrf.CsrfViewMiddleware',

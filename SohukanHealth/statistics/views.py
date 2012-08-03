@@ -22,6 +22,7 @@ def statistics(request):
     c = Context({
         'user': request.user
     })
+
     return HttpResponse(t.render(c))
 
 # 综合 注册用户数统计
@@ -58,7 +59,14 @@ def user_total(request):
 
     # 计算data的增长率
     add_inc_for_data(data)
-    return HttpResponse(anyjson.dumps(data))
+    
+    response = HttpResponse(anyjson.dumps(data))
+    # 缓存一天, 也只能缓存一天
+    # 因为start_time和end_time可能是NA, 那么一天之后, 这个NA的数据实际上是会发生变化的.
+    now = datetime.datetime.now()
+    expire = now + datetime.timedelta(days=1)
+    response['Expires'] = expire.strftime('%a, %d %b %Y 01:00:00 %Z')
+    return response
 
 # 综合 收藏文章数统计
 @login_required
@@ -93,7 +101,13 @@ def bookmark_total(request):
 
     # 计算data的增长率
     add_inc_for_data(data)
-    return HttpResponse(anyjson.dumps(data))
+    
+    response = HttpResponse(anyjson.dumps(data))
+    # 缓存一天
+    now = datetime.datetime.now()
+    expire = now + datetime.timedelta(days=1)
+    response['Expires'] = expire.strftime('%a, %d %b %Y 01:00:00 %Z')
+    return response
 
 # 综合 收藏文章排行统计  
 @login_required
@@ -109,7 +123,13 @@ def bookmark_per_user(request):
         end_time = c.MAX_TIME
 
     jsondata = get_bookmark_per_user(start_time, end_time, limit)
-    return HttpResponse(jsondata)
+    
+    response = HttpResponse(jsondata)
+    # 缓存一天
+    now = datetime.datetime.now()
+    expire = now + datetime.timedelta(days=1)
+    response['Expires'] = expire.strftime('%a, %d %b %Y 01:00:00 %Z')
+    return response
 
 # 综合 收藏文章时段统计
 @login_required
@@ -123,7 +143,13 @@ def bookmark_time(request):
         end_time = c.MAX_TIME
         
     jsondata = get_bookmark_time(start_time, end_time)
-    return HttpResponse(jsondata)
+    
+    response = HttpResponse(jsondata)
+    # 缓存一天
+    now = datetime.datetime.now()
+    expire = now + datetime.timedelta(days=1)
+    response['Expires'] = expire.strftime('%a, %d %b %Y 01:00:00 %Z')
+    return response
 
 # 综合 收藏文章百分比(pie)统计
 @login_required
@@ -137,7 +163,13 @@ def user_bookmark_percent(request):
         end_time = c.MAX_TIME
         
     jsondata = get_bookmark_percent(start_time, end_time, raw=False)
-    return HttpResponse(jsondata)
+
+    response = HttpResponse(jsondata)
+    # 缓存一天
+    now = datetime.datetime.now()
+    expire = now + datetime.timedelta(days=1)
+    response['Expires'] = expire.strftime('%a, %d %b %Y 01:00:00 %Z')
+    return response
 
 '''深度统计'''
 
@@ -164,7 +196,13 @@ def activate_user(request):
         end_time = c.MAX_TIME
 
     jsondata = get_activate_user(start_time, end_time, data_grain=data_grain)
-    return HttpResponse(jsondata)
+
+    response = HttpResponse(jsondata)
+    # 缓存一天
+    now = datetime.datetime.now()
+    expire = now + datetime.timedelta(days=1)
+    response['Expires'] = expire.strftime('%a, %d %b %Y 01:00:00 %Z')
+    return response
 
 # 深度 收藏文章来源网站统计
 @login_required
@@ -179,7 +217,13 @@ def bookmark_website(request):
     if end_time == 'NaN-aN-aN aN:aN:aN': 
         end_time = c.MAX_TIME
     jsondata = get_bookmark_website(start_time, end_time, limit=limit)
-    return HttpResponse(jsondata)
+    
+    response = HttpResponse(jsondata)
+    # 缓存一天
+    now = datetime.datetime.now()
+    expire = now + datetime.timedelta(days=1)
+    response['Expires'] = expire.strftime('%a, %d %b %Y 01:00:00 %Z')
+    return response
 
 # 深度 用户使用平台统计
 @login_required
@@ -193,8 +237,13 @@ def user_platform(request):
         end_time = c.MAX_TIME
         
     jsondata = get_user_platform(start_time, end_time)
-    print jsondata
-    return HttpResponse(jsondata)
+    
+    response = HttpResponse(jsondata)
+    # 缓存3小时
+    now = datetime.datetime.now()
+    expire = now + datetime.timedelta(hours=3)
+    response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
+    return response
 
 '''日报'''
 # 日报首页页面
@@ -224,7 +273,14 @@ def day_report_date(request):
     s['code'] = 0
     s['total'] = len(day_array)
     s['list'] = day_array
-    return HttpResponse(anyjson.dumps(s))
+    
+    response = HttpResponse(anyjson.dumps(s))
+    # 缓存一天, url不会变, 但是数据是一天一变, 所以最多只能缓存一天
+    # 新数据会在0点之后出来
+    now = datetime.datetime.now()
+    expire = now + datetime.timedelta(days=1)
+    response['Expires'] = expire.strftime('%a, %d %b %Y 01:00:00 %Z')
+    return response
 
 # 日报概要信息    
 @login_required
@@ -251,7 +307,12 @@ def day_report_abstract(request):
             'bookmark_new_inc_color': c.red if data['bookmark']['new_inc'] > 0  else c.green,
         }
         
-        return HttpResponse(anyjson.dumps(s))
+        response = HttpResponse(anyjson.dumps(s))
+        # 这是旧时的数据, 可以永久缓存
+        now = datetime.datetime.now()
+        expire = now + datetime.timedelta(days=7)
+        response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
+        return response
     
 # 日报收藏文章比例        
 @login_required
@@ -264,7 +325,13 @@ def day_report_bookmark_percent(request):
     if jsondata_array:
         jsondata = jsondata_array[0]['jsondata']
         data = anyjson.loads(jsondata)
-        return HttpResponse(anyjson.dumps(data['bookmark_count']))        
+        response = HttpResponse(anyjson.dumps(data['bookmark_count']))
+        
+        # 这是旧时的数据, 可以永久缓存
+        now = datetime.datetime.now()
+        expire = now + datetime.timedelta(days=7)
+        response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
+        return response        
 
 # 日报收藏文章来源网站    
 @login_required
@@ -277,7 +344,14 @@ def day_report_bookmark_website(request):
     if jsondata_array:
         jsondata = jsondata_array[0]['jsondata']
         data = anyjson.loads(jsondata)
-        return HttpResponse(anyjson.dumps(data['bookmark_website']))        
+        response = HttpResponse(anyjson.dumps(data['bookmark_website']))
+        
+        # 这是旧时的数据, 可以永久缓存
+        now = datetime.datetime.now()
+        expire = now + datetime.timedelta(days=7)
+        response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
+        return response        
+        
 
 '''周报'''
   

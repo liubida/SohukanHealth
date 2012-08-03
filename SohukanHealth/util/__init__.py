@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import anyjson
 import datetime
+import time
 import urllib
 import urllib2
 
@@ -85,7 +86,24 @@ def timediff(start, end, ft='second'):
         return round((diff.days * 24 * 60 + (diff.seconds + 0.0000000001) / 60), 0)
     
 def to_percent(p):
-    return '%.4f%%' % (p*100)
-     
+    return '%.4f%%' % (p * 100)
+
+def left_seconds(time, mod=5):
+    # 离最近的整数5分钟还剩多少秒
+    # a = 21:00:10; 距离a最近的整数5分钟是21:05:00
+    # 则结果应该是 (4*60+50) 秒
+    min = time.minute
+    sec = time.second
+    return (mod - 1 - min % mod) * 60 + (60 - sec)
+    
 if __name__ == '__main__':
-    a = 0.123
+    while True:
+        now = datetime.datetime.now()
+        a = now.minute
+        b = now.second
+        print a%5
+        print a, ':', b, '|  ',(5 - 1 - a % 5) * 60 + (60 - b)
+        time.sleep(1)
+    
+    
+    

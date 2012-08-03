@@ -5,9 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.template import loader
 from django.template.context import Context
-from monitor.biz import appAvailableData_to_json
 from monitor.models import AppAvailableData, SysAlarm
 from util import get_start_end_for_month, timediff, to_percent
+import anyjson
 import datetime
 
 @login_required
@@ -39,10 +39,18 @@ def monitor(request):
         av_percent = to_percent(av_percent)
         av.append({'month':i, 'time':av_time, 'percent':av_percent, 'color':av_color})
         
-    return HttpResponse(t.render(Context({
+    response = HttpResponse(t.render(Context({
         'av':av,
         'user':request.user
     })))
+    
+    # 业务监控的系统可用率
+    now = datetime.datetime.now()
+    expire = now + datetime.timedelta(hours=8)
+    print now
+    print expire
+    response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
+    return response
 
 @login_required
 def sys_alarm(request, month=0):
@@ -62,14 +70,35 @@ def sys_alarm(request, month=0):
                      'wiki_url':i.wiki_url if i.wiki_url else '',
                      'comments':i.comments if i.comments else ''})
     
-    return HttpResponse(t.render(Context({'alarm':alarm})))
+    response = HttpResponse(t.render(Context({'alarm':alarm})))
+    
+    # 业务监控的系统可用率
+    now = datetime.datetime.now()
+    expire = (now + datetime.timedelta(hours=8))
+    print expire
+    response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
+    return response
     
 @login_required
 def read(request):
+    s = {'list':[]}
     data = AppAvailableData.objects.filter(name='read').values('name', 'time_used', 'time')
-    return HttpResponse(appAvailableData_to_json(data))
+    for d in data:
+        s['list'].append({'name':d['name'], 'time_used':d['time_used'], 'time':d['time'].strftime('%Y.%m.%d %H:%M:%S')})
+    
+    response = HttpResponse(anyjson.dumps(s))
+    response['Cache-Control'] = 'max-age=%d' % (300)
+    
+    return response
 
 @login_required
 def add(request):
+    s = {'list':[]}
     data = AppAvailableData.objects.filter(name='add').values('name', 'time_used', 'time')
-    return HttpResponse(appAvailableData_to_json(data))
+    for d in data:
+        s['list'].append({'name':d['name'], 'time_used':d['time_used'], 'time':d['time'].strftime('%Y.%m.%d %H:%M:%S')})
+    
+    response = HttpResponse(anyjson.dumps(s))
+    response['Cache-Control'] = 'max-age=%d' % (300)
+    
+    return response
