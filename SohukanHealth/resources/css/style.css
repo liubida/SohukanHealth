@@ -1,11 +1,13 @@
 #day_report_date {
 	height: 20px;
+	margin-bottom: 50px;
 }
 
 #day_report_date a {
 	display: block;
 	float: left;
 	font-size: 12px;
+	text-decoration: none;
 }
 
 #user_bookmark_percent_day_report_div {

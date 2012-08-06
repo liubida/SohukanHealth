@@ -5,10 +5,10 @@ var prepare_day_report = function() {
 	div_content.style.display = 'none';
 
 	var div_date = document.getElementById('day_report_date');
-
+	div_date.appendChild(document.createElement('p'));
+	
 	myAjax(url, {}, function(obj) {
 				data = obj.list;
-
 				for (var i = 0; i < data.length; i++) {
 					var a = document.createElement('a');
 					a.setAttribute('id', data[i]);
@@ -32,7 +32,7 @@ var prepare_day_report = function() {
 							var da = day_str.split("-");
 							var da_int = [];
 							for (var i = 0; i < da.length; i++) {
-								da_int[i] = parseInt(da[i],10);
+								da_int[i] = parseInt(da[i], 10);
 							}
 							var day = new Date(da_int[0], da_int[1] - 1,
 									da_int[2], 0, 0, 0);
@@ -60,6 +60,7 @@ var prepare_day_report = function() {
 					a.appendChild(a_text);
 					div_date.appendChild(a);
 				}
+
 			});
 };
 
@@ -78,52 +79,53 @@ var load_day_report_abstract = function(params) {
 	clearElement(bookmark_new);
 
 	myAjax(url, params, function(obj) {
-				data = obj;
+		data = obj;
 
-				// var inc = document.createTextNode('[' +
-				// data['user_total_inc']
-				// + ']');
-				// inc.style.color = '#c00';
-				// user_total.appendChild(value);
-				// user_total.appendChild(inc);
+		// var inc = document.createTextNode('[' +
+		// data['user_total_inc']
+		// + ']');
+		// inc.style.color = '#c00';
+		// user_total.appendChild(value);
+		// user_total.appendChild(inc);
 
-				var value = document.createTextNode(data['user_total'] + ' ');
-				var inc = document.createElement('font');
-				inc.style.color = '#c00';
-				var inc_text = document.createTextNode('['
-						+ (parseFloat(data['user_total_inc'])*100).toFixed(2) + '%]');
-				inc.appendChild(inc_text);
-				user_total.appendChild(value);
-				user_total.appendChild(inc);
+		var value = document.createTextNode(data['user_total'] + ' ');
+		var inc = document.createElement('font');
+		inc.style.color = '#c00';
+		var inc_text = document.createTextNode('['
+				+ (parseFloat(data['user_total_inc']) * 100).toFixed(2) + '%]');
+		inc.appendChild(inc_text);
+		user_total.appendChild(value);
+		user_total.appendChild(inc);
 
-				var value = document.createTextNode(data['user_new'] + ' ');
-				var inc = document.createElement('font');
-				inc.style.color = data['user_new_inc_color'];
-				var inc_text = document.createTextNode('['
-						+ (parseFloat(data['user_new_inc'])*100).toFixed(2) + '%]');
-				inc.appendChild(inc_text);
-				user_new.appendChild(value);
-				user_new.appendChild(inc);
+		var value = document.createTextNode(data['user_new'] + ' ');
+		var inc = document.createElement('font');
+		inc.style.color = data['user_new_inc_color'];
+		var inc_text = document.createTextNode('['
+				+ (parseFloat(data['user_new_inc']) * 100).toFixed(2) + '%]');
+		inc.appendChild(inc_text);
+		user_new.appendChild(value);
+		user_new.appendChild(inc);
 
-				var value = document.createTextNode(data['bookmark_total']
-						+ ' ');
-				var inc = document.createElement('font');
-				inc.style.color = '#c00';
-				var inc_text = document.createTextNode('['
-						+ (parseFloat(data['bookmark_total_inc'])*100).toFixed(2) + '%]');
-				inc.appendChild(inc_text);
-				bookmark_total.appendChild(value);
-				bookmark_total.appendChild(inc);
+		var value = document.createTextNode(data['bookmark_total'] + ' ');
+		var inc = document.createElement('font');
+		inc.style.color = '#c00';
+		var inc_text = document.createTextNode('['
+				+ (parseFloat(data['bookmark_total_inc']) * 100).toFixed(2)
+				+ '%]');
+		inc.appendChild(inc_text);
+		bookmark_total.appendChild(value);
+		bookmark_total.appendChild(inc);
 
-				var value = document.createTextNode(data['bookmark_new'] + ' ');
-				var inc = document.createElement('font');
-				inc.style.color = data['bookmark_new_inc_color'];
-				var inc_text = document.createTextNode('['
-						+ (parseFloat(data['bookmark_new_inc'])*100).toFixed(2) + '%]');
-				inc.appendChild(inc_text);
-				bookmark_new.appendChild(value);
-				bookmark_new.appendChild(inc);
-			});
+		var value = document.createTextNode(data['bookmark_new'] + ' ');
+		var inc = document.createElement('font');
+		inc.style.color = data['bookmark_new_inc_color'];
+		var inc_text = document.createTextNode('['
+				+ (parseFloat(data['bookmark_new_inc']) * 100).toFixed(2)
+				+ '%]');
+		inc.appendChild(inc_text);
+		bookmark_new.appendChild(value);
+		bookmark_new.appendChild(inc);
+	});
 }
 
 $(document).ready(function() {
