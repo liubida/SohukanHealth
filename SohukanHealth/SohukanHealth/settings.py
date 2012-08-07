@@ -141,8 +141,8 @@ INSTALLED_APPS = (
 )
 
 
-LOGIN_URL = '/login/'
-LOGOUT_URL = '/logout/'
+LOGIN_URL = '/mlogin/'
+LOGOUT_URL = '/mlogout/'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
