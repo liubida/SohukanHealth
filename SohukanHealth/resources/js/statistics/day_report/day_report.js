@@ -6,7 +6,7 @@ var prepare_day_report = function() {
 
 	var div_date = document.getElementById('day_report_date');
 	div_date.appendChild(document.createElement('p'));
-	
+
 	myAjax(url, {}, function(obj) {
 				data = obj.list;
 				for (var i = 0; i < data.length; i++) {
@@ -60,7 +60,15 @@ var prepare_day_report = function() {
 					a.appendChild(a_text);
 					div_date.appendChild(a);
 				}
-
+				
+				var now = new Date();
+				// 获取昨天的日期
+				now.setDate(now.getDate() - 1);
+				$('#day_report_date a').each(function(){
+					if(now.getDate() == this.id.split("-")[1]){
+						$('#'+this.id).click();
+					}
+				});
 			});
 };
 

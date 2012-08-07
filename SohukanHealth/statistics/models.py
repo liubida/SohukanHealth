@@ -4,8 +4,9 @@ from django.db import models
 
 MAX_UA_LENGTH = 192
 
-class DayReport(models.Model):
-        
+class Report(models.Model):
+    
+    type = models.CharField(max_length=64, blank=True, null=True)
     time = models.DateTimeField(db_index=True)
     version = models.IntegerField(blank=True, null=True)
     jsondata = models.TextField(blank=True, null=True)
@@ -14,7 +15,7 @@ class DayReport(models.Model):
     gmt_modify = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
-        db_table = 'day_report'
+        db_table = 'report'
         ordering = ['time', 'gmt_create']
         get_latest_by = "time" # Entry.objects.latest()
         

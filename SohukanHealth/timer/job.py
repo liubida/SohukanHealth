@@ -5,31 +5,33 @@ Created on Jun 7, 2012
 @author: liubida
 '''
 
-import sys
-import os
-root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print root_path
-sys.path.append(root_path)
-print sys.path
-
-from django.core.management import setup_environ
 from SohukanHealth import settings
-print settings
-setup_environ(settings)
-
 from config.config import c
+from django.core.management import setup_environ
 from monitor.models import AppAvailableData, SomeTotal, SysAlarm
 from monitor.system.worker import add_worker, read_worker
 from statistics.biz import get_userdata_for_day_report, \
     get_bookmarkdata_for_day_report, get_bookmark_website_raw_data, \
     get_bookmark_percent_raw_data, test_id, _is_test
-from statistics.models import DayReport, UA
+from statistics.models import Report, UA
 from timer.sms import sms
 from util import print_info, query_ua, timediff
 from util.random_spider import RandomSpider
 import MySQLdb
 import anyjson
 import datetime
+import os
+import sys
+import time
+root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print root_path
+sys.path.append(root_path)
+print sys.path
+
+print settings
+setup_environ(settings)
+
+
 
 @print_info(name='read_job')
 def read_job():
@@ -58,7 +60,7 @@ def user_total_job():
         cursor = conn.cursor()
 
         #去掉测试用户的id
-        tmp = ' where id > 100 and id !='
+        tmp = ' where id !='
         tmp += ' and id !='.join(map(lambda x:str(x), test_id))
         print tmp
         cursor.execute('select count(*) from account_user %s' % tmp)
@@ -212,8 +214,74 @@ def day_report_job(now=None):
     jsondata['bookmark_website'] = bookmark_website
     jsondata['bookmark_count'] = bookmark_count
     
-    day_report = DayReport(time=datetime.datetime.now(), version=c.day_report_version, jsondata=anyjson.dumps(jsondata))
+    day_report = Report(type='day', time=now, version=c.report_version, jsondata=anyjson.dumps(jsondata))
     day_report.save();
+
+#start = datetime.datetime(2012, 7, 16, 23, 58, 0)
+#now = datetime.datetime.now()
+#step = datetime.timedelta(days=1)
+#
+#while start < now:
+#    day_report_job(start)
+#    start += step
+
+@print_info(name='week_report_job')
+def week_report_job(today=None):
+    '''week_report created at mon 07:00:00'''
+    
+    if not today:
+        today = datetime.date.today()
+    # 双重保证, 不是周一就返回
+    if today.isoweekday() != 1: return
+    # 从上周的周一开始 
+    last_mon = today - datetime.timedelta(days=7)
+    jsondata_array = Report.objects.filter(type='day', time__gte=last_mon, time__lt=today).values('jsondata')
+    
+    new_user = {}
+    new_bookmark = {}
+    if jsondata_array:
+        count = 1
+        for jsondata in jsondata_array:
+            data = anyjson.loads(jsondata['jsondata'])
+            # 本周每天新增用户
+            new_user[count] = data['user']['total'] - data['user']['total_yd']
+            # 本周每天新增文章
+            new_bookmark[count] = data['bookmark']['total'] - data['bookmark']['total_yd']
+            count = count + 1
+
+    start_time = datetime.datetime(last_mon.year, last_mon.month, last_mon.day)
+    start_time = start_time.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_time = start_time + datetime.timedelta(days=6)
+    end_time = end_time.replace(hour=23, minute=59, second=59, microsecond=0)
+    bookmark_website = {}
+    bookmark_website['data'] = get_bookmark_website_raw_data(start_time, end_time, limit=100)                
+            
+    jsondata = {}
+    jsondata['new_user'] = new_user
+    jsondata['new_bookmark'] = new_bookmark
+    jsondata['bookmark_website'] = bookmark_website
+#    jsondata['bookmark_count'] = bookmark_count
+
+    week_report = Report(type='week', time=today, version=c.report_version, jsondata=anyjson.dumps(jsondata))
+    week_report.save();
+    
+start = datetime.date(2012, 7, 16)
+today = datetime.date.today()
+step = datetime.timedelta(days=1)
+
+while start <= today:
+    week_report_job(start)
+    start += step
+        
+#        response = HttpResponse(anyjson.dumps(data['bookmark_website']))
+        
+#        # 这是旧时的数据, 可以永久缓存
+#        now = datetime.datetime.now()
+#        expire = now + datetime.timedelta(days=7)
+#        response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
+#        return response        
+        
+
     
 @print_info(name='fix_ua_job')
 def fix_ua_job():
@@ -233,8 +301,9 @@ def fix_ua_job():
         c.logger.error(e)
 
 if __name__ == '__main__':
+    pass
 #    add_alarm_job()
-    read_alarm_job()
+#    read_alarm_job()
 #    read_job()
 #    add_job()
 #    now = datetime.datetime.now()

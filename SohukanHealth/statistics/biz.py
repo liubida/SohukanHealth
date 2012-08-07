@@ -17,7 +17,10 @@ import urlparse
 #         '#04D215', '#0D8ECF', '#0D52D1', '#2A0CD0', '#8A0CCF', '#CD0D74']
 color = ['#FF0F00', '#FF9E01', '#FCD202', '#F8FF01', '#B0DE09', \
          '#04D215', '#0D8ECF', '#0D52D1', '#2A0CD0', '#8A0CCF', '#CD0D74']
-test_id = [108, 165, 591]
+
+test_id = [2, 3, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 22, \
+          23, 24, 25, 29, 32, 33, 35, 43, 46, 53, 58, 91, \
+          108, 125, 165, 591, 1288, 1486, 2412, 3373]
 
 def get_data_interval(raw_data, delta=datetime.timedelta(days=1), time_format='str'):
     ret = []
@@ -46,7 +49,7 @@ def add_inc_for_data(data):
             
 def _is_test(user_id):
     
-    if user_id < 100 or user_id in test_id:
+    if user_id in test_id:
         return True;
     else:
         return False;
@@ -73,6 +76,29 @@ def _which_index(count):
     
     return None;
 
+def _get_week_list(start=datetime.datetime(2012, 7, 16), end=None):
+    now = datetime.datetime.now()
+    start_time = start if start else now.replace(month=1, day=1)
+    end_time = end if end else now.replace(month=12, day=31)
+    
+    week_list = [];
+    
+    cur = start_time
+    step = datetime.timedelta(days=7)
+    
+    # 处理开始时间
+    first_week_day = cur.isoweekday()
+    if first_week_day != 1:
+        week_list.append((cur.strftime('%Y-%m-%d'), (cur + datetime.timedelta(days=(7 - first_week_day))).strftime('%Y-%m-%d')))
+        cur = cur + datetime.timedelta(days=(7 - first_week_day + 1))
+    
+    while cur <= end_time and (end_time - cur).days >= 7:
+        week_list.append((cur.strftime('%Y-%m-%d'), (cur + datetime.timedelta(days=6)).strftime('%Y-%m-%d')))
+        cur = cur + step
+         
+    return week_list
+#_get_week_list(start=None, end=datetime.datetime(2012, 8, 30))
+    
 def _get_fix(start_time, end_time, start_delta=None, end_delta=None):
     having_fix = ''
     and_fix = ''
@@ -160,7 +186,7 @@ def get_user_platform(start_time=None, end_time=None):
     
     ret = {'list':data}
     return anyjson.dumps(ret)
-        
+
 def get_activate_user(start_time=None, end_time=None, data_grain='day'):
 
     # 获取注册用户数, 图中对比用
@@ -223,7 +249,7 @@ def get_activate_user_raw_data(start_time=None, end_time=None, data_grain='day')
 
         ret = []
         # 去掉测试用户的id
-        tmp = ' and user_id > 100 and user_id !='
+        tmp = ' and user_id !='
         tmp += ' and user_id !='.join(map(lambda x:str(x), test_id))
 
         if data_grain == 'week':
@@ -349,7 +375,7 @@ def get_user_platform_raw_data(start_time=None, end_time=None):
         cursor = conn.cursor()
         
         # 去掉测试用户的id
-        tmp = ' user_id > 100 and user_id !='
+        tmp = 'user_id !='
         tmp += ' and user_id !='.join(map(lambda x:str(x), test_id))
 
         ret = []
@@ -360,6 +386,7 @@ def get_user_platform_raw_data(start_time=None, end_time=None):
            where gmt_create >= '%s' and gmt_create <='%s' and  %s ) o 
            left join stats_ua u on o.ua_id = u.id group by u.platform, o.data_grain order by o.data_grain''' \
            % (data_grain_format, start_time, end_time, tmp)
+        print sql
         cursor.execute(sql)
         results = cursor.fetchall()
         mm = {'time':''};
@@ -414,6 +441,11 @@ def get_bookmark_website_raw_data(start_time=None, end_time=None, limit=100):
             ret.append({'domain':k, 'count':mm[k]})
             
         ret.sort(key=lambda x:x['count'], reverse=True)
+        
+        # 需要去除domain='kan.sohu.com'的数据
+        for r in ret:
+            if r['domain'] == 'kan.sohu.com':
+                ret.remove(r)
         return ret[:limit];
     except Exception, e:
         c.logger.error(e)
@@ -617,8 +649,8 @@ def get_userdata_for_day_report(today_start, today_end):
     user_total_inc_yd = (abs(user_new_yd) + 0.00000001) / user_total_b_yd
     user_total_inc_yd = round(user_total_inc_yd, 4)
         
-    # 环比新增用户_增长率_百分点
-    user_new_inc = user_total_inc - user_total_inc_yd 
+    # 环比新增用户_(本期新增用户-上期新增用户)/上期新增用户
+    user_new_inc = (user_new - user_new_yd + 0.00000001) / user_new_yd 
     user_new_inc = round(user_new_inc, 4)
     
     ret = {}
@@ -670,10 +702,10 @@ def get_bookmarkdata_for_day_report(today_start, today_end):
     bookmark_total_inc_yd = (abs(bookmark_new_yd) + 0.00000001) / bookmark_total_b_yd
     bookmark_total_inc_yd = round(bookmark_total_inc_yd, 4)
         
-    # 环比新增文章_增长率_百分点
-    bookmark_new_inc = bookmark_total_inc - bookmark_total_inc_yd 
+    # 环比新增文章=(本期新增文章-上期新增文章)/上期新增文章
+    bookmark_new_inc = (bookmark_new - bookmark_new_yd + 0.00000001) / bookmark_new_yd 
     bookmark_new_inc = round(bookmark_new_inc, 4)
-    
+     
     ret = {}
     ret['total'] = bookmark_total;
     ret['total_yd'] = bookmark_total_yd;
@@ -730,6 +762,10 @@ def _get_week_num(date):
     else:
         nweek = days / 7 + 1
     return nweek
+
+def get_week_report_abstract(start_time, end_time):
+    cur = start_time;
+    step = datetime.timedelta(days=1)
     
 if __name__ == '__main__':
 #    a = get_app_available()
@@ -754,7 +790,8 @@ if __name__ == '__main__':
 #    b = get_activate_user('2012-01-01 00:00:00', '2222-06-10 00:00:00')
 #    b = get_bookmark_per_user('2012-07-23 00:00:00', '2012-07-24 23:59:00')
 #    b = get_bookmark_percent_raw_data('2012-07-23 00:00:00', '2012-07-24 23:59:00')
-     b = get_userdata_for_day_report(1, 2)
+#     b = get_userdata_for_day_report(1, 2)
+     b = 1
      print b
 #    b = get_activate_user('2012-07-16 00:00:00', '2012-07-24 23:59:59', data_grain='day')
 #    print b

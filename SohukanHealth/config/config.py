@@ -21,7 +21,7 @@ class Config:
     
     cookie = ["Cookie", "access_token = 0381d220305f5acc8dab9a2ab9692a9d09be5e1d"]
     log_file = ROOT_PATH + '/sohukan.log' 
-    day_report_version = 0
+    report_version = 0
 
     red = '#c00'
     green = '#008000'

@@ -8,8 +8,8 @@ from django.template.context import Context
 from monitor.models import SomeTotal
 from statistics.biz import get_bookmark_per_user, get_bookmark_time, \
     get_bookmark_percent, get_data_interval, add_inc_for_data, get_activate_user, \
-    get_bookmark_website, _get_week_num, get_user_platform
-from statistics.models import DayReport
+    get_bookmark_website, _get_week_num, get_user_platform, _get_week_list
+from statistics.models import Report
 import anyjson
 import datetime
 
@@ -258,7 +258,7 @@ def day_report(request):
 # 日报日期
 @login_required
 def day_report_date(request):
-    time_array = DayReport.objects.filter().values('time')
+    time_array = Report.objects.filter(type='day').values('time')
     
     day_array = []
     day_format = "%m-%d"
@@ -288,7 +288,8 @@ def day_report_abstract(request):
     start_time = request.GET.get('start_time', '')
     end_time = request.GET.get('end_time', '')
     
-    jsondata_array = DayReport.objects.filter(time__gte=start_time, time__lt=end_time).values('jsondata')
+    
+    jsondata_array = Report.objects.filter(type='day', time__gte=start_time, time__lt=end_time).values('jsondata')
     if jsondata_array:
         jsondata = jsondata_array[0]['jsondata']
         data = anyjson.loads(jsondata)
@@ -320,7 +321,7 @@ def day_report_bookmark_percent(request):
     start_time = request.GET.get('start_time', '')
     end_time = request.GET.get('end_time', '')
     
-    jsondata_array = DayReport.objects.filter(time__gte=start_time, time__lt=end_time).values('jsondata')
+    jsondata_array = Report.objects.filter(type='day', time__gte=start_time, time__lt=end_time).values('jsondata')
     print jsondata_array
     if jsondata_array:
         jsondata = jsondata_array[0]['jsondata']
@@ -339,7 +340,7 @@ def day_report_bookmark_website(request):
     start_time = request.GET.get('start_time', '')
     end_time = request.GET.get('end_time', '')
     
-    jsondata_array = DayReport.objects.filter(time__gte=start_time, time__lt=end_time).values('jsondata')
+    jsondata_array = Report.objects.filter(type='day', time__gte=start_time, time__lt=end_time).values('jsondata')
     print jsondata_array
     if jsondata_array:
         jsondata = jsondata_array[0]['jsondata']
@@ -364,6 +365,67 @@ def week_report(request):
         
     return HttpResponse(template.render(c))
 
+# 周报日期
+@login_required
+def week_report_date(request):
+    t = loader.get_template('statistics/week_report_date.html')
+
+    week_list = _get_week_list(end=datetime.datetime.now()) 
+    
+    response = HttpResponse(t.render(Context({'week_list':week_list})))
+    return response
+
+# 周报综合
+@login_required
+def week_report_abstract(request):
+    start_time = request.GET.get('start_time', '2012-07-16')
+    # 注意, 周报表里面的time是当时统计周报数据的时间, 所以记录的数据实际是相对time上一周的数据
+    # 那么我要查7-16这一周的数据, time就应该为7-23
+    start_time = datetime.datetime.strptime(start_time, '%Y-%m-%d')
+    start_time = start_time + datetime.timedelta(days=7)
+    end_time = start_time + datetime.timedelta(days=2)
+
+    jsondata_array = Report.objects.filter(type='week', time__gte=start_time, time__lt=end_time).values('jsondata')
+    if jsondata_array:
+        jsondata = jsondata_array[0]['jsondata']
+        data = anyjson.loads(jsondata)
+        s = {
+            'name': 'liubida',
+            'new_user'    : data['new_user'],
+            'new_bookmark'    : data['new_bookmark'],
+        }
+        t = loader.get_template('statistics/week_report_abstract.html')
+        response = HttpResponse(t.render(Context({'s':s})))
+        return response
+        
+#        # 这是旧时的数据, 可以永久缓存
+#        now = datetime.datetime.now()
+#        expire = now + datetime.timedelta(days=7)
+#        response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
+#        return response
+
+# 周报收藏文章来源网站    
+@login_required
+def week_report_bookmark_website(request):
+    start_time = request.GET.get('start_time', '2012-07-16')
+    # 注意, 周报表里面的time是当时统计周报数据的时间, 所以记录的数据实际是相对time上一周的数据
+    # 那么我要查7-16这一周的数据, time就应该为7-23
+    start_time = datetime.datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S')
+    start_time = start_time + datetime.timedelta(days=7)
+    end_time = start_time + datetime.timedelta(days=2)
+    
+    jsondata_array = Report.objects.filter(type='week', time__gte=start_time, time__lt=end_time).values('jsondata')
+    if jsondata_array:
+        jsondata = jsondata_array[0]['jsondata']
+        data = anyjson.loads(jsondata)
+        response = HttpResponse(anyjson.dumps(data['bookmark_website']))
+        return response
+#        # 这是旧时的数据, 可以永久缓存
+#        now = datetime.datetime.now()
+#        expire = now + datetime.timedelta(days=7)
+#        response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
+#        return response        
+    
 # 编码时测试用
 @login_required
 def test(start_time, end_time, data_grain='day'):

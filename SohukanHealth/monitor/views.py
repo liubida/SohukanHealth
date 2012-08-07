@@ -75,7 +75,6 @@ def sys_alarm(request, month=0):
     # 业务监控的系统可用率
     now = datetime.datetime.now()
     expire = (now + datetime.timedelta(hours=8))
-    print expire
     response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
     return response
     

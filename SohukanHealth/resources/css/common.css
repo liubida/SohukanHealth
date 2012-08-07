@@ -18,6 +18,10 @@ table th,table td {
 	text-align: center;
 }
 
+a {
+	text-decoration: none;
+}
+
 a:visited {
 	color: #035A87
 }
@@ -48,14 +52,14 @@ a:hover {
 .right_navigate {
 	float: right;
 	width: 100px;
-	height: 600px;
+	height: 900px;
 	margin: 5px;
 }
 
 .statistics_div {
 	width: 800px;
 	height: 400px;
-	float:left;
+	float: left;
 }
 
 .firstPage,.lastPage,.prevPage,.nextPage,.morePages,.pageNum,.currentPage
