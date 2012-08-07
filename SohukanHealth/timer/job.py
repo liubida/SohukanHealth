@@ -22,7 +22,6 @@ import anyjson
 import datetime
 import os
 import sys
-import time
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print root_path
 sys.path.append(root_path)
@@ -265,13 +264,13 @@ def week_report_job(today=None):
     week_report = Report(type='week', time=today, version=c.report_version, jsondata=anyjson.dumps(jsondata))
     week_report.save();
     
-start = datetime.date(2012, 7, 16)
-today = datetime.date.today()
-step = datetime.timedelta(days=1)
-
-while start <= today:
-    week_report_job(start)
-    start += step
+#start = datetime.date(2012, 7, 16)
+#today = datetime.date.today()
+#step = datetime.timedelta(days=1)
+#
+#while start <= today:
+#    week_report_job(start)
+#    start += step
         
 #        response = HttpResponse(anyjson.dumps(data['bookmark_website']))
         
