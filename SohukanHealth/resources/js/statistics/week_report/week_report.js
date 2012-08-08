@@ -55,7 +55,17 @@ var prepare_week_report = function() {
 		// 获取7天前的日期
 		now.setDate(now.getDate() - 7);
 		$('#week_report_date a').each(function() {
-					if ((now.getDate() - parseInt(this.id.split("-")[2], 10)) < 7) {
+					var day_str = this.id;
+					var da = day_str.split("-");
+					var da_int = [];
+					for (var i = 0; i < da.length; i++) {
+						da_int[i] = parseInt(da[i], 10);
+					}
+
+					var day = new Date(da_int[0], da_int[1] - 1, da_int[2], 0,
+							0, 0);
+					var diff = parseInt((now - day) / 86400000, 10)
+					if (diff < 7) {
 						$('#' + this.id).click();
 					}
 				});
