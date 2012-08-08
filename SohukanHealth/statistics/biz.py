@@ -181,6 +181,12 @@ def get_bookmark_website(start_time=None, end_time=None, limit=100):
     ret = {'list':data}
     return anyjson.dumps(ret)
 
+def get_bookmark_website_for_user(start_time=None, end_time=None, limit=100):
+    data = get_bookmark_website_for_user_raw_data(start_time, end_time, limit);
+
+    ret = {'list':data}
+    return anyjson.dumps(ret)
+
 def get_user_platform(start_time=None, end_time=None):
     data = get_user_platform_raw_data(start_time, end_time)
     
@@ -309,8 +315,8 @@ def get_bookmark_percent_raw_data(start_time=None, end_time=None, limit=100):
         
         
         # 去掉测试用户的id, 因为要查询用户总数, 所以单独指定tmp
-        tmp = ' and id !='
-        tmp += ' and id !='.join(map(lambda x:str(x), test_id))
+#        tmp = ' and id !='
+#        tmp += ' and id !='.join(map(lambda x:str(x), test_id))
 
         having_fix, and_fix = _get_fix(start_time, end_time)
 #        if not user_total:        
@@ -416,7 +422,7 @@ def get_user_platform_raw_data(start_time=None, end_time=None):
                 conn.close()
                 
 def get_bookmark_website_raw_data(start_time=None, end_time=None, limit=100):
-    '''为[收藏文章的域名统计]获取原始数据'''
+    '''为[收藏文章的域名统计_PV]获取原始数据'''
     try:
         conn = MySQLdb.connect(**c.db_config)
         cursor = conn.cursor()
@@ -425,6 +431,8 @@ def get_bookmark_website_raw_data(start_time=None, end_time=None, limit=100):
         mm = {}
         ret = []
         
+        # 由于bookmark表以前没有gmt_create, 所以凡是查询bookmark表都要替换成create_time
+        and_fix = and_fix.replace('gmt_create', 'create_time')
         for i in range(64):
             cursor.execute("select user_id, url from bookmark_bookmark_%s where 1=1 %s" % (i, and_fix))
             results = cursor.fetchall()
@@ -447,6 +455,63 @@ def get_bookmark_website_raw_data(start_time=None, end_time=None, limit=100):
             if r['domain'] == 'kan.sohu.com':
                 ret.remove(r)
         return ret[:limit];
+    except Exception, e:
+        c.logger.error(e)
+        raise e
+    finally:
+        try:
+            if cursor:
+                cursor.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()
+
+def get_bookmark_website_for_user_raw_data(start_time=None, end_time=None, limit=100):
+    '''为[收藏文章的域名统计_UV]获取原始数据'''
+    try:
+        conn = MySQLdb.connect(**c.db_config)
+        cursor = conn.cursor()
+        
+        having_fix, and_fix = _get_fix(start_time, end_time)
+        
+        data_list = []
+        mm = {}
+        ret = []
+        
+        # 由于bookmark表以前没有gmt_create, 所以凡是查询bookmark表都要替换成create_time
+        and_fix = and_fix.replace('gmt_create', 'create_time')
+        # 先取得原始数据, 
+        for i in range(64):
+            sql = "select user_id, url from bookmark_bookmark_%s where 1=1 %s" % (i, and_fix)
+            print sql
+            cursor.execute(sql)
+            results = cursor.fetchall()
+            for d in results:
+                user_id = int(d[0])
+                url = str(d[1])
+                domain = urlparse.urlparse(url)[1]
+                if not _is_test(user_id):
+                    # 把收藏文章的每一条记录整理成domain,u_id的形式
+                    data_list.append({'domain':domain, 'u_id':user_id})
+
+        for a in data_list:
+            if a['domain'] in mm.keys():
+                mm[a['domain']].add(a['u_id'])
+            else:
+                mm[a['domain']] = set([a['u_id']])
+        
+        for k in mm.keys():
+            ret.append({'domain':k, 'count':len(mm[k])})
+            
+        ret.sort(key=lambda x:x['count'], reverse=True)
+        
+        # 需要去除domain='kan.sohu.com'的数据
+        for r in ret:
+            if r['domain'] == 'kan.sohu.com':
+                ret.remove(r)
+        return ret[:limit]
     except Exception, e:
         c.logger.error(e)
         raise e
@@ -529,81 +594,6 @@ def get_bookmark_per_user_raw_data(start_time=None, end_time=None, limit=100):
             if conn:
                 conn.close()
 
-def calc_app_available(duration='day'):
-    '''
-    计算系统可用率
-    duration=hour, day, week, month, sixmonths, year
-    '''
-    
-    now = datetime.datetime.now()
-
-    if 'hour' == duration:
-        delta = datetime.timedelta(hours=1)
-    elif 'day' == duration:
-        delta = datetime.timedelta(days=1)
-    elif 'week' == duration:
-        delta = datetime.timedelta(weeks=1)
-    elif 'month' == duration:
-        delta = datetime.timedelta(weeks=4)
-    elif 'sixmonths' == duration:
-        delta = datetime.timedelta(weeks=4 * 6)
-    elif 'year' == duration:
-        delta = datetime.timedelta(weeks=4 * 52)
-    start_time = now - delta
-    
-    success_data = AppAvailableData.objects.filter(result=True, time__gte=start_time).count()
-    failure_data = AppAvailableData.objects.filter(result=False, time__gte=start_time).count()
-
-    if success_data or failure_data:
-        ret = 100 * (success_data + 0.00001) / (success_data + failure_data)
-        return format(ret, '.2f')
-    else:
-        return 'None'
-
-def get_app_available():
-    hour_available = calc_app_available('hour')
-    day_available = calc_app_available('day')
-    week_available = calc_app_available('week')
-    month_available = calc_app_available('month')
-    sixmonths_available = calc_app_available('sixmonths')
-    year_available = calc_app_available('year')
-    
-    ret = {};
-    ret['hour'] = hour_available
-    ret['day'] = day_available
-    ret['week'] = week_available
-    ret['month'] = month_available
-    ret['sixmonths'] = sixmonths_available
-    ret['year'] = year_available
-    
-    return ret
-#    return dict_to_json(ret)
-    
-def dict_to_json(data):
-    s = {}
-    s['success'] = True
-    s['info'] = ''
-    s['code'] = 0
-    s['total'] = 1
-    s['list'] = []
-    s['list'].append(data)
-    return s
-    
-def appAvailableData_to_json(data):
-    s = {}
-    s['success'] = True
-    s['info'] = ''
-    s['code'] = 0
-    s['total'] = data.count()
-    s['list'] = []
-    for d in data:
-        tmp = {}
-        tmp['name'] = d['name']
-        tmp['time_used'] = d['time_used']
-        tmp['time'] = d['time'].strftime('%Y.%m.%d %H:%M:%S')
-        s['list'].append(tmp)
-    return anyjson.dumps(s)   
-
 def get_userdata_for_day_report(today_start, today_end):
     # 针对some_total的机制对时间做点处理
     # 用户总数是在整点时间+5分钟统计的, 当天的最后一个数据需要在第二天的00:06:00取得
@@ -662,7 +652,6 @@ def get_userdata_for_day_report(today_start, today_end):
     ret['new_inc'] = user_new_inc;
     
     return ret
-
 
 def get_bookmarkdata_for_day_report(today_start, today_end):
     # 针对some_total的机制对时间做点处理
@@ -768,52 +757,8 @@ def get_week_report_abstract(start_time, end_time):
     step = datetime.timedelta(days=1)
     
 if __name__ == '__main__':
-#    a = get_app_available()
-#    print a
-#    get_bookmark_per_user()
-#    calc_bookmark_time(0, 0)
-#    print get_bookmark_per_user_raw_data()
-#    get_bookmark_percent_raw_data()
-#    a = get_bookmark_percent(include_test=True)
-#    a = get_bookmark_percent()
-#    print a
-#    tmp = 'or id = '
-#    tmp += " or id=".join(map(lambda x:str(x), test_id))
-##        tmp += 'or id='.join(str(i))
-#    print tmp        
-
-#    a = get_bookmark_percent_raw_data('2012.06.05 16:54:10')
-#    a = tmp_raw_data()
-#    b = get_bookmark_per_user_raw_data('2012.07.10', '2012.07.12', 2)
-#    b = get_bookmark_time_raw_data('2012.07.10', '2012.07.12')
-#    b = get_bookmark_time('2012-07-10', '2012-07-12')
-#    b = get_activate_user('2012-01-01 00:00:00', '2222-06-10 00:00:00')
-#    b = get_bookmark_per_user('2012-07-23 00:00:00', '2012-07-24 23:59:00')
-#    b = get_bookmark_percent_raw_data('2012-07-23 00:00:00', '2012-07-24 23:59:00')
-#     b = get_userdata_for_day_report(1, 2)
-     b = 1
-     print b
-#    b = get_activate_user('2012-07-16 00:00:00', '2012-07-24 23:59:59', data_grain='day')
-#    print b
-#    b = get_activate_user('2012-06-15 00:00:00', '2012-07-28 23:59:59', data_grain='week')
-#    b = get_user_platform_raw_data('2012-07-22 00:00:00', '2012-07-23 23:59:59')
-#    print b
-#    num = 29
-#    today = datetime.date.today()
-#    first_day = datetime.date.today().replace(month=1, day=1)
-##    first_day = datetime.date.today().replace(year=2011, month=1, day=1)
-#    sec_day = datetime.date.today().replace(month=1, day=2)
-#    first_weekday = first_day.isoweekday()
-#    print first_day
-#    print first_weekday
-##    if first_weekday == 7:
-#    delta = datetime.timedelta(weeks=(num-1))
-#    mon = first_day + delta
-#    print mon
-#    
-#    print today
-#    print '今周是今年的第%s周 ' % first_day.strftime('%W')
-#    print '今周是今年的第%s周 ' % sec_day.strftime('%W')
-#    print '今周是今年的第%s周 ' % today.strftime('%W')
-#    print _get_week_num(datetime.datetime.now().replace(day=23))
-#    print datetime.datetime(2006,9,4).isocalendar()[1]
+#    b = get_bookmark_website_for_user_raw_data()
+    b = get_bookmark_website_for_user_raw_data('2012-01-01 00:00:00', '2222-06-10 00:00:00')
+    
+#    b = get_bookmark_website_for_user_raw_data()
+    print b

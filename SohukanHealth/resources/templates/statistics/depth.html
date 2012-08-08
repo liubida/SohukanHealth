@@ -72,6 +72,35 @@
 		</table>
 	</div>
 </div>
+<div class="clearfix" >
+	<div id="depth_bookmark_website_for_user" class="statistics_div"></div>
+	<div style="padding-top: 60px">
+		<table id="table_bookmark_website_for_user" class="table_1">
+			<tr>
+				<td>开始时间:</td>
+				<td><input type="text" id="depth_bookmark_website_for_user_from"
+					style="width: 120px" /><input type="submit" id="reset"
+					value="reset" /></td>
+			</tr>
+			<tr>
+				<td>结束时间:</td>
+				<td><input type="text" id="depth_bookmark_website_for_user_to"
+					style="width: 120px" /></td>
+			</tr>
+			<tr>
+				<td>网站数量:&nbsp前</td>
+				<td><input type="text" id="size" style="width: 120px"
+					value="20" />个</td>
+			</tr>
+			<tr>
+				<td><a id='bookmark_website_for_user_raw_data' href='raw_data'>原始数据</a></td>
+			</tr>
+			<tr>
+				<td><input type="submit" id="submit" /></td>
+			</tr>
+		</table>
+	</div>
+</div>
 <div class="clearfix" style="height: 420px">
 	<div id="depth_platform" class="statistics_div"></div>
 	<div style="padding-top: 60px">
@@ -114,6 +143,8 @@
 	src="/static/js/statistics/depth/activate_user.js"></script>
 <script type="text/javascript"
 	src="/static/js/statistics/depth/bookmark_website.js"></script>
+<script type="text/javascript"
+	src="/static/js/statistics/depth/bookmark_website_for_user.js"></script>
 <script type="text/javascript"
 	src="/static/js/statistics/depth/platform.js"></script>
 {% endblock %}

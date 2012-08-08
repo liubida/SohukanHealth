@@ -7,20 +7,38 @@
 <link rel="stylesheet" href="/static/css/jqueryui/jquery.ui.all.css">
 {% block css %}{% endblock %}
 </head>
+<style>
+#box {
+	width: 1300px;
+	margin: 0 auto;
+	background: #fff;
+	border: 1px solid #ccc;
+	padding: 20px;
+	display: none;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	display: none;
+}
+
+#box p {
+	margin-bottom: 20px;
+}
+</style>
 <body>
 	<div class="container">
 		<ul id="menu_ul">
 			<li><a href="/">首页</a></li>
-			<li><a href="/statistics/">统计</a></li>
+			<li><a href="/statistics/">统计</a></li> 
 			{% if user.username == 'supersohukan' %}
-			<li><a href="/monitor/">业务监控</a></li>
-			{% endif %}
+			<li><a href="/monitor/">业务监控</a></li> {% endif %}
 			<li><a href="http://10.10.69.54:8080/ganglia/">运维监控</a></li>
-			<li><a href="/about/" style="display:none">计划</a></li>
-			<li><a style="float:right" href='/monitor/mlogout/'>登出</a></li>
+			<li><a href="/about/" style="display: none">计划</a></li>
+			<li><a style="float: right" href='/monitor/mlogout/'>登出</a></li>
 		</ul>
 		{% block content %} 内容 {% endblock %}
 	</div>
+	<div id="box"></div>
+
 </body>
 <script type="text/javascript" src="/static/js/amcharts/amcharts.js"></script>
 <script type="text/javascript" src="/static/js/jquery-1.7.2.min.js"></script>
@@ -28,8 +46,8 @@
 <script type="text/javascript" src="/static/js/jquery.ui.core.js"></script>
 <script type="text/javascript" src="/static/js/jquery.ui.widget.js"></script>
 <script type="text/javascript" src="/static/js/jquery.ui.datepicker.js"></script>
+<script type="text/javascript" src="/static/js/jquery.blockUI.js"></script>
 
 
-{% block js%}
-{% endblock %}
+{% block js%} {% endblock %}
 </html>
