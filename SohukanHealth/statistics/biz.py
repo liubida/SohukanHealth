@@ -265,24 +265,50 @@ def get_activate_user_raw_data(start_time=None, end_time=None, data_grain='day')
         else:
             data_grain_format = r'%Y-%m-%d'
 
-        sql = "select count(u_id), tmp.data_grain from \
-               (select distinct(user_id) as u_id, date_format(gmt_create,'%s') as data_grain from stats_oper \
-               where gmt_create >= '%s' and gmt_create <='%s' %s) tmp group by tmp.data_grain" \
-                % (data_grain_format, start_time, end_time, tmp)
+        '''获取不同时间维度下有api请求的用户id
+           day:  id     date
+                (4087L, '2012-08-07') 4087用户在08-07至少有过一次api请求
+                (5455L, '2012-08-08') 5455用户在08-08至少有过一次api请求
+                (3602L, '2012-08-09')
+           week: id     week
+                (3866L, '2012-31') 3866用户在2012年第31周至少有过一次api请求
+                (5453L, '2012-31')
+                (5455L, '2012-32')
+                (3602L, '2012-32')
+           month: id    month
+                (5452L, '2012-08') 5452用户在2012年8月至少有过一次api请求
+                (5454L, '2012-08')
+                (5455L, '2012-08') 
+                '''
+        sql = '''SELECT DISTINCT user_id, DATE_FORMAT(gmt_create,'%s')
+              FROM stats_oper WHERE gmt_create >= '%s' AND gmt_create <='%s' 
+              %s ''' % (data_grain_format, start_time, end_time, tmp)
+#        sql = "select count(u_id), tmp.data_grain from \
+#               (select distinct(user_id) as u_id, date_format(gmt_create,'%s') as data_grain from stats_oper \
+#               where gmt_create >= '%s' and gmt_create <='%s' %s) tmp group by tmp.data_grain" \
+#                % (data_grain_format, start_time, end_time, tmp)
+        print sql
         cursor.execute(sql)
         results = cursor.fetchall()
-        
-        if data_grain == 'day' or data_grain == 'month':
-            for d in results:
-                au = int(d[0])
-                time = datetime.datetime.strptime(str(d[1]), data_grain_format)
-                ret.append({'time':time, 'count':au})
-
-        if data_grain == 'week':
-            for d in results:
-                au = int(d[0])
-                time = str(d[1])
-                ret.append({'time':time, 'count':au})
+        for d in results:
+            print d
+            
+        ''''''
+#        if data_grain == 'day' or data_grain == 'month':
+#            for d in results:
+#                au = int(d[0])
+#                time = datetime.datetime.strptime(str(d[1]), data_grain_format)
+#                ret.append({'time':time, 'count':au})
+#
+#        if data_grain == 'week':
+#             '''(1618L, '2012-31')
+#                (2178L, '2012-31')
+#                (3159L, '2012-31')
+#                (4174L, '2012-31')'''
+#            for d in results:
+#                au = int(d[0])
+#                time = str(d[1])
+#                ret.append({'time':time, 'count':au})
         return ret
     except Exception, e:
         c.logger.error(e)
@@ -296,7 +322,7 @@ def get_activate_user_raw_data(start_time=None, end_time=None, data_grain='day')
         finally:
             if conn:
                 conn.close()
-
+print get_activate_user_raw_data('2012-01-01 00:00:00', '2222-06-10 00:00:00', data_grain='month')
 def get_bookmark_percent_raw_data(start_time=None, end_time=None, limit=100):
     '''为[用户收藏文章数统计]获取原始数据'''
     try:
@@ -325,10 +351,12 @@ def get_bookmark_percent_raw_data(start_time=None, end_time=None, limit=100):
 #            result = cursor.fetchone()
 #            user_total = result[0]
 #        print 'user_total:', user_total
-        
+
+        remove_guide = " url not regexp '^http://kan.sohu.com/help/guide-' "
         and_fix = and_fix.replace('gmt_create', 'create_time')
         for i in range(64):
-            sql = "select user_id, count(*) from bookmark_bookmark_%s where 1=1 %s group by user_id" % (i, and_fix)
+            sql = "select user_id, count(*) from bookmark_bookmark_%s where 1=1 \
+                   and %s %s group by user_id" % (i, remove_guide, and_fix)
             cursor.execute(sql)
             results = cursor.fetchall()
             for d in results:
@@ -392,7 +420,6 @@ def get_user_platform_raw_data(start_time=None, end_time=None):
            where gmt_create >= '%s' and gmt_create <='%s' and  %s ) o 
            left join stats_ua u on o.ua_id = u.id group by u.platform, o.data_grain order by o.data_grain''' \
            % (data_grain_format, start_time, end_time, tmp)
-        print sql
         cursor.execute(sql)
         results = cursor.fetchall()
         mm = {'time':''};
@@ -433,6 +460,8 @@ def get_bookmark_website_raw_data(start_time=None, end_time=None, limit=100):
         
         # 由于bookmark表以前没有gmt_create, 所以凡是查询bookmark表都要替换成create_time
         and_fix = and_fix.replace('gmt_create', 'create_time')
+        # 这里不需要去掉guide, 因为后面会有专门的domain删除
+        # remove_guide = " url not regexp '^http://kan.sohu.com/help/guide-' "
         for i in range(64):
             cursor.execute("select user_id, url from bookmark_bookmark_%s where 1=1 %s" % (i, and_fix))
             results = cursor.fetchall()
@@ -482,10 +511,11 @@ def get_bookmark_website_for_user_raw_data(start_time=None, end_time=None, limit
         
         # 由于bookmark表以前没有gmt_create, 所以凡是查询bookmark表都要替换成create_time
         and_fix = and_fix.replace('gmt_create', 'create_time')
+        # 这里不需要去掉guide, 因为后面会有专门的domain删除
+        # remove_guide = " url not regexp '^http://kan.sohu.com/help/guide-' "
         # 先取得原始数据, 
         for i in range(64):
             sql = "select user_id, url from bookmark_bookmark_%s where 1=1 %s" % (i, and_fix)
-            print sql
             cursor.execute(sql)
             results = cursor.fetchall()
             for d in results:
@@ -533,10 +563,10 @@ def get_bookmark_time_raw_data(start_time=None, end_time=None):
         
         having_fix, and_fix = _get_fix(start_time, end_time)
         and_fix = and_fix.replace('gmt_create', 'create_time')
-        
+        remove_guide = " url not regexp '^http://kan.sohu.com/help/guide-' "
         ret = []
         for i in range(64):
-            sql = "select create_time, user_id from bookmark_bookmark_%s where 1=1 %s" % (i, and_fix)
+            sql = "select create_time, user_id from bookmark_bookmark_%s where 1=1 and %s %s" % (i, remove_guide, and_fix)
             cursor.execute(sql)
             results = cursor.fetchall()
             for d in results:
@@ -557,7 +587,7 @@ def get_bookmark_time_raw_data(start_time=None, end_time=None):
         finally:
             if conn:
                 conn.close()
-    
+
 def get_bookmark_per_user_raw_data(start_time=None, end_time=None, limit=100):
     '''为[用户收藏文章数排行]获取原始数据'''
     try:
@@ -566,10 +596,12 @@ def get_bookmark_per_user_raw_data(start_time=None, end_time=None, limit=100):
         
         having_fix, and_fix = _get_fix(start_time, end_time)    
         and_fix = and_fix.replace('gmt_create', 'create_time')
-            
+        remove_guide = " url not regexp '^http://kan.sohu.com/help/guide-' "    
+        
         ret = []
         for i in range(64):
-            sql = "select user_id, count(*) from bookmark_bookmark_%s where 1=1 %s group by user_id " % (i, and_fix)
+            sql = "select user_id, count(*) from bookmark_bookmark_%s where 1=1 and %s %s \
+                   group by user_id " % (i, remove_guide, and_fix)
             cursor.execute(sql)
             results = cursor.fetchall()
             for d in results:
@@ -758,7 +790,8 @@ def get_week_report_abstract(start_time, end_time):
     
 if __name__ == '__main__':
 #    b = get_bookmark_website_for_user_raw_data()
-    b = get_bookmark_website_for_user_raw_data('2012-01-01 00:00:00', '2222-06-10 00:00:00')
+#    b = get_bookmark_website_for_user_raw_data('2012-01-01 00:00:00', '2222-06-10 00:00:00')
     
 #    b = get_bookmark_website_for_user_raw_data()
-    print b
+#    print b
+    pass
