@@ -4,6 +4,7 @@ Created on Jul 5, 2012
 
 @author: liubida
 '''
+from config.config import c
 import urllib
 
 def sms(mobile_list=None, message_post=None):
@@ -13,11 +14,12 @@ def sms(mobile_list=None, message_post=None):
     p = {}
     p['message_post'] = message_post.encode('gbk')
     p['mobile_list'] = mobile_list
-    print p
     try:
         urllib.urlopen(url, urllib.urlencode(p))
+        c.logger.info(str(p))
         return True
-    except:
+    except Exception, e :
+        c.logger.error(e)
         return False
 
 #This code is for debugging and unit testing    

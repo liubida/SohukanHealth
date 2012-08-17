@@ -116,7 +116,7 @@ def bookmark_total_job():
 @print_info(name='add_alarm_job')
 def add_alarm_job():
     start_time = datetime.datetime.now() - datetime.timedelta(minutes=36) 
-    add_failure_data = AppAvailableData.objects.filter(name='add', result=True, time__gte=start_time).values('time')
+    add_failure_data = AppAvailableData.objects.filter(name='add', result=False, time__gte=start_time).values('time')
     failure_count = len(add_failure_data)
     
     if failure_count >= c.add_alarm_time: 
@@ -124,7 +124,7 @@ def add_alarm_job():
             start_time = add_failure_data[0]['time']
             end_time = add_failure_data[failure_count - 1]['time']
             type = 'add_bookmark'
-            msg = 'add failure count(30min): %s' % str(failure_count)
+            msg = 'add failure count: %s,%s' % (str(failure_count),datetime.datetime.now())
             sms(mobile_list=c.mobile_list, message_post=msg)
 
             latest = SysAlarm.objects.filter(type=type).order_by('-gmt_create')
@@ -165,7 +165,7 @@ def read_alarm_job():
             print start_time
             print end_time
             type = 'read_bookmark'
-            msg = 'read failure count(30min): %s' % str(failure_count)
+            msg = 'read failure count:%s,%s' % (str(failure_count),datetime.datetime.now())
             sms(mobile_list=c.mobile_list, message_post=msg)
 
             # 获取上一次的报警信息

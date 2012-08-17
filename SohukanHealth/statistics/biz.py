@@ -265,50 +265,24 @@ def get_activate_user_raw_data(start_time=None, end_time=None, data_grain='day')
         else:
             data_grain_format = r'%Y-%m-%d'
 
-        '''获取不同时间维度下有api请求的用户id
-           day:  id     date
-                (4087L, '2012-08-07') 4087用户在08-07至少有过一次api请求
-                (5455L, '2012-08-08') 5455用户在08-08至少有过一次api请求
-                (3602L, '2012-08-09')
-           week: id     week
-                (3866L, '2012-31') 3866用户在2012年第31周至少有过一次api请求
-                (5453L, '2012-31')
-                (5455L, '2012-32')
-                (3602L, '2012-32')
-           month: id    month
-                (5452L, '2012-08') 5452用户在2012年8月至少有过一次api请求
-                (5454L, '2012-08')
-                (5455L, '2012-08') 
-                '''
-        sql = '''SELECT DISTINCT user_id, DATE_FORMAT(gmt_create,'%s')
-              FROM stats_oper WHERE gmt_create >= '%s' AND gmt_create <='%s' 
-              %s ''' % (data_grain_format, start_time, end_time, tmp)
-#        sql = "select count(u_id), tmp.data_grain from \
-#               (select distinct(user_id) as u_id, date_format(gmt_create,'%s') as data_grain from stats_oper \
-#               where gmt_create >= '%s' and gmt_create <='%s' %s) tmp group by tmp.data_grain" \
-#                % (data_grain_format, start_time, end_time, tmp)
-        print sql
+        sql = "select count(u_id), tmp.data_grain from \
+               (select distinct(user_id) as u_id, date_format(gmt_create,'%s') as data_grain from stats_oper \
+               where gmt_create >= '%s' and gmt_create <='%s' %s) tmp group by tmp.data_grain" \
+                % (data_grain_format, start_time, end_time, tmp)
         cursor.execute(sql)
         results = cursor.fetchall()
-        for d in results:
-            print d
-            
-        ''''''
-#        if data_grain == 'day' or data_grain == 'month':
-#            for d in results:
-#                au = int(d[0])
-#                time = datetime.datetime.strptime(str(d[1]), data_grain_format)
-#                ret.append({'time':time, 'count':au})
-#
-#        if data_grain == 'week':
-#             '''(1618L, '2012-31')
-#                (2178L, '2012-31')
-#                (3159L, '2012-31')
-#                (4174L, '2012-31')'''
-#            for d in results:
-#                au = int(d[0])
-#                time = str(d[1])
-#                ret.append({'time':time, 'count':au})
+        
+        if data_grain == 'day' or data_grain == 'month':
+            for d in results:
+                au = int(d[0])
+                time = datetime.datetime.strptime(str(d[1]), data_grain_format)
+                ret.append({'time':time, 'count':au})
+
+        if data_grain == 'week':
+            for d in results:
+                au = int(d[0])
+                time = str(d[1])
+                ret.append({'time':time, 'count':au})
         return ret
     except Exception, e:
         c.logger.error(e)
@@ -322,7 +296,7 @@ def get_activate_user_raw_data(start_time=None, end_time=None, data_grain='day')
         finally:
             if conn:
                 conn.close()
-print get_activate_user_raw_data('2012-01-01 00:00:00', '2222-06-10 00:00:00', data_grain='month')
+
 def get_bookmark_percent_raw_data(start_time=None, end_time=None, limit=100):
     '''为[用户收藏文章数统计]获取原始数据'''
     try:
@@ -587,7 +561,7 @@ def get_bookmark_time_raw_data(start_time=None, end_time=None):
         finally:
             if conn:
                 conn.close()
-
+    
 def get_bookmark_per_user_raw_data(start_time=None, end_time=None, limit=100):
     '''为[用户收藏文章数排行]获取原始数据'''
     try:

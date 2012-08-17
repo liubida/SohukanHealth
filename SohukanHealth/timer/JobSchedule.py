@@ -18,7 +18,7 @@ print settings
 setup_environ(settings)
 
 from job import add_job, read_job, user_total_job, \
-    bookmark_total_job, add_alarm_job, read_alarm_job, day_report_job,fix_ua_job
+    bookmark_total_job, add_alarm_job, read_alarm_job, day_report_job, week_report_job, fix_ua_job
 
 
 if __name__ == '__main__':
@@ -33,6 +33,7 @@ if __name__ == '__main__':
         elif method_name == 'user_total_job': user_total_job()
         elif method_name == 'bookmark_total_job': bookmark_total_job()
         elif method_name == 'day_report_job': day_report_job()
+        elif method_name == 'week_report_job': week_report_job()
         elif method_name == 'fix_ua_job' : fix_ua_job()
         else: pass
 
@@ -43,4 +44,5 @@ if __name__ == '__main__':
 # 5    */1  *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py user_total_job
 # 10   */1  *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py bookmark_total_job
 # 58   23   *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py day_report_job
+# 50   23   *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py week_report_job
 # 15   */5  *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py fix_ua_job
