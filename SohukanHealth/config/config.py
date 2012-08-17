@@ -19,25 +19,36 @@ class Config:
     #["Cookie", "access_token = 80f0630f6a410b559155dd8b87223be1976d558f"],
     #["Cookie", "access_token = 432925e688a245092439b1532408cbccc5dc5e67"]
     
+    # 监控所使用用户的cookie
     cookie = ["Cookie", "access_token = 0381d220305f5acc8dab9a2ab9692a9d09be5e1d"]
+    # log文件的位置
     log_file = ROOT_PATH + '/sohukan.log' 
     report_version = 0
 
+    # 页面红色值
     red = '#c00'
+    # 页面绿色值
     green = '#008000'
-    
+    # 能看监控页面的用户名
     monitor_user = ['supersohukan', ]
     
+    # request查询的最小时间
     MIN_TIME = '2012-01-01 00:00:00';
+    # request查询的最大时间
     MAX_TIME = '2222-06-10 00:00:00';
-    add_time_limit = 30
+    # 监控: 添加文章时限
+    add_time_limit = 40
+    # 报警: 添加文章失败次数上限
     add_alarm_time = 3
-    read_time_limit = 25
+    # 监控: 阅读文章时限
+    read_time_limit = 30
+    # 报警: 阅读文章失败次数上限
     read_alarm_time = 3
     
     bucket_name = 'sohukan'
     expires_seconds = 300
     
+    # sys_alarm表中type为'read_bookmar'和'add_bookmark'的为内部原因导致的系统不可用
     self_alarm_type = ['read_bookmark', 'add_bookmark']
 
 class DevConfig(Config):

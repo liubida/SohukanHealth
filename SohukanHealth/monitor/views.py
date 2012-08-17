@@ -61,8 +61,6 @@ def monitor(request):
     # 业务监控的系统可用率
     now = datetime.datetime.now()
     expire = now + datetime.timedelta(hours=8)
-    print now
-    print expire
     response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
     return response
 
