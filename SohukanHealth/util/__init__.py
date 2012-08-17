@@ -77,6 +77,7 @@ def get_start_end_for_month(month=1):
     return start, end
 
 def timediff(start, end, ft='second'):
+    # end 必须大于 start
     diff = end - start
     seconds = diff.days * 24 * 3600 + diff.seconds
      
@@ -97,13 +98,20 @@ def left_seconds(time, mod=5):
     return (mod - 1 - min % mod) * 60 + (60 - sec)
     
 if __name__ == '__main__':
-    while True:
-        now = datetime.datetime.now()
-        a = now.minute
-        b = now.second
-        print a%5
-        print a, ':', b, '|  ',(5 - 1 - a % 5) * 60 + (60 - b)
-        time.sleep(1)
+    start_time = datetime.datetime.strptime("2012-08-17 10:35:08","%Y-%m-%d %H:%M:%S")
+    end_time = datetime.datetime.strptime("2012-08-17 01:05:43","%Y-%m-%d %H:%M:%S")
+    print start_time
+    print end_time
+    tdiff = timediff(start_time,end_time)
+    print tdiff
     
+#    while True:
+#        now = datetime.datetime.now()
+#        a = now.minute
+#        b = now.second
+#        print a%5
+#        print a, ':', b, '|  ',(5 - 1 - a % 5) * 60 + (60 - b)
+#        time.sleep(1)
+#    
     
     

@@ -116,7 +116,7 @@ def bookmark_total_job():
 @print_info(name='add_alarm_job')
 def add_alarm_job():
     start_time = datetime.datetime.now() - datetime.timedelta(minutes=36) 
-    add_failure_data = AppAvailableData.objects.filter(name='add', result=False, time__gte=start_time).values('time')
+    add_failure_data = AppAvailableData.objects.filter(name='add', result=True, time__gte=start_time).values('time')
     failure_count = len(add_failure_data)
     
     if failure_count >= c.add_alarm_time: 
@@ -130,7 +130,10 @@ def add_alarm_job():
             latest = SysAlarm.objects.filter(type=type).order_by('-gmt_create')
             if latest:
                 latest = latest[0]
-                tdiff = timediff(start_time, latest.end_time)
+                # start_time是本次报警的开始时间
+                # latest.end_time是上次报警的结束时间
+                # 所有在算时间差的时候, start_time应该是时间差的end, latest.end_time应该是时间差的start
+                tdiff = timediff(latest.end_time, start_time)
                 if (not latest) or start_time > latest.end_time and tdiff > 600:
                     # 一次新故障
                     alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
@@ -169,7 +172,10 @@ def read_alarm_job():
             latest = SysAlarm.objects.filter(type=type).order_by('-gmt_create')
             if latest:
                 latest = latest[0]
-                tdiff = timediff(start_time, latest.end_time)
+                # start_time是本次报警的开始时间
+                # latest.end_time是上次报警的结束时间
+                # 所有在算时间差的时候, start_time应该是时间差的end, latest.end_time应该是时间差的start
+                tdiff = timediff(latest.end_time, start_time)
                 if (not latest) or start_time > latest.end_time and tdiff > 600:
                     # 一次新的故障
                     alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
@@ -300,8 +306,8 @@ def fix_ua_job():
         c.logger.error(e)
 
 if __name__ == '__main__':
-    pass
-#    add_alarm_job()
+#    pass
+    add_alarm_job()
 #    read_alarm_job()
 #    read_job()
 #    add_job()
