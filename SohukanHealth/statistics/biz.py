@@ -4,20 +4,20 @@ Created on Jun 19, 2012
 
 @author: liubida
 '''
-
-from config.config import c
-from monitor.models import AppAvailableData, SomeTotal
-from util import to_percent
-import MySQLdb
-import anyjson
-import datetime
-import os
 import sys
-import urlparse
+import os
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print root_path
 sys.path.append(root_path)
 print sys.path
+
+from config.config import c
+from monitor.models import SomeTotal
+from util import to_percent
+import MySQLdb
+import anyjson
+import datetime
+import urlparse
 
 
 #ring = HashRing([str(i) for i in range(64)])
