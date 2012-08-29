@@ -9,7 +9,7 @@ from monitor.models import SomeTotal
 from statistics.biz import get_bookmark_per_user, get_bookmark_time, \
     get_bookmark_percent, get_data_interval, add_inc_for_data, get_activate_user, \
     get_bookmark_website, _get_week_num, get_user_platform, _get_week_list, \
-    get_bookmark_website_for_user
+    get_bookmark_website_for_user, get_week_report_add_way_and_platform
 from statistics.models import Report
 import anyjson
 import datetime
@@ -404,7 +404,7 @@ def week_report_date(request):
 def week_report_abstract(request):
     start_time = request.GET.get('start_time', '2012-07-16')
     # 注意, 周报表里面的time是当时统计周报数据的时间, 所以记录的数据实际是相对time上一周的数据
-    # 那么我要查7-16这一周的数据, time就应该为7-23
+    # request里请求的时间是7-16, 则实际存储的周报时间是7-23
     start_time = datetime.datetime.strptime(start_time, '%Y-%m-%d')
     start_time = start_time + datetime.timedelta(days=7)
     end_time = start_time + datetime.timedelta(days=2)
@@ -413,10 +413,12 @@ def week_report_abstract(request):
     if jsondata_array:
         jsondata = jsondata_array[0]['jsondata']
         data = anyjson.loads(jsondata)
+        print data
         s = {
             'name': 'liubida',
             'new_user'    : data['new_user'],
             'new_bookmark'    : data['new_bookmark'],
+            'add_way_and_platform' : data['add_way_and_platform']['data']
         }
         t = loader.get_template('statistics/week_report_abstract.html')
         response = HttpResponse(t.render(Context({'s':s})))
@@ -426,6 +428,35 @@ def week_report_abstract(request):
 #        now = datetime.datetime.now()
 #        expire = now + datetime.timedelta(days=7)
 #        response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
+#        return response
+#
+#@login_required
+#def week_report_add_way_and_platform(request):
+#    start_time = request.GET.get('start_time', '2012-07-16')
+#    # 注意, 周报表里面的time是当时统计周报数据的时间, 所以记录的数据实际是相对time上一周的数据
+#    # 如果time为7-23, 那么对应的是7-16这一周的周报数据
+#    start_time = datetime.datetime.strptime(start_time, '%Y-%m-%d')
+#    start_time = start_time + datetime.timedelta(days=7)
+#    end_time = start_time + datetime.timedelta(days=2)
+#
+#
+##    jsondata_array = Report.objects.filter(type='week', time__gte=start_time, time__lt=end_time).values('jsondata')
+##    if jsondata_array:
+##        jsondata = jsondata_array[0]['jsondata']
+##        data = anyjson.loads(jsondata)
+##        s = {
+##            'name': 'liubida',
+##            'new_user'    : data['new_user'],
+##            'new_bookmark'    : data['new_bookmark'],
+##        }
+##        t = loader.get_template('statistics/week_report_abstract.html')
+##        response = HttpResponse(t.render(Context({'s':s})))
+##        return response
+#
+#    data = get_week_report_add_way_and_platform(start_time, end_time)
+#    if data:
+#        t = loader.get_template('statistics/week_report_add_way_and_platform.html')
+#        response = HttpResponse(t.render(Context({'data':data})))
 #        return response
 
 # 周报收藏文章来源网站    

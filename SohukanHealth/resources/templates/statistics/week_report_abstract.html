@@ -1,5 +1,5 @@
 <h3>1. 数据增量</h3>
-<table style="font-size:12px;">
+<table style="font-size: 12px;">
 	<th>类别</th>
 	<th>周一</th>
 	<th>周二</th>
@@ -27,5 +27,72 @@
 		<td>{{ s.new_bookmark.5 }}</td>
 		<td>{{ s.new_bookmark.6 }}</td>
 		<td>{{ s.new_bookmark.7 }}</td>
+	</tr>
+</table>
+<h3>2. 收藏方式&&收藏平台</h3>
+<table style="font-size: 12px; float: left; text-align: left;">
+	<th colspan=3>收藏方式</th>
+	<tr>
+		<td>{{s.add_way_and_platform.way.page.2}}</td>
+		<td style="display: none">{{ s.add_way_and_platform.way.page.0}}</td>
+		<td>{{ s.add_way_and_platform.way.page.3}}</td>
+	</tr>
+	<tr>
+		<td>{{s.add_way_and_platform.way.chrome_url.2}}</td>
+		<td style="display: none">{{ s.add_way_and_platform.way.chrome_url.0}}</td>
+		<td>{{ s.add_way_and_platform.way.chrome_url.3}}</td>
+	</tr>
+	<tr>
+		<td>{{s.add_way_and_platform.way.partial.2}}</td>
+		<td style="display: none">{{
+			s.add_way_and_platform.way.partial.0}}</td>
+		<td>{{ s.add_way_and_platform.way.partial.3}}</td>
+	</tr>
+	<tr>
+		<td>{{s.add_way_and_platform.way.phone_url.2}}</td>
+		<td style="display: none">{{
+			s.add_way_and_platform.way.phone_url.0}}</td>
+		<td>{{ s.add_way_and_platform.way.phone_url.3}}</td>
+	</tr>
+</table>
+<table style="font-size: 12px; float: left; text-align: left;">
+	<th colspan=3>收藏平台</th>
+	<tr>
+		<td rowspan=4>PC平台</td>
+		<td>{{ s.add_way_and_platform.platform.Windows.2}}</td>
+		<td style="display: none">{{
+			s.add_way_and_platform.platform.Windows.0}}</td>
+		<td>{{ s.add_way_and_platform.platform.Windows.3}}</td>
+	</tr>
+	<tr>
+		<td>{{ s.add_way_and_platform.platform.Linux.2}}</td>
+		<td style="display: none">{{
+			s.add_way_and_platform.platform.Linux.0}}</td>
+		<td>{{ s.add_way_and_platform.platform.Linux.3}}</td>
+	</tr>
+	<tr>
+		<td>{{ s.add_way_and_platform.platform.Macintosh.2}}</td>
+		<td style="display: none">{{
+			s.add_way_and_platform.platform.Macintosh.0}}</td>
+		<td>{{ s.add_way_and_platform.platform.Macintosh.3}}</td>
+	</tr>
+	<tr>
+		<td>{{ s.add_way_and_platform.platform.unknown.2}}</td>
+		<td style="display: none">{{
+			s.add_way_and_platform.platform.unknown.0}}</td>
+		<td>{{ s.add_way_and_platform.platform.unknown.3}}</td>
+	</tr>
+	<tr>
+		<td rowspan=2>手机平台</td>
+		<td>{{ s.add_way_and_platform.platform.Android.2}}</td>
+		<td style="display: none">{{
+			s.add_way_and_platform.platform.Android.0}}</td>
+		<td>{{ s.add_way_and_platform.platform.Android.3}}</td>
+	</tr>
+	<tr>
+		<td>Iphone</td>
+		<td style="display: none">{{
+			s.add_way_and_platform.platform.Darwin.0}}</td>
+		<td>{{ s.add_way_and_platform.platform.Darwin.3}}</td>
 	</tr>
 </table>

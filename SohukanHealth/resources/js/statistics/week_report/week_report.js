@@ -1,5 +1,5 @@
 var load_week_report_abstract = function(params, callback) {
-	var url = '/statistics/week_report/abstract/';
+	var url = '/statistics/week_report/abstract';
 	var e = document.getElementById('week_report_abstract');
 
 	if (e) {
@@ -17,6 +17,21 @@ var load_week_report_abstract = function(params, callback) {
 	div_content.style.display = 'block';
 };
 
+var load_week_report_add_way_and_platform = function(params, callback) {
+	var url = "statistics/week_report/add_way_and_platform";
+	var e = document.getElementById('week_report_add_way_and_platform');
+
+	if (e) {
+		clearElement(e);
+		var loading = document.createElement('p')
+		var loading_text = document.createTextNode('数据加载中...')
+		loading.appendChild(loading_text);
+		e.appendChild(loading);
+	}
+	url = url + '?start_time' + params
+	$('week_report_add_way_and_platform').load(url);
+};
+
 var prepare_week_report = function() {
 	var url = '/statistics/week_report/date/'
 
@@ -29,6 +44,7 @@ var prepare_week_report = function() {
 	$('#week_report_date').load(url, function() {
 		$('#week_report_date a').click(function() {
 			load_week_report_abstract(this.id);
+			load_week_report_add_way_and_platform(this.id);
 			$('#week_report_date a').attr('class', 'pageNum');
 			$(this).attr('class', 'currentPage');
 

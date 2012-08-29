@@ -60,15 +60,19 @@ var prepare_day_report = function() {
 					a.appendChild(a_text);
 					div_date.appendChild(a);
 				}
-				
+
+				// ajax获取date之后, 自动触发一次昨天的click, 显示昨天的日报信息
 				var now = new Date();
 				// 获取昨天的日期
 				now.setDate(now.getDate() - 1);
-				$('#day_report_date a').each(function(){
-					if(now.getDate() == this.id.split("-")[1]){
-						$('#'+this.id).click();
-					}
-				});
+				$('#day_report_date a').each(function() {
+							var month = this.id.split("-")[0]
+							var day = this.id.split("-")[1]
+							if (now.getMonth() + 1 == month
+									&& now.getDate() == day) {
+								$('#' + this.id).click();
+							}
+						});
 			});
 };
 

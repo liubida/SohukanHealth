@@ -4,15 +4,24 @@ Created on Jun 7, 2012
 
 @author: liubida
 '''
+import sys
+import os
+root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print root_path
+sys.path.append(root_path)
+print sys.path
 
-from SohukanHealth import settings
-from config.config import c
 from django.core.management import setup_environ
+from SohukanHealth import settings
+print settings
+setup_environ(settings)
+
+from config.config import c
 from monitor.models import AppAvailableData, SomeTotal, SysAlarm
 from monitor.system.worker import add_worker, read_worker
 from statistics.biz import get_userdata_for_day_report, \
     get_bookmarkdata_for_day_report, get_bookmark_website_raw_data, \
-    get_bookmark_percent_raw_data, test_id, _is_test
+    get_bookmark_percent_raw_data, test_id, _is_test, get_week_report_add_way_and_platform
 from statistics.models import Report, UA
 from timer.sms import sms
 from util import print_info, query_ua, timediff
@@ -20,16 +29,6 @@ from util.random_spider import RandomSpider
 import MySQLdb
 import anyjson
 import datetime
-import os
-import sys
-root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print root_path
-sys.path.append(root_path)
-print sys.path
-
-print settings
-setup_environ(settings)
-
 
 
 @print_info(name='read_job')
@@ -86,9 +85,11 @@ def bookmark_total_job():
     try:
         conn = MySQLdb.connect(**c.db_config)
         cursor = conn.cursor()
+        remove_guide = " url not regexp '^http://kan.sohu.com/help/guide-' "
         sum = 0
         for i in range(64):
-            cursor.execute ("select user_id, count(*) from bookmark_bookmark_%s group by user_id" % i)
+            sql = "select user_id, count(*) from bookmark_bookmark_%s where %s group by user_id" % (i, remove_guide)
+            cursor.execute (sql)
             results = cursor.fetchall()
             for d in results:
                 user_id = int(d[0])
@@ -124,7 +125,7 @@ def add_alarm_job():
             start_time = add_failure_data[0]['time']
             end_time = add_failure_data[failure_count - 1]['time']
             type = 'add_bookmark'
-            msg = 'add failure count: %s,%s' % (str(failure_count),datetime.datetime.now())
+            msg = 'add failure count: %s,%s' % (str(failure_count), datetime.datetime.now())
             sms(mobile_list=c.mobile_list, message_post=msg)
 
             latest = SysAlarm.objects.filter(type=type).order_by('-gmt_create')
@@ -165,7 +166,7 @@ def read_alarm_job():
             print start_time
             print end_time
             type = 'read_bookmark'
-            msg = 'read failure count:%s,%s' % (str(failure_count),datetime.datetime.now())
+            msg = 'read failure count:%s,%s' % (str(failure_count), datetime.datetime.now())
             sms(mobile_list=c.mobile_list, message_post=msg)
 
             # 获取上一次的报警信息
@@ -222,7 +223,8 @@ def day_report_job(now=None):
     day_report = Report(type='day', time=now, version=c.report_version, jsondata=anyjson.dumps(jsondata))
     day_report.save();
 
-#start = datetime.datetime(2012, 7, 16, 23, 58, 0)
+#start = datetime.datetime(2012, 8, 25, 23, 58, 0)
+#day_report_job(start)
 #now = datetime.datetime.now()
 #step = datetime.timedelta(days=1)
 #
@@ -253,40 +255,24 @@ def week_report_job(today=None):
             # 本周每天新增文章
             new_bookmark[count] = data['bookmark']['total'] - data['bookmark']['total_yd']
             count = count + 1
-
+    
     start_time = datetime.datetime(last_mon.year, last_mon.month, last_mon.day)
     start_time = start_time.replace(hour=0, minute=0, second=0, microsecond=0)
     end_time = start_time + datetime.timedelta(days=6)
     end_time = end_time.replace(hour=23, minute=59, second=59, microsecond=0)
     bookmark_website = {}
-    bookmark_website['data'] = get_bookmark_website_raw_data(start_time, end_time, limit=100)                
+    bookmark_website['data'] = get_bookmark_website_raw_data(start_time, end_time, limit=100)
+    add_way_and_platform = {}
+    add_way_and_platform['data'] = get_week_report_add_way_and_platform(start_time, end_time);
             
     jsondata = {}
     jsondata['new_user'] = new_user
     jsondata['new_bookmark'] = new_bookmark
     jsondata['bookmark_website'] = bookmark_website
-#    jsondata['bookmark_count'] = bookmark_count
+    jsondata['add_way_and_platform'] = add_way_and_platform
 
     week_report = Report(type='week', time=today, version=c.report_version, jsondata=anyjson.dumps(jsondata))
     week_report.save();
-    
-#start = datetime.date(2012, 7, 16)
-#today = datetime.date.today()
-#step = datetime.timedelta(days=1)
-#
-#while start <= today:
-#    week_report_job(start)
-#    start += step
-        
-#        response = HttpResponse(anyjson.dumps(data['bookmark_website']))
-        
-#        # 这是旧时的数据, 可以永久缓存
-#        now = datetime.datetime.now()
-#        expire = now + datetime.timedelta(days=7)
-#        response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
-#        return response        
-        
-
     
 @print_info(name='fix_ua_job')
 def fix_ua_job():
@@ -306,8 +292,26 @@ def fix_ua_job():
         c.logger.error(e)
 
 if __name__ == '__main__':
-#    pass
-    add_alarm_job()
+#    bookmark_total_job()
+    start = datetime.date(2012, 8, 27)
+    week_report_job(start)
+#    start = datetime.date(2012, 7, 16)
+#    today = datetime.date.today()
+#    step = datetime.timedelta(days=1)
+#    
+#    while start <= today:
+#        week_report_job(start)
+#        start += step
+#    start = datetime.datetime(2012, 8, 25, 23, 58, 0)
+#    day_report_job(start)
+    
+#    start_time = datetime.datetime.now() - datetime.timedelta(minutes=36)
+#    print start_time 
+#    read_failure_data = AppAvailableData.objects.filter(name='read', result=False, time__gte=start_time).values('time')
+#    failure_count = len(read_failure_data)
+#    print failure_count
+#    
+#    add_alarm_job()
 #    read_alarm_job()
 #    read_job()
 #    add_job()
@@ -321,8 +325,6 @@ if __name__ == '__main__':
 #    read_failure_data = AppAvailableData.objects.filter(name='read', result=False, time__gte=start_time, time__lte=end_time).values('time')
 #    failure_count = len(read_failure_data)
 #    print failure_count
-    
-    
     
 #    end_time = datetime.datetime.now()
 #    print (start_time - end_time).total_seconds()

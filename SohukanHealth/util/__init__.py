@@ -98,12 +98,13 @@ def left_seconds(time, mod=5):
     return (mod - 1 - min % mod) * 60 + (60 - sec)
     
 if __name__ == '__main__':
-    start_time = datetime.datetime.strptime("2012-08-17 10:35:08","%Y-%m-%d %H:%M:%S")
-    end_time = datetime.datetime.strptime("2012-08-17 01:05:43","%Y-%m-%d %H:%M:%S")
-    print start_time
-    print end_time
-    tdiff = timediff(start_time,end_time)
-    print tdiff
+#    start_time = datetime.datetime.strptime("2012-08-17 10:35:08","%Y-%m-%d %H:%M:%S")
+#    end_time = datetime.datetime.strptime("2012-08-17 01:05:43","%Y-%m-%d %H:%M:%S")
+#    print start_time
+#    print end_time
+#    tdiff = timediff(start_time,end_time)
+#    print tdiff
+    print to_percent(1)
     
 #    while True:
 #        now = datetime.datetime.now()

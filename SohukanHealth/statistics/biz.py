@@ -4,12 +4,21 @@ Created on Jun 19, 2012
 
 @author: liubida
 '''
+
 from config.config import c
 from monitor.models import AppAvailableData, SomeTotal
+from util import to_percent
 import MySQLdb
 import anyjson
 import datetime
+import os
+import sys
 import urlparse
+root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print root_path
+sys.path.append(root_path)
+print sys.path
+
 
 #ring = HashRing([str(i) for i in range(64)])
 
@@ -377,7 +386,7 @@ def get_bookmark_percent_raw_data(start_time=None, end_time=None, limit=100):
                 conn.close()
 
 def get_user_platform_raw_data(start_time=None, end_time=None):
-    '''为[收藏文章的域名统计]获取原始数据'''
+    '''为[收藏文章的平台统计]获取原始数据'''
     try:
         conn = MySQLdb.connect(**c.db_self_config)
         cursor = conn.cursor()
@@ -490,6 +499,7 @@ def get_bookmark_website_for_user_raw_data(start_time=None, end_time=None, limit
         # 先取得原始数据, 
         for i in range(64):
             sql = "select user_id, url from bookmark_bookmark_%s where 1=1 %s" % (i, and_fix)
+            print sql
             cursor.execute(sql)
             results = cursor.fetchall()
             for d in results:
@@ -499,7 +509,7 @@ def get_bookmark_website_for_user_raw_data(start_time=None, end_time=None, limit
                 if not _is_test(user_id):
                     # 把收藏文章的每一条记录整理成domain,u_id的形式
                     data_list.append({'domain':domain, 'u_id':user_id})
-
+        
         for a in data_list:
             if a['domain'] in mm.keys():
                 mm[a['domain']].add(a['u_id'])
@@ -508,7 +518,7 @@ def get_bookmark_website_for_user_raw_data(start_time=None, end_time=None, limit
         
         for k in mm.keys():
             ret.append({'domain':k, 'count':len(mm[k])})
-            
+
         ret.sort(key=lambda x:x['count'], reverse=True)
         
         # 需要去除domain='kan.sohu.com'的数据
@@ -758,13 +768,118 @@ def _get_week_num(date):
         nweek = days / 7 + 1
     return nweek
 
+def get_week_report_add_way_and_platform(start_time, end_time):
+    '''为[周报_收藏方式&&平台]获取数据'''
+    try:
+        conn = MySQLdb.connect(**c.db_self_config)
+        cursor = conn.cursor()
+        
+        having_fix, and_fix = _get_fix(start_time, end_time)
+        and_fix = and_fix.replace("gmt_create", "o.gmt_create")    
+        #remove_guide = " url not regexp '^http://kan.sohu.com/help/guide-' "    
+
+        # 去掉测试用户的id
+        tmp = ' and user_id !='
+        tmp += ' and user_id !='.join(map(lambda x:str(x), test_id))
+        tmp = tmp.replace("user_id", "o.user_id")
+
+        # 收藏总数       
+        sql_total = "select count(oo.object_key) from stats_oper o left join stats_operobject oo on oo.oper_id = o.id\
+               where 1=1 %s %s and o.oper_type_id in (1,35)" % (and_fix, tmp)
+        cursor.execute(sql_total)
+        result = cursor.fetchone()
+        total = int(result[0])
+        print total
+        
+        # 段落收藏
+        sql_partial_total = "select count(oo.object_key) from stats_oper o left join stats_operobject oo on oo.oper_id = o.id\
+               where 1=1 %s %s and o.oper_type_id in (1,35) \
+               and object_key regexp '.*\"content\":.*\"content_source\".*partial.*' " % (and_fix, tmp)
+        cursor.execute(sql_partial_total)
+        result = cursor.fetchone()
+        partial = int(result[0])
+        print partial 
+        
+        # 所有通过链接收藏的文章, 这一项包括chrome链接收藏+手机链接收藏
+        sql_url_total = "select count(oo.object_key) from stats_oper o left join stats_operobject oo on oo.oper_id = o.id\
+               where 1=1 %s %s and o.oper_type_id in (1,35) and object_key not regexp '.*\"content\".*'" % (and_fix, tmp)
+        print sql_url_total
+        cursor.execute(sql_url_total)
+        result = cursor.fetchone()
+        url_total = int(result[0])
+        print url_total
+        
+        # 收藏平台
+        platform_total = 0;
+        platforms = {'Android':0, 'Darwin':0, 'Linux':0, 'Macintosh':0, 'unknown':0, 'Windows':0}
+        for p in platforms.keys():
+            sql = "select count(*) from stats_oper o left join stats_ua u on o.ua_id = u.id \
+                          where 1=1 %s and oper_type_id in (1,35) and platform = '%s' %s" % (tmp, p, and_fix)
+            cursor.execute(sql)
+            result = cursor.fetchone()
+            platforms[p] = int(result[0])
+            platform_total += platforms[p]
+            print p
+            
+        # chrome通过链接收藏
+        phone_url = platforms['Android'] + platforms['Darwin']
+        chrome_url = url_total - phone_url
+
+        # page整页收藏
+        page = total - url_total - partial
+
+        way = {}
+        way_page = round((page + 0.001) / total, 6)
+        way_chrome_url = round((chrome_url + 0.001) / total, 6)
+        way_phone_url = round((phone_url + 0.001) / total, 6)
+        way_partial = round((partial + 0.001) / total, 6)
+        way['total'] = [total, 1, "收藏方式总数", to_percent(1) ]
+        way['page'] = [page, way_page, "chrome+bookmarklet整页收藏", to_percent(way_page)]
+        way['chrome_url'] = [chrome_url, way_chrome_url, "chrome链接收藏", to_percent(way_chrome_url)]
+        way['phone_url'] = [phone_url, way_phone_url , "手机收藏", to_percent(way_phone_url)]
+        way['partial'] = [partial, way_partial , "chrome段落收藏", to_percent(way_partial)]
+        
+        platform = {}
+        platform_windows = round((platforms['Windows'] + 0.001) / platform_total, 6)
+        platform_macintosh = round((platforms['Macintosh'] + 0.001) / platform_total, 6)
+        platform_linux = round((platforms['Linux'] + 0.001) / platform_total, 6)
+        platform_unknown = round((platforms['unknown'] + 0.001) / platform_total, 6)
+        platform_android = round((platforms['Android'] + 0.001) / platform_total, 6)
+        platform_darwin = round((platforms['Darwin'] + 0.001) / platform_total, 6)
+        platform['total'] = [platform_total, 1, "收藏平台总数"]
+        platform['Windows'] = [platforms['Windows'], platform_windows, "Windows", to_percent(platform_windows)]
+        platform['Macintosh'] = [platforms['Macintosh'], platform_macintosh, "Macintosh", to_percent(platform_macintosh)]
+        platform['Linux'] = [platforms['Linux'], platform_linux, "Linux", to_percent(platform_linux)]
+        platform['unknown'] = [platforms['unknown'], platform_unknown, "unknown", to_percent(platform_unknown)]
+        platform['Android'] = [platforms['Android'], platform_android, "Android", to_percent(platform_android)]
+        platform['Darwin'] = [platforms['Darwin'], platform_darwin, "Darwin", to_percent(platform_darwin)]
+        
+        ret = {'way':way, 'platform':platform}
+        return ret
+    except Exception, e:
+        c.logger.error(e)
+        return str(e)
+    finally:
+        try:
+            if cursor:
+                cursor.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()    
+    
 def get_week_report_abstract(start_time, end_time):
     cur = start_time;
     step = datetime.timedelta(days=1)
     
 if __name__ == '__main__':
+    start_time = datetime.datetime(2012, 7, 2, 7, 50, 1)
+    end_time = datetime.datetime(2013, 8, 2, 7, 50, 0)
+#    b = get_week_report_add_way_and_platform('2012-08-20 00:00:00', '2012-08-26 23:59:59')
+    b = get_bookmark_website_for_user_raw_data(start_time,end_time)
+    print b
 #    b = get_bookmark_website_for_user_raw_data()
-#    b = get_bookmark_website_for_user_raw_data('2012-01-01 00:00:00', '2222-06-10 00:00:00')
     
 #    b = get_bookmark_website_for_user_raw_data()
 #    print b

@@ -221,6 +221,7 @@ var load_chart_data = function(name, params, callback) {
 };
 
 var load_sys_alarm = function(params, callback) {
+	// 加载系统可用率数据
 	var url = '/monitor/sys_alarm/'
 	var e = document.getElementById('sys_alarm')
 
