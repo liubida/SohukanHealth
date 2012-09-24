@@ -61,7 +61,8 @@ class DevConfig(Config):
 #    fangmeng 18627839148
 #    chenwei 13545257885
 #    zhangheng 13437104382'
-    mobile_list = '13476852610,18627839148,13545257885,13437104382'
+    #mobile_list = '13476852610,18627839148,13545257885,13437104382'
+    mobile_list = '13476852610'
     logger = logging.getLogger("SohukanHealth")
     
     def do(self):
