@@ -221,10 +221,10 @@ def rabbitmq_queue_alarm_job():
         error_q = []
         for q in queue.keys():
             if q == 'log':
-                if not queue[q] or queue[q] >= 128:
+                if queue[q] is None or queue[q] >= 128:
                     error_q.append("%s:%s" % (q, queue[q]))
             else:
-                if not queue[q] or queue[q] >= 64:
+                if queue[q] is None or queue[q] >= 64:
                     error_q.append("%s:%s" % (q, queue[q]))
         
         if error_q:
