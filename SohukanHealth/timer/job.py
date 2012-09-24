@@ -202,12 +202,12 @@ def rabbitmq_queue_alarm_job():
              'encode': None, 'entry': None, 'store': None}
     try:
         # lines should be only one row
-#        lines = from_file("/tmp/rabbitmq_queue.o")
-#        if not lines:
-#            c.logger.error("/tmp/rabbitmq_queue.o is blank")
-#            
-#        info = lines[0]
-        info = r"encode:|entry:|purify:|download:|log:|upload:|store:"
+        lines = from_file("/tmp/rabbitmq_queue.o")
+        if not lines:
+            c.logger.error("/tmp/rabbitmq_queue.o is blank")
+            
+        info = lines[0]
+#        info = r"encode:|entry:|purify:|download:|log:|upload:|store:"
         
         item_list = info.split('|')
         if not item_list:
@@ -221,10 +221,10 @@ def rabbitmq_queue_alarm_job():
         error_q = []
         for q in queue.keys():
             if q == 'log':
-                if not queue[q] or queue[q] >= 0:
+                if not queue[q] or queue[q] >= 128:
                     error_q.append("%s:%s" % (q, queue[q]))
             else:
-                if not queue[q] or queue[q] >= 0:
+                if not queue[q] or queue[q] >= 64:
                     error_q.append("%s:%s" % (q, queue[q]))
         
         
