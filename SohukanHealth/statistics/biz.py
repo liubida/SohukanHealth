@@ -728,20 +728,29 @@ def tmp_raw_data(include_test=False):
         
         ret = []
         for i in range(64):
-            cursor.execute("select user_id, url from bookmark_bookmark_%s where gmt_create > '2012-07-04 20:00:00' \
-            and gmt_create < '2012-07-04 22:20:00'" % i)
+            cursor.execute("select user_id, url from bookmark_bookmark_%s where gmt_create > '2012-09-10 00:00:00' \
+            and gmt_create < '2012-09-16 23:59:59'" % i)
             results = cursor.fetchall()
             for d in results:
-                if d[0]:
-                    kv = {}
-                    kv['user_id'] = int(d[0])
+#                if d[0]:
+#                    kv = {}
+#                    kv['user_id'] = int(d[0])
+#                    kv['url'] = str(d[1])
+#                    kv['bookmark'] = i
+                if include_test or not _is_test(int(d[0])):
+                    domain = urlparse.urlparse(str(d[1]))[1]
+                    kv={}
+                    kv['domain'] = domain
                     kv['url'] = str(d[1])
-                    kv['bookmark'] = i
-#                    if include_test or not _is_test(kv['user_id']):
-#                        ret.append(kv)
                     ret.append(kv)
-        ret.sort(key=lambda x:x['user_id'], reverse=True)
-        return ret;
+#        ret.sort(key=lambda x:x['user_id'], reverse=True)
+        i = 0
+        for r in ret:
+            if r['domain'] == "www.google.com":
+                print i,r['url']
+                i = i+1
+            
+        return None;
     except Exception, e:
         c.logger.error(e)
         return str(e)
@@ -874,11 +883,14 @@ def get_week_report_abstract(start_time, end_time):
     step = datetime.timedelta(days=1)
     
 if __name__ == '__main__':
-    start_time = datetime.datetime(2012, 7, 2, 7, 50, 1)
-    end_time = datetime.datetime(2013, 8, 2, 7, 50, 0)
-#    b = get_week_report_add_way_and_platform('2012-08-20 00:00:00', '2012-08-26 23:59:59')
-    b = get_bookmark_website_for_user_raw_data(start_time,end_time)
-    print b
+#    start_time = datetime.datetime(2012, 7, 2, 7, 50, 1)
+#    end_time = datetime.datetime(2013, 8, 2, 7, 50, 0)
+##    b = get_week_report_add_way_and_platform('2012-08-20 00:00:00', '2012-08-26 23:59:59')
+#    b = get_bookmark_website_for_user_raw_data(start_time,end_time)
+#    print b
+    
+    ret = tmp_raw_data()
+    print ret
 #    b = get_bookmark_website_for_user_raw_data()
     
 #    b = get_bookmark_website_for_user_raw_data()

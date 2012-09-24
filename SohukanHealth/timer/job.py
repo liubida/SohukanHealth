@@ -293,8 +293,9 @@ def fix_ua_job():
 
 if __name__ == '__main__':
 #    bookmark_total_job()
-    start = datetime.date(2012, 8, 27)
-    week_report_job(start)
+#    start = datetime.date(2012, 8, 27)
+#    week_report_job(start)
+    add_job()
 #    start = datetime.date(2012, 7, 16)
 #    today = datetime.date.today()
 #    step = datetime.timedelta(days=1)
@@ -314,7 +315,6 @@ if __name__ == '__main__':
 #    add_alarm_job()
 #    read_alarm_job()
 #    read_job()
-#    add_job()
 #    now = datetime.datetime.now()
 #    start_time = datetime.datetime(2012, 8, 2, 7, 50, 1)
 #    end_time = datetime.datetime(2012, 8, 2, 7, 50, 0)
