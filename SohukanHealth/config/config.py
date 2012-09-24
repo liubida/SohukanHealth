@@ -59,9 +59,10 @@ class DevConfig(Config):
     db_self_config = {'host':'10.10.69.53', 'port':3306, 'user':'sohukan', 'passwd':'sohukan', 'db':'sohukanhealth'}
 #    liubida 13476852610
 #    fangmeng 18627839148
+#    fangmeng_tmp 18971149285
 #    chenwei 13545257885
 #    zhangheng 13437104382'
-    mobile_list = '13476852610,18627839148,13545257885,13437104382'
+    mobile_list = '13476852610,18627839148,13545257885,13437104382,18971149285'
     logger = logging.getLogger("SohukanHealth")
     
     def do(self):
