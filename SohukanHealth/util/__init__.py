@@ -96,6 +96,17 @@ def left_seconds(time, mod=5):
     min = time.minute
     sec = time.second
     return (mod - 1 - min % mod) * 60 + (60 - sec)
+          
+def from_file(filename):
+    if not filename:
+        return None
+    
+    f = open(filename, "r")  #  Opens file for reading
+    lines = [] 
+    for line in f:
+        lines.append(line)
+    f.close()
+    return lines      
     
 if __name__ == '__main__':
 #    start_time = datetime.datetime.strptime("2012-08-17 10:35:08","%Y-%m-%d %H:%M:%S")

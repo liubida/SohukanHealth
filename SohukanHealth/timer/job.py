@@ -24,8 +24,9 @@ from statistics.biz import get_userdata_for_day_report, \
     get_bookmark_percent_raw_data, test_id, _is_test, get_week_report_add_way_and_platform
 from statistics.models import Report, UA
 from timer.sms import sms
-from util import print_info, query_ua, timediff
+from util import print_info, query_ua, timediff, from_file, get_date_and_time
 from util.random_spider import RandomSpider
+import re
 import MySQLdb
 import anyjson
 import datetime
@@ -125,7 +126,8 @@ def add_alarm_job():
             start_time = add_failure_data[0]['time']
             end_time = add_failure_data[failure_count - 1]['time']
             type = 'add_bookmark'
-            msg = 'add failure count: %s,%s' % (str(failure_count), datetime.datetime.now())
+            time = get_date_and_time()[1]
+            msg = 'add failure count: %s,%s' % (str(failure_count), time)
             sms(mobile_list=c.mobile_list, message_post=msg)
 
             latest = SysAlarm.objects.filter(type=type).order_by('-gmt_create')
@@ -166,7 +168,8 @@ def read_alarm_job():
             print start_time
             print end_time
             type = 'read_bookmark'
-            msg = 'read failure count:%s,%s' % (str(failure_count), datetime.datetime.now())
+            time = get_date_and_time()[1]
+            msg = 'read failure count:%s,%s' % (str(failure_count), time)
             sms(mobile_list=c.mobile_list, message_post=msg)
 
             # 获取上一次的报警信息
@@ -194,6 +197,85 @@ def read_alarm_job():
             c.logger.error(e)
             c.logger.error(msg)
             print msg
+
+@print_info(name='rabbitmq_queue_alarm_job')
+def rabbitmq_queue_alarm_job():
+    queue = {'log': None, 'purify': None, 'upload': None, 'download': None,
+             'encode': None, 'entry': None, 'store': None}
+    try:
+        # lines should be only one row
+        lines = from_file("/tmp/rabbitmq_queue.o")
+        if not lines:
+            c.logger.error("/tmp/rabbitmq_queue.o is blank")
+            
+        info = lines[0]
+#        info = r"encode:0|entry:|purify:0|download:0|log:0|upload:0|store:32"
+        
+        item_list = info.split('|')
+        if not item_list:
+            c.logger.error("queue_info parse error")
+        
+        for item in item_list:
+            tmp = item.split(':')
+            if tmp[1]:
+                queue[tmp[0]] = int(tmp[1])
+    
+        error_q = []
+        for q in queue.keys():
+            if q == 'log':
+                if not queue[q] or queue[q] >= 0:
+                    error_q.append("%s:%s" % (q, queue[q]))
+            else:
+                if not queue[q] or queue[q] >= 0:
+                    error_q.append("%s:%s" % (q, queue[q]))
+        
+        
+        time = get_date_and_time()[1]
+        content = '|'.join(error_q)
+        msg = '[%s] %s' % (time, content)
+        print msg
+        sms(mobile_list=c.mobile_list, message_post=msg)
+    except Exception, e:
+        c.logger.error(e)
+        c.logger.error(msg)
+        print e
+    
+#    
+#    if failure_count >= c.read_alarm_time: 
+#        try:
+#            start_time = read_failure_data[0]['time']
+#            end_time = read_failure_data[failure_count - 1]['time']
+#            print start_time
+#            print end_time
+#            type = 'rabbitmq_queue'
+#            msg = 'read failure count:%s,%s' % (str(failure_count), datetime.datetime.now())
+#            sms(mobile_list=c.mobile_list, message_post=msg)
+#
+#            # 获取上一次的报警信息
+#            latest = SysAlarm.objects.filter(type=type).order_by('-gmt_create')
+#            if latest:
+#                latest = latest[0]
+#                # start_time是本次报警的开始时间
+#                # latest.end_time是上次报警的结束时间
+#                # 所有在算时间差的时候, start_time应该是时间差的end, latest.end_time应该是时间差的start
+#                tdiff = timediff(latest.end_time, start_time)
+#                if (not latest) or start_time > latest.end_time and tdiff > 600:
+#                    # 一次新的故障
+#                    alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
+#                    alarm.save()
+#                else:
+#                    # 添加-报警的定时任务是每10min执行一次, 如果本次报警的时间和上次开始的时间<10min, 则认为是同一次故障
+#                    # 同一次故障的持续报警, 只需修改上次的结束时间即可
+#                    latest.end_time = end_time
+#                    latest.save()
+#            else:
+#                # 以前没有过这样类型的故障
+#                alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
+#                alarm.save()
+#        except Exception, e:
+#            c.logger.error(e)
+#            c.logger.error(msg)
+#            print msg
         
 @print_info(name='day_report_job')
 def day_report_job(now=None):
@@ -292,10 +374,11 @@ def fix_ua_job():
         c.logger.error(e)
 
 if __name__ == '__main__':
+    rabbitmq_queue_alarm_job()
 #    bookmark_total_job()
 #    start = datetime.date(2012, 8, 27)
 #    week_report_job(start)
-    add_job()
+#    add_job()
 #    start = datetime.date(2012, 7, 16)
 #    today = datetime.date.today()
 #    step = datetime.timedelta(days=1)
