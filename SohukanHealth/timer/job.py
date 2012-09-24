@@ -152,7 +152,6 @@ def add_alarm_job():
                 alarm.save()
         except Exception, e:
             c.logger.error(e)
-            c.logger.error(msg)
             print msg
 
 @print_info(name='read_alarm_job')
@@ -195,7 +194,6 @@ def read_alarm_job():
                 alarm.save()
         except Exception, e:
             c.logger.error(e)
-            c.logger.error(msg)
             print msg
 
 @print_info(name='rabbitmq_queue_alarm_job')
@@ -204,12 +202,12 @@ def rabbitmq_queue_alarm_job():
              'encode': None, 'entry': None, 'store': None}
     try:
         # lines should be only one row
-        lines = from_file("/tmp/rabbitmq_queue.o")
-        if not lines:
-            c.logger.error("/tmp/rabbitmq_queue.o is blank")
-            
-        info = lines[0]
-#        info = r"encode:0|entry:|purify:0|download:0|log:0|upload:0|store:32"
+#        lines = from_file("/tmp/rabbitmq_queue.o")
+#        if not lines:
+#            c.logger.error("/tmp/rabbitmq_queue.o is blank")
+#            
+#        info = lines[0]
+        info = r"encode:|entry:|purify:|download:|log:|upload:|store:"
         
         item_list = info.split('|')
         if not item_list:
@@ -217,7 +215,7 @@ def rabbitmq_queue_alarm_job():
         
         for item in item_list:
             tmp = item.split(':')
-            if tmp[1]:
+            if tmp[1] and tmp[1] != '\n':
                 queue[tmp[0]] = int(tmp[1])
     
         error_q = []
@@ -237,7 +235,6 @@ def rabbitmq_queue_alarm_job():
         sms(mobile_list=c.mobile_list, message_post=msg)
     except Exception, e:
         c.logger.error(e)
-        c.logger.error(msg)
         print e
     
 #    
