@@ -227,12 +227,12 @@ def rabbitmq_queue_alarm_job():
                 if not queue[q] or queue[q] >= 64:
                     error_q.append("%s:%s" % (q, queue[q]))
         
-        
-        time = get_date_and_time()[1]
-        content = '|'.join(error_q)
-        msg = '[%s] %s' % (time, content)
-        print msg
-        sms(mobile_list=c.mobile_list, message_post=msg)
+        if error_q:
+            time = get_date_and_time()[1]
+            content = '|'.join(error_q)
+            msg = '[%s] %s' % (time, content)
+            print msg
+            sms(mobile_list=c.mobile_list, message_post=msg)
     except Exception, e:
         c.logger.error(e)
         print e
