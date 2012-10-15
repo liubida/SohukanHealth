@@ -39,11 +39,11 @@ class Config:
     # 监控: 添加文章时限
     add_time_limit = 40
     # 报警: 添加文章失败次数上限
-    add_alarm_time = 3
+    add_alarm_time = 1
     # 监控: 阅读文章时限
     read_time_limit = 30
     # 报警: 阅读文章失败次数上限
-    read_alarm_time = 3
+    read_alarm_time = 1
     
     bucket_name = 'sohukan'
     expires_seconds = 300

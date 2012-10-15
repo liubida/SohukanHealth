@@ -48,6 +48,8 @@ var prepare_week_report = function() {
 			$('#week_report_date a').attr('class', 'pageNum');
 			$(this).attr('class', 'currentPage');
 
+			
+			div_content.style.display = 'block';
 			var day_str = this.id;
 			var da = day_str.split("-");
 			var da_int = [];

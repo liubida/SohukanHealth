@@ -371,11 +371,11 @@ def fix_ua_job():
         c.logger.error(e)
 
 if __name__ == '__main__':
-    rabbitmq_queue_alarm_job()
+#    rabbitmq_queue_alarm_job()
 #    bookmark_total_job()
 #    start = datetime.date(2012, 8, 27)
 #    week_report_job(start)
-#    add_job()
+    add_job()
 #    start = datetime.date(2012, 7, 16)
 #    today = datetime.date.today()
 #    step = datetime.timedelta(days=1)

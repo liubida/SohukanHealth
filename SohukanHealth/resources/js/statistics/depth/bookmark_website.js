@@ -30,8 +30,14 @@ var make_bookmark_website_chart = function(chartData) {
 var load_bookmark_website = function(params, callback) {
 	url = '/statistics/depth/bookmark_website';
 
-	var from = $("#depth_bookmark_website_from").val();
+	var now = new Date();
 	var to = $("#depth_bookmark_website_to").val();
+	to = to || now.format('yyyy-MM-dd hh:mm:ss');
+	
+	var from = $("#depth_bookmark_website_from").val();
+	tmp = now;
+	tmp.setMonth(now.getMonth() - 1)
+	from = from || tmp.format('yyyy-MM-dd hh:mm:ss');
 	
 	var date_range = get_date_range(from, to);
 	var size = $("#table_bookmark_website #size").val();
@@ -52,19 +58,14 @@ var load_bookmark_website = function(params, callback) {
 	myAjax(url, params, function(obj) {
 				data = obj.list;
 				len = data.length;
-				// chartData = [];
-				// for (var i = 0; i < len; i++) {
-				// chartData.push({
-				// domain : data[i].domain,
-				// count : data[i].count
-				// });
-				// }
 				make_bookmark_website_chart(data);
 				prepare_bookmark_website.data = data;
 
 				if (callback && typeof callback == 'function') {
 					callback();
 				}
+				$("#depth_bookmark_website_from").val(from.substr(0,10));
+				$("#depth_bookmark_website_to").val(to.substr(0,10));
 			});
 };
 
@@ -83,18 +84,6 @@ var prepare_bookmark_website = function() {
 				numberOfMonths : 2,
 				dateFormat : "yy-mm-dd"
 			});
-//	$("#table_bookmark_website :radio").change(function() {
-//		if (prepare_bookmark_website.data) {
-//			var radio_type = parseInt(
-//					$("#table_bookmark_website :radio:checked").val(), 10);
-//			if (radio_type == 0) {
-//				make_bookmark_website_chart(prepare_bookmark_website.data);
-//			} else {
-//			}
-//		} else {
-//			load_bookmark_website();
-//		}
-//	});
 	$("#table_bookmark_website #submit").click(load_bookmark_website);
 	$("#table_bookmark_website #reset").click(function() {
 				$("#depth_bookmark_website_from").val('');

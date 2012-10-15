@@ -30,10 +30,17 @@ var make_bookmark_website_for_user_chart = function(chartData) {
 var load_bookmark_website_for_user = function(params, callback) {
 	url = '/statistics/depth/bookmark_website_for_user';
 
-	var from = $("#depth_bookmark_website_for_user_from").val();
+	var now = new Date();
 	var to = $("#depth_bookmark_website_for_user_to").val();
+	to = to || now.format('yyyy-MM-dd hh:mm:ss');
+	
+	var from = $("#depth_bookmark_website_for_user_from").val();
+	tmp = now;
+	tmp.setMonth(now.getMonth() - 1)
+	from = from || tmp.format('yyyy-MM-dd hh:mm:ss');
 
 	var date_range = get_date_range(from, to);
+	
 	var size = $("#table_bookmark_website_for_user #size").val();
 	var radio_type = parseInt(
 			$("#table_bookmark_website_for_user :radio:checked").val(), 10);
@@ -60,6 +67,8 @@ var load_bookmark_website_for_user = function(params, callback) {
 				if (callback && typeof callback == 'function') {
 					callback();
 				}
+				$('#depth_bookmark_website_for_user_from').val(from.substr(0,10));
+				$('#depth_bookmark_website_for_user_to').val(to.substr(0,10));
 			});
 };
 

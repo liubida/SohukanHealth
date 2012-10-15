@@ -12,7 +12,7 @@ var make_user_total_chart = function(chartData, radio_type) {
 	chart.dataProvider = chartData;
 	chart.categoryField = "date";
 
-	if (chartData.length > 300) {
+	if (chartData.length > 100) {
 		chart.addListener("dataUpdated", function() {
 					chart.zoomToIndexes(chartData.length - 100,
 							chartData.length - 1);
@@ -86,8 +86,13 @@ var make_user_total_chart = function(chartData, radio_type) {
 var load_user_total = function(callback) {
 	url = '/statistics/user/total'
 
-	var from = $("#statistics_user_total_from").val();
+	var now = new Date();
 	var to = $("#statistics_user_total_to").val();
+	to = to || now.format('yyyy-MM-dd hh:mm:ss');
+	var from = $("#statistics_user_total_from").val();
+	tmp = now;
+	tmp.setMonth(now.getMonth() - 2)
+	from = from || tmp.format('yyyy-MM-dd hh:mm:ss');
 
 	var date_range = get_date_range(from, to);
 	var data_grain = $("#table_user_total #data_grain").val();
@@ -122,6 +127,8 @@ var load_user_total = function(callback) {
 				};
 				make_user_total_chart(chartData, radio_type);
 				prepare_user_total.chartData = chartData;
+				$("#statistics_user_total_from").val(from.substr(0,10));
+				$("#statistics_user_total_to").val(to.substr(0,10));
 			});
 };
 

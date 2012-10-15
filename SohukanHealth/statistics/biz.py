@@ -4,12 +4,18 @@ Created on Jun 19, 2012
 
 @author: liubida
 '''
+
 import sys
 import os
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print root_path
 sys.path.append(root_path)
 print sys.path
+
+from django.core.management import setup_environ
+from SohukanHealth import settings
+print settings
+setup_environ(settings)
 
 from config.config import c
 from monitor.models import SomeTotal
@@ -446,7 +452,7 @@ def get_bookmark_website_raw_data(start_time=None, end_time=None, limit=100):
         # 这里不需要去掉guide, 因为后面会有专门的domain删除
         # remove_guide = " url not regexp '^http://kan.sohu.com/help/guide-' "
         for i in range(64):
-            cursor.execute("select user_id, url from bookmark_bookmark_%s where 1=1 %s" % (i, and_fix))
+            cursor.execute("select user_id, url from bookmark_bookmark_%s where 1=1 %s " % (i, and_fix))
             results = cursor.fetchall()
             for d in results:
                 user_id = int(d[0])
@@ -498,8 +504,7 @@ def get_bookmark_website_for_user_raw_data(start_time=None, end_time=None, limit
         # remove_guide = " url not regexp '^http://kan.sohu.com/help/guide-' "
         # 先取得原始数据, 
         for i in range(64):
-            sql = "select user_id, url from bookmark_bookmark_%s where 1=1 %s" % (i, and_fix)
-            print sql
+            sql = "select user_id, url from bookmark_bookmark_%s where 1=1 %s " % (i, and_fix)
             cursor.execute(sql)
             results = cursor.fetchall()
             for d in results:
@@ -598,6 +603,55 @@ def get_bookmark_per_user_raw_data(start_time=None, end_time=None, limit=100):
         ret.sort(key=lambda x:x['count'], reverse=True)
         return ret[:limit];
     except Exception, e:
+        c.logger.error(e)
+        return str(e)
+    finally:
+        try:
+            if cursor:
+                cursor.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()
+    
+def get_folder_name_per_user_raw_data(start_time=None, end_time=None, limit=100):
+    '''为[统计用户创建的分类名]获取原始数据'''
+    try:
+        conn = MySQLdb.connect(**c.db_config)
+        cursor = conn.cursor()
+        
+        having_fix, and_fix = _get_fix(start_time, end_time)
+#        remove_guide = " url not regexp '^http://kan.sohu.com/help/guide-' "    
+        
+        ret = []
+        m = {}
+        cursor.execute("set names utf8");
+        num = 0
+        for i in range(64):
+            sql = "select user_id, name from folder_folder_%s where 1=1 %s " % (i, and_fix)
+#            print sql
+            cursor.execute(sql)
+            results = cursor.fetchall()
+            for d in results:
+                user_id = int(d[0])
+                name = str(d[1])
+                print num, user_id, name
+                num +=1
+                if not _is_test(user_id):
+                    if name not in m.keys():
+                        m[name] = 1
+                    else:
+                        m[name] += 1
+        
+        items = m.items()
+        items.sort(key=lambda x:x[1], reverse=True)
+        ret = [{'name':key, 'count':value} for key, value in items]                            
+        for r in ret:
+            print r['name'],r['count']
+        return ret[:limit];
+    except Exception, e:
+        print e
         c.logger.error(e)
         return str(e)
     finally:
@@ -739,7 +793,7 @@ def tmp_raw_data(include_test=False):
 #                    kv['bookmark'] = i
                 if include_test or not _is_test(int(d[0])):
                     domain = urlparse.urlparse(str(d[1]))[1]
-                    kv={}
+                    kv = {}
                     kv['domain'] = domain
                     kv['url'] = str(d[1])
                     ret.append(kv)
@@ -747,8 +801,8 @@ def tmp_raw_data(include_test=False):
         i = 0
         for r in ret:
             if r['domain'] == "www.google.com":
-                print i,r['url']
-                i = i+1
+                print i, r['url']
+                i = i + 1
             
         return None;
     except Exception, e:
@@ -888,9 +942,8 @@ if __name__ == '__main__':
 ##    b = get_week_report_add_way_and_platform('2012-08-20 00:00:00', '2012-08-26 23:59:59')
 #    b = get_bookmark_website_for_user_raw_data(start_time,end_time)
 #    print b
+    get_folder_name_per_user_raw_data('2012-08-20 00:00:00', '2012-08-26 23:59:59')
     
-    ret = tmp_raw_data()
-    print ret
 #    b = get_bookmark_website_for_user_raw_data()
     
 #    b = get_bookmark_website_for_user_raw_data()

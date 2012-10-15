@@ -429,35 +429,6 @@ def week_report_abstract(request):
 #        expire = now + datetime.timedelta(days=7)
 #        response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
 #        return response
-#
-#@login_required
-#def week_report_add_way_and_platform(request):
-#    start_time = request.GET.get('start_time', '2012-07-16')
-#    # 注意, 周报表里面的time是当时统计周报数据的时间, 所以记录的数据实际是相对time上一周的数据
-#    # 如果time为7-23, 那么对应的是7-16这一周的周报数据
-#    start_time = datetime.datetime.strptime(start_time, '%Y-%m-%d')
-#    start_time = start_time + datetime.timedelta(days=7)
-#    end_time = start_time + datetime.timedelta(days=2)
-#
-#
-##    jsondata_array = Report.objects.filter(type='week', time__gte=start_time, time__lt=end_time).values('jsondata')
-##    if jsondata_array:
-##        jsondata = jsondata_array[0]['jsondata']
-##        data = anyjson.loads(jsondata)
-##        s = {
-##            'name': 'liubida',
-##            'new_user'    : data['new_user'],
-##            'new_bookmark'    : data['new_bookmark'],
-##        }
-##        t = loader.get_template('statistics/week_report_abstract.html')
-##        response = HttpResponse(t.render(Context({'s':s})))
-##        return response
-#
-#    data = get_week_report_add_way_and_platform(start_time, end_time)
-#    if data:
-#        t = loader.get_template('statistics/week_report_add_way_and_platform.html')
-#        response = HttpResponse(t.render(Context({'data':data})))
-#        return response
 
 # 周报收藏文章来源网站    
 @login_required

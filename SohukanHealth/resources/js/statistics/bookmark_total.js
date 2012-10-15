@@ -12,7 +12,7 @@ var make_bookmark_total_chart = function(chartData, radio_type) {
 	chart.dataProvider = chartData;
 	chart.categoryField = "date";
 
-	if (chartData.length > 300) {
+	if (chartData.length > 100) {
 		chart.addListener("dataUpdated", function() {
 					chart.zoomToIndexes(chartData.length - 100,
 							chartData.length - 1);
@@ -94,8 +94,13 @@ var make_bookmark_total_chart = function(chartData, radio_type) {
 var load_bookmark_total = function(params, callback) {
 	url = '/statistics/bookmark/total'
 
-	var from = $("#statistics_bookmark_total_from").val()
+	var now = new Date();
 	var to = $("#statistics_bookmark_total_to").val()
+	to = to || now.format('yyyy-MM-dd hh:mm:ss');
+	var from = $("#statistics_bookmark_total_from").val()
+	tmp = now;
+	tmp.setMonth(now.getMonth() - 2)
+	from = from || tmp.format('yyyy-MM-dd hh:mm:ss');
 
 	var date_range = get_date_range(from, to);
 	var data_grain = $("#table_bookmark_total #data_grain").val();
@@ -131,6 +136,8 @@ var load_bookmark_total = function(params, callback) {
 				}
 				make_bookmark_total_chart(chartData, radio_type);
 				prepare_bookmark_total.chartData = chartData;
+				$("#statistics_bookmark_total_from").val(from.substr(0,10));
+				$("#statistics_bookmark_total_to").val(to.substr(0,10));
 			});
 };
 
@@ -171,4 +178,4 @@ var prepare_bookmark_total = function() {
 };
 $(document).ready(function() {
 			prepare_bookmark_total();
-		});		
+		});

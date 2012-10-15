@@ -100,8 +100,13 @@ var make_platform_chart = function(chartData) {
 var load_platform = function(params, callback) {
 	url = '/statistics/depth/platform';
 
-	var from = $("#depth_platform_from").val()
+	var now = new Date();
 	var to = $("#depth_platform_to").val()
+	to = to || now.format('yyyy-MM-dd hh:mm:ss');
+	var from = $("#depth_platform_from").val()
+	tmp = now;
+	tmp.setMonth(now.getMonth() - 1)
+	from = from || tmp.format('yyyy-MM-dd hh:mm:ss');
 
 	var date_range = get_date_range(from, to);
 	var size = $("#table_platform #size").val();
@@ -129,6 +134,9 @@ var load_platform = function(params, callback) {
 				if (callback && typeof callback == 'function') {
 					callback();
 				}
+				$("#depth_platform_from").val(from.substr(0,
+						10));
+				$("#depth_platform_to").val(to.substr(0, 10));
 			});
 };
 

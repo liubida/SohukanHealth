@@ -76,8 +76,13 @@ var make_activate_user_chart = function(chartData, radio_type) {
 var load_activate_user = function(params, callback) {
 	url = '/statistics/depth/activate_user';
 
-	var from = $("#depth_activate_user_from").val()
+	var now = new Date();
 	var to = $("#depth_activate_user_to").val()
+	to = to || now.format('yyyy-MM-dd hh:mm:ss');
+	var from = $("#depth_activate_user_from").val()
+	tmp = now;
+	tmp.setMonth(now.getMonth() - 2)
+	from = from || tmp.format('yyyy-MM-dd hh:mm:ss');
 
 	var date_range = get_date_range(from, to);
 	var data_grain = $("#table_activate_user #data_grain").val();
@@ -115,6 +120,8 @@ var load_activate_user = function(params, callback) {
 				if (callback && typeof callback == 'function') {
 					callback();
 				}
+				$("#depth_activate_user_from").val(from.substr(0, 10));
+				$("#depth_activate_user_to").val(to.substr(0, 10));
 			});
 };
 
@@ -152,7 +159,6 @@ var prepare_activate_user = function() {
 
 	load_activate_user();
 };
-
 
 $(document).ready(function() {
 			prepare_activate_user();
