@@ -641,7 +641,6 @@ def get_folder_name_per_user_raw_data(start_time=None, end_time=None, limit=100)
             for d in results:
                 user_id = int(d[0])
                 name = str(d[1])
-                print num, user_id, name
                 num += 1
                 if not _is_test(user_id):
                     if name not in m.keys():
@@ -653,10 +652,10 @@ def get_folder_name_per_user_raw_data(start_time=None, end_time=None, limit=100)
         items.sort(key=lambda x:x[1], reverse=True)
         ret = [{'name':key, 'count':value} for key, value in items]                            
         for r in ret:
-            print r['name'], r['count']
+            pass
+#            print r['name'], r['count']
         return ret[:limit];
     except Exception, e:
-        print e
         c.logger.error(e)
         return str(e)
     finally:
@@ -806,8 +805,9 @@ def tmp_raw_data(include_test=False):
         i = 0
         for r in ret:
             if r['domain'] == "www.google.com":
-                print i, r['url']
                 i = i + 1
+                pass
+#                print i, r['url']
             
         return None;
     except Exception, e:
@@ -871,11 +871,11 @@ def get_week_report_add_way_and_platform(start_time, end_time):
         # 所有通过链接收藏的文章, 这一项包括chrome链接收藏+手机链接收藏
         sql_url_total = "select count(oo.object_key) from stats_oper o left join stats_operobject oo on oo.oper_id = o.id\
                where 1=1 %s %s and o.oper_type_id in (1,35) and object_key not regexp '.*\"content\".*'" % (and_fix, tmp)
-        print sql_url_total
+#        print sql_url_total
         cursor.execute(sql_url_total)
         result = cursor.fetchone()
         url_total = int(result[0])
-        print url_total
+#        print url_total
         
         # 收藏平台
         platform_total = 0;
@@ -887,7 +887,7 @@ def get_week_report_add_way_and_platform(start_time, end_time):
             result = cursor.fetchone()
             platforms[p] = int(result[0])
             platform_total += platforms[p]
-            print p
+#            print p
             
         # chrome通过链接收藏
         phone_url = platforms['Android'] + platforms['Darwin']
@@ -947,7 +947,7 @@ if __name__ == '__main__':
 ##    b = get_week_report_add_way_and_platform('2012-08-20 00:00:00', '2012-08-26 23:59:59')
 #    b = get_bookmark_website_for_user_raw_data(start_time,end_time)
 #    print b
-    get_bookmark_website_raw_data('2012-08-20 00:00:00', '2012-08-26 23:59:59')
+#    get_bookmark_website_raw_data('2012-08-20 00:00:00', '2012-08-26 23:59:59')
     
 #    b = get_bookmark_website_for_user_raw_data()
     

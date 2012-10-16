@@ -9,7 +9,7 @@ from monitor.models import SomeTotal
 from statistics.biz import get_bookmark_per_user, get_bookmark_time, \
     get_bookmark_percent, get_data_interval, add_inc_for_data, get_activate_user, \
     get_bookmark_website, _get_week_num, get_user_platform, _get_week_list, \
-    get_bookmark_website_for_user, get_week_report_add_way_and_platform
+    get_bookmark_website_for_user
 from statistics.models import Report
 import anyjson
 import datetime
@@ -287,8 +287,6 @@ def day_report_date(request):
     day_array = []
     day_format = "%m-%d"
     for t in time_array:
-        print t
-        print t['time']
         day_array.append(t['time'].strftime(day_format))
 
     s = {}
@@ -346,7 +344,6 @@ def day_report_bookmark_percent(request):
     end_time = request.GET.get('end_time', '')
     
     jsondata_array = Report.objects.filter(type='day', time__gte=start_time, time__lt=end_time).values('jsondata')
-    print jsondata_array
     if jsondata_array:
         jsondata = jsondata_array[0]['jsondata']
         data = anyjson.loads(jsondata)
@@ -365,7 +362,6 @@ def day_report_bookmark_website(request):
     end_time = request.GET.get('end_time', '')
     
     jsondata_array = Report.objects.filter(type='day', time__gte=start_time, time__lt=end_time).values('jsondata')
-    print jsondata_array
     if jsondata_array:
         jsondata = jsondata_array[0]['jsondata']
         data = anyjson.loads(jsondata)
@@ -413,7 +409,6 @@ def week_report_abstract(request):
     if jsondata_array:
         jsondata = jsondata_array[0]['jsondata']
         data = anyjson.loads(jsondata)
-        print data
         s = {
             'name': 'liubida',
             'new_user'    : data['new_user'],
@@ -474,9 +469,6 @@ def test(start_time, end_time, data_grain='day'):
         
         first_day = datetime.date.today().replace(month=1, day=1)
         day = first_day + datetime.timedelta(weeks=week_start)
-        print raw_data[0]['time']
-        print week_start
-        print day
         
         for d in raw_data:
             if d['time'].hour == 23 and \

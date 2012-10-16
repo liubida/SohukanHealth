@@ -61,7 +61,6 @@ def user_total_job():
         #去掉测试用户的id
         tmp = ' where id !='
         tmp += ' and id !='.join(map(lambda x:str(x), test_id))
-        print tmp
         cursor.execute('select count(*) from account_user %s' % tmp)
         result = cursor.fetchone()
         now = datetime.datetime.now()
@@ -152,7 +151,6 @@ def add_alarm_job():
                 alarm.save()
         except Exception, e:
             c.logger.error(e)
-            print msg
 
 @print_info(name='read_alarm_job')
 def read_alarm_job():
@@ -164,8 +162,6 @@ def read_alarm_job():
         try:
             start_time = read_failure_data[0]['time']
             end_time = read_failure_data[failure_count - 1]['time']
-            print start_time
-            print end_time
             type = 'read_bookmark'
             time = get_date_and_time()[1]
             msg = 'read failure count:%s,%s' % (str(failure_count), time)
@@ -194,7 +190,6 @@ def read_alarm_job():
                 alarm.save()
         except Exception, e:
             c.logger.error(e)
-            print msg
 
 @print_info(name='rabbitmq_queue_alarm_job')
 def rabbitmq_queue_alarm_job():
@@ -231,11 +226,9 @@ def rabbitmq_queue_alarm_job():
             time = get_date_and_time()[1]
             content = '|'.join(error_q)
             msg = '[%s] %s' % (time, content)
-            print msg
             sms(mobile_list=c.mobile_list, message_post=msg)
     except Exception, e:
         c.logger.error(e)
-        print e
     
 #    
 #    if failure_count >= c.read_alarm_time: 
