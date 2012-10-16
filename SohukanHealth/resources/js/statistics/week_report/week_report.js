@@ -88,63 +88,6 @@ var prepare_week_report = function() {
 					}
 				});
 	});
-
-	//	
-	// myAjax(url, {}, function(obj) {
-	// data = obj.list;
-	// for (var i = 0; i < data.length; i++) {
-	// var a = document.createElement('a');
-	// a.setAttribute('id', data[i]);
-	// a.setAttribute('href', data[i]);
-	// a.setAttribute('title', data[i]);
-	// a.className = 'pageNum';
-	//
-	// var day_str = '2012-' + data[i];
-	// (function (day_str) {
-	// a.onclick = function() {
-	// var date_div = document
-	// .getElementById('week_report_date');
-	// var links = date_div.getElementsByTagName('a');
-	// for (var i = 0; i < links.length; i++) {
-	// links[i].className = 'pageNum';
-	// }
-	// this.className = 'currentPage';
-	//
-	// div_content.style.display = 'block';
-	//
-	// var da = day_str.split("-");
-	// var da_int = [];
-	// for (var i = 0; i < da.length; i++) {
-	// da_int[i] = parseInt(da[i], 10);
-	// }
-	// var day = new Date(da_int[0], da_int[1] - 1,
-	// da_int[2], 0, 0, 0);
-	// var tmp = new Date(da_int[0], da_int[1] - 1,
-	// da_int[2] + 1, 0, 0, 0);
-	// var start_time = day.format('yyyy-MM-dd hh:mm:ss');
-	// var end_time = tmp.format('yyyy-MM-dd hh:mm:ss');
-	// load_week_report_abstract({
-	// start_time : start_time,
-	// end_time : end_time
-	// });
-	// load_user_bookmark_percent({
-	// start_time : start_time,
-	// end_time : end_time
-	// });
-	// load_user_bookmark_website({
-	// start_time : start_time,
-	// end_time : end_time
-	// });
-	// return false;
-	// };
-	// })(day_str)
-	//
-	// var a_text = document.createTextNode(data[i]);
-	// a.appendChild(a_text);
-	// div_date.appendChild(a);
-	// }
-	//
-	// });
 };
 
 var load_week_report_abstract1 = function(params) {

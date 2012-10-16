@@ -445,6 +445,7 @@ def get_bookmark_website_raw_data(start_time=None, end_time=None, limit=100):
         
         having_fix, and_fix = _get_fix(start_time, end_time)
         mm = {}
+        urls = {}
         ret = []
         
         # 由于bookmark表以前没有gmt_create, 所以凡是查询bookmark表都要替换成create_time
@@ -463,8 +464,12 @@ def get_bookmark_website_raw_data(start_time=None, end_time=None, limit=100):
                         mm[domain] += 1
                     else:
                         mm[domain] = 1
+                        urls[domain] = [] 
+                    if(len(urls[domain]) <= 100):
+                        urls[domain].append(url)
+                    
         for k in mm.keys():
-            ret.append({'domain':k, 'count':mm[k]})
+            ret.append({'domain':k, 'count':mm[k], 'urls':urls[k]})
             
         ret.sort(key=lambda x:x['count'], reverse=True)
         
@@ -637,7 +642,7 @@ def get_folder_name_per_user_raw_data(start_time=None, end_time=None, limit=100)
                 user_id = int(d[0])
                 name = str(d[1])
                 print num, user_id, name
-                num +=1
+                num += 1
                 if not _is_test(user_id):
                     if name not in m.keys():
                         m[name] = 1
@@ -648,7 +653,7 @@ def get_folder_name_per_user_raw_data(start_time=None, end_time=None, limit=100)
         items.sort(key=lambda x:x[1], reverse=True)
         ret = [{'name':key, 'count':value} for key, value in items]                            
         for r in ret:
-            print r['name'],r['count']
+            print r['name'], r['count']
         return ret[:limit];
     except Exception, e:
         print e
@@ -942,7 +947,7 @@ if __name__ == '__main__':
 ##    b = get_week_report_add_way_and_platform('2012-08-20 00:00:00', '2012-08-26 23:59:59')
 #    b = get_bookmark_website_for_user_raw_data(start_time,end_time)
 #    print b
-    get_folder_name_per_user_raw_data('2012-08-20 00:00:00', '2012-08-26 23:59:59')
+    get_bookmark_website_raw_data('2012-08-20 00:00:00', '2012-08-26 23:59:59')
     
 #    b = get_bookmark_website_for_user_raw_data()
     

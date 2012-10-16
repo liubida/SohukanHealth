@@ -72,11 +72,11 @@ var load_user_bookmark_website = function(params, callback) {
 				}
 				data = obj.data;
 				make_user_bookmark_website_chart(data);
-				
+
 				for (var j = 0; j < 4; j++) {
 					var table = document.createElement('table')
 					table.style.fontSize = '12px';
-					table.style.float='left';
+					table.style.float = 'left';
 					var th0 = document.createElement('th')
 					var th0_text = document.createTextNode("序号");
 					th0.appendChild(th0_text);
@@ -93,28 +93,89 @@ var load_user_bookmark_website = function(params, callback) {
 
 					var index = 0;
 					for (var i = 0; i < 20; i++) {
-						var tr = document.createElement('tr');
+						var w_tr = document.createElement('tr');
 						index = 20 * j + i;
-						
+
 						// 序号列
 						var td = document.createElement('td');
-						var td_text = document.createTextNode(index+1);
+						var td_text = document.createTextNode(index + 1);
 						td.appendChild(td_text);
-						tr.appendChild(td);
+						w_tr.appendChild(td);
 
 						// 网站列
 						var td = document.createElement('td');
-						var td_text = document.createTextNode(data[index].domain);
+						var td_text = document
+								.createTextNode(data[index].domain);
 						td.appendChild(td_text);
-						tr.appendChild(td);
+						w_tr.appendChild(td);
 
 						// 文章数列
 						var td = document.createElement('td');
-						var td_text = document.createTextNode(data[index].count);
+						var td_text = document
+								.createTextNode(data[index].count);
 						td.appendChild(td_text);
-						tr.appendChild(td);
+						w_tr.appendChild(td);
 
-						table.appendChild(tr);
+						if (data[index].urls) {
+							var url_table = document.createElement('table')
+							url_table.style.fontSize = '12px';
+							url_table.style.float = 'left';
+							url_table.style.width = '900px';
+							url_table.style.wordBreak = 'break-all';
+
+							urls = data[index].urls;
+							var len = urls.length >= 100 ? 100 : urls.length;
+
+							for (var k = 0; k < len; k++) {
+								var tr = document.createElement('tr');
+								for (var l = 0; l < 7; l++, k++) {
+									if (urls[k]) {
+										var td = document.createElement('td');
+										td.style.float = 'left';
+										var a = document.createElement('a');
+										a.setAttribute('href', urls[k]);
+										var a_text = document
+												.createTextNode(urls[k]);
+										a.appendChild(a_text);
+										td.appendChild(a);
+										tr.appendChild(td);
+									}
+								}
+								k--;
+								url_table.appendChild(tr);
+							}
+
+	(function				(index, url_table) {
+								w_tr.onclick = function() {
+									$('#box')
+											.empty()
+											.append('<div class="clearfix"></div>');
+
+									$('#box div').append(url_table);
+
+									$.blockUI({
+												message : $('#box'),
+												css : {
+													top : '20%',
+													left : '30%',
+													textAlign : 'left',
+													marginLeft : '-320px',
+													marginTop : '-145px',
+													background : 'none'
+												}
+											});
+									$('.blockOverlay').attr('title', '单击关闭')
+											.click($.unblockUI);
+								}
+							})(index, url_table);
+							w_tr.onmouseover = function() {
+								this.style.background = '#DFF7F8';
+							};
+							w_tr.onmouseout = function() {
+								this.style.background = 'white';
+							};
+						}
+						table.appendChild(w_tr);
 					}
 					raw_div.appendChild(table);
 				}

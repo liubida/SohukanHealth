@@ -318,7 +318,8 @@ def week_report_job(today=None):
     if not today:
         today = datetime.date.today()
     # 双重保证, 不是周一就返回
-    if today.isoweekday() != 1: return
+    if today.isoweekday() != 1: 
+        return
     # 从上周的周一开始 
     last_mon = today - datetime.timedelta(days=7)
     jsondata_array = Report.objects.filter(type='day', time__gte=last_mon, time__lt=today).values('jsondata')
@@ -375,14 +376,14 @@ if __name__ == '__main__':
 #    bookmark_total_job()
 #    start = datetime.date(2012, 8, 27)
 #    week_report_job(start)
-    add_job()
-#    start = datetime.date(2012, 7, 16)
-#    today = datetime.date.today()
-#    step = datetime.timedelta(days=1)
-#    
-#    while start <= today:
-#        week_report_job(start)
-#        start += step
+#    add_job()
+    start = datetime.date(2012, 7, 13)
+    today = datetime.date.today()
+    step = datetime.timedelta(days=1)
+
+    while start <= today:
+        week_report_job(start)
+        start += step
 #    start = datetime.datetime(2012, 8, 25, 23, 58, 0)
 #    day_report_job(start)
     

@@ -93,7 +93,11 @@ def sys_alarm(request, month=0):
 @login_required
 def read(request):
     s = {'list':[]}
-    data = AppAvailableData.objects.filter(name='read').values('name', 'time_used', 'time')
+    now = datetime.datetime.now()
+    # 前七天的数据
+    delta = datetime.timedelta(days=7)
+    start_time = now - delta
+    data = AppAvailableData.objects.filter(name='read', time__gte=start_time).values('name', 'time_used', 'time')
     for d in data:
         s['list'].append({'name':d['name'], 'time_used':d['time_used'], 'time':d['time'].strftime('%Y.%m.%d %H:%M:%S')})
     
@@ -105,7 +109,12 @@ def read(request):
 @login_required
 def add(request):
     s = {'list':[]}
-    data = AppAvailableData.objects.filter(name='add').values('name', 'time_used', 'time')
+    
+    now = datetime.datetime.now()
+    delta = datetime.timedelta(days=7)
+    # 前七天的数据
+    start_time = now - delta
+    data = AppAvailableData.objects.filter(name='add', time__gte=start_time).values('name', 'time_used', 'time')
     for d in data:
         s['list'].append({'name':d['name'], 'time_used':d['time_used'], 'time':d['time'].strftime('%Y.%m.%d %H:%M:%S')})
     

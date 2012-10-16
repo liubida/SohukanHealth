@@ -433,7 +433,7 @@ def week_report_abstract(request):
 # 周报收藏文章来源网站    
 @login_required
 def week_report_bookmark_website(request):
-    start_time = request.GET.get('start_time', '2012-07-16')
+    start_time = request.GET.get('start_time', '2012-07-16 00:00:00')
     # 注意, 周报表里面的time是当时统计周报数据的时间, 所以记录的数据实际是相对time上一周的数据
     # 那么我要查7-16这一周的数据, time就应该为7-23
     start_time = datetime.datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S')
