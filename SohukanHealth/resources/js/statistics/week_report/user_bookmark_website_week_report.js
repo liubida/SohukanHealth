@@ -118,8 +118,7 @@ var load_user_bookmark_website = function(params, callback) {
 
 						if (data[index].urls) {
 							var url_table = document.createElement('table')
-							url_table.style.fontSize = '12px';
-							url_table.style.float = 'left';
+							url_table.style.fontSize = '11px';
 							url_table.style.width = '900px';
 							url_table.style.wordBreak = 'break-all';
 
@@ -128,10 +127,11 @@ var load_user_bookmark_website = function(params, callback) {
 
 							for (var k = 0; k < len; k++) {
 								var tr = document.createElement('tr');
-								for (var l = 0; l < 7; l++, k++) {
+								for (var l = 0; l < 3; l++, k++) {
 									if (urls[k]) {
 										var td = document.createElement('td');
-										td.style.float = 'left';
+										td.style.width = '450px';
+										td.style.textAlign = 'left';
 										var a = document.createElement('a');
 										a.setAttribute('href', urls[k]);
 										var a_text = document
@@ -145,7 +145,7 @@ var load_user_bookmark_website = function(params, callback) {
 								url_table.appendChild(tr);
 							}
 
-	(function				(index, url_table) {
+				(function	(index, url_table) {
 								w_tr.onclick = function() {
 									$('#box')
 											.empty()
@@ -156,7 +156,7 @@ var load_user_bookmark_website = function(params, callback) {
 									$.blockUI({
 												message : $('#box'),
 												css : {
-													top : '20%',
+													top : '15%',
 													left : '30%',
 													textAlign : 'left',
 													marginLeft : '-320px',
