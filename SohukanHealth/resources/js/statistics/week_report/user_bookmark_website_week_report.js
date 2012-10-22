@@ -134,6 +134,7 @@ var load_user_bookmark_website = function(params, callback) {
 										td.style.textAlign = 'left';
 										var a = document.createElement('a');
 										a.setAttribute('href', urls[k]);
+										a.target = "_blank";
 										var a_text = document
 												.createTextNode(urls[k]);
 										a.appendChild(a_text);
@@ -145,7 +146,7 @@ var load_user_bookmark_website = function(params, callback) {
 								url_table.appendChild(tr);
 							}
 
-				(function	(index, url_table) {
+	(function				(index, url_table) {
 								w_tr.onclick = function() {
 									$('#box')
 											.empty()
@@ -156,7 +157,7 @@ var load_user_bookmark_website = function(params, callback) {
 									$.blockUI({
 												message : $('#box'),
 												css : {
-													top : '15%',
+													top : '20%',
 													left : '30%',
 													textAlign : 'left',
 													marginLeft : '-320px',
