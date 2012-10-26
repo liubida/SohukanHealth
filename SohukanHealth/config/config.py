@@ -37,11 +37,11 @@ class Config:
     # request查询的最大时间
     MAX_TIME = '2222-06-10 00:00:00';
     # 监控: 添加文章时限
-    add_time_limit = 40
+    add_time_limit = 120
     # 报警: 添加文章失败次数上限
     add_alarm_time = 2
     # 监控: 阅读文章时限
-    read_time_limit = 30
+    read_time_limit = 100
     # 报警: 阅读文章失败次数上限
     read_alarm_time = 2
     
