@@ -22,14 +22,14 @@ class RandomSpider(object):
     
     def __init__(self):
         self._site_mapper = {
-                             'ifanr': 'http://www.ifanr.com/',
-                             'engadget': 'http://cn.engadget.com/',
+#                             'ifanr': 'http://www.ifanr.com/',
+#                             'engadget': 'http://cn.engadget.com/',
 #                             'sina': 'http://news.sina.com.cn/',
                              'sohu': 'http://news.sohu.com/',
                              }
         self._patterns = {
-                          'www.ifanr.com': '/\d+',
-                          'cn.engadget.com': '/\d+',
+#                          'www.ifanr.com': '/\d+',
+#                          'cn.engadget.com': '/\d+',
 #                          'news.sina.com.cn': '/(pl|[cswm])/.+',
                           'news.sohu.com': '/\d+',
                           }
