@@ -17,6 +17,7 @@ from SohukanHealth import settings
 print settings
 setup_environ(settings)
 
+from statistics.models import Report
 from config.config import c
 from monitor.models import SomeTotal
 from util import to_percent
@@ -744,6 +745,7 @@ def get_bookmarkdata_for_day_report(today_start, today_end):
     # 今日文章总数
     bookmark_total = int(SomeTotal.objects.filter(name='bookmark', time__gte=today_start, time__lte=today_end).values('count').\
                             reverse()[0]['count'])
+
     # 昨日文章总数
     bookmark_total_yd = int(SomeTotal.objects.filter(name='bookmark', time__gte=yd_start, time__lte=yd_end).\
                             values('count').reverse()[0]['count'])
@@ -768,7 +770,10 @@ def get_bookmarkdata_for_day_report(today_start, today_end):
     # 环比新增文章=(本期新增文章-上期新增文章)/上期新增文章
     bookmark_new_inc = (bookmark_new - bookmark_new_yd + 0.00000001) / bookmark_new_yd 
     bookmark_new_inc = round(bookmark_new_inc, 4)
-     
+    
+    # 今日收藏失败文章
+    bookmark_failed = get_bookmark_failed(today_start, today_end)
+    
     ret = {}
     ret['total'] = bookmark_total;
     ret['total_yd'] = bookmark_total_yd;
@@ -776,9 +781,38 @@ def get_bookmarkdata_for_day_report(today_start, today_end):
     ret['total_inc'] = bookmark_total_inc;
     ret['total_inc_yd'] = bookmark_total_inc_yd;
     ret['new_inc'] = bookmark_new_inc;
+    ret['failed'] = bookmark_failed
     
     return ret
-    
+
+def get_bookmark_failed(start, end):
+    try:
+        conn = MySQLdb.connect(**c.db_self_config)
+        cursor = conn.cursor()
+        
+        bookmark_fail = [];
+        sql = "select user_id, url from stats_failcase where gmt_create >= '%s' and gmt_create <= '%s'" % (start, end)
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        for d in results:
+            user_id = int(d[0])
+            url = str(d[1])
+            if not _is_test(user_id):
+                bookmark_fail.append({'user_id':user_id, 'url':url})
+        return bookmark_fail;
+    except Exception, e:
+        c.logger.error(e)
+        return str(e)
+    finally:
+        try:
+            if cursor:
+                cursor.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()    
+                
 def tmp_raw_data(include_test=False):
     try:
         conn = MySQLdb.connect(**c.db_config)
@@ -936,15 +970,16 @@ def get_week_report_add_way_and_platform(start_time, end_time):
         finally:
             if conn:
                 conn.close()    
-    
+        
 def get_week_report_abstract(start_time, end_time):
     cur = start_time;
     step = datetime.timedelta(days=1)
     
 if __name__ == '__main__':
-#    start_time = datetime.datetime(2012, 7, 2, 7, 50, 1)
-#    end_time = datetime.datetime(2013, 8, 2, 7, 50, 0)
-##    b = get_week_report_add_way_and_platform('2012-08-20 00:00:00', '2012-08-26 23:59:59')
+    start_time = datetime.datetime(2012, 10, 26, 0, 0, 0)
+    end_time = datetime.datetime(2012, 10, 26, 23, 59, 59)
+    b = get_bookmarkdata_for_day_report(start_time, end_time)
+    print b
 #    b = get_bookmark_website_for_user_raw_data(start_time,end_time)
 #    print b
 #    get_bookmark_website_raw_data('2012-08-20 00:00:00', '2012-08-26 23:59:59')

@@ -90,62 +90,6 @@ var prepare_week_report = function() {
 	});
 };
 
-var load_week_report_abstract1 = function(params) {
-	var url = '/statistics/week_report/abstract'
-	var week_report_user = document.getElementById('week_report_user');
-	var week_report_bookmark = document.getElementById('week_report_bookmark');
-
-	var user_total = document.getElementById('week_report_user_total');
-	clearElement(user_total);
-	var user_new = document.getElementById('week_report_user_new');
-	clearElement(user_new);
-	var bookmark_total = document.getElementById('week_report_bookmark_total');
-	clearElement(bookmark_total);
-	var bookmark_new = document.getElementById('week_report_bookmark_new');
-	clearElement(bookmark_new);
-
-	myAjax(url, params, function(obj) {
-		data = obj;
-		var value = document.createTextNode(data['user_total'] + ' ');
-		var inc = document.createElement('font');
-		inc.style.color = '#c00';
-		var inc_text = document.createTextNode('['
-				+ (parseFloat(data['user_total_inc']) * 100).toFixed(2) + '%]');
-		inc.appendChild(inc_text);
-		user_total.appendChild(value);
-		user_total.appendChild(inc);
-
-		var value = document.createTextNode(data['user_new'] + ' ');
-		var inc = document.createElement('font');
-		inc.style.color = data['user_new_inc_color'];
-		var inc_text = document.createTextNode('['
-				+ (parseFloat(data['user_new_inc']) * 100).toFixed(2) + '%]');
-		inc.appendChild(inc_text);
-		user_new.appendChild(value);
-		user_new.appendChild(inc);
-
-		var value = document.createTextNode(data['bookmark_total'] + ' ');
-		var inc = document.createElement('font');
-		inc.style.color = '#c00';
-		var inc_text = document.createTextNode('['
-				+ (parseFloat(data['bookmark_total_inc']) * 100).toFixed(2)
-				+ '%]');
-		inc.appendChild(inc_text);
-		bookmark_total.appendChild(value);
-		bookmark_total.appendChild(inc);
-
-		var value = document.createTextNode(data['bookmark_new'] + ' ');
-		var inc = document.createElement('font');
-		inc.style.color = data['bookmark_new_inc_color'];
-		var inc_text = document.createTextNode('['
-				+ (parseFloat(data['bookmark_new_inc']) * 100).toFixed(2)
-				+ '%]');
-		inc.appendChild(inc_text);
-		bookmark_new.appendChild(value);
-		bookmark_new.appendChild(inc);
-	});
-}
-
 $(document).ready(function() {
 			prepare_week_report();
 		});

@@ -316,6 +316,12 @@ def day_report_abstract(request):
         jsondata = jsondata_array[0]['jsondata']
         data = anyjson.loads(jsondata)
 
+        bookmark_new = data['bookmark']['total'] - data['bookmark']['total_yd']
+        bookmark_failed_count = len(data['bookmark']['failed'])
+        bookmark_failed_percent = (bookmark_failed_count + 0.00000001) / bookmark_new
+        bookmark_failed_percent = round(bookmark_failed_percent, 4)
+        print bookmark_failed_percent
+        
         s = {
             'name': 'liubida',
             'user_total'    : data['user']['total'],
@@ -325,9 +331,12 @@ def day_report_abstract(request):
             'user_new_inc_color': c.red if data['user']['new_inc'] > 0  else c.green,
             'bookmark_total'    : data['bookmark']['total'],
             'bookmark_total_inc': data['bookmark']['total_inc'],
-            'bookmark_new'      : data['bookmark']['total'] - data['bookmark']['total_yd'],
+            'bookmark_new'      : bookmark_new,
             'bookmark_new_inc'  : data['bookmark']['new_inc'],
             'bookmark_new_inc_color': c.red if data['bookmark']['new_inc'] > 0  else c.green,
+            'bookmark_failed_count' : bookmark_failed_count,
+            'bookmark_failed_percent' : bookmark_failed_percent,
+            'bookmark_failed' : data['bookmark']['failed'],
         }
         
         response = HttpResponse(anyjson.dumps(s))
@@ -415,6 +424,11 @@ def week_report_abstract(request):
             'new_bookmark'    : data['new_bookmark'],
             'add_way_and_platform' : data['add_way_and_platform']['data']
         }
+        try:
+            s['failed_bookmark'] = data['failed_bookmark']
+        except Exception, e:
+            s['failed_bookmark'] = None
+                        
         t = loader.get_template('statistics/week_report_abstract.html')
         response = HttpResponse(t.render(Context({'s':s})))
         return response
@@ -446,7 +460,32 @@ def week_report_bookmark_website(request):
 #        expire = now + datetime.timedelta(days=7)
 #        response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
 #        return response        
+
+@login_required
+def week_report_bookmark_failed(request):
+    start_time = request.GET.get('start_time', '2012-07-16 00:00:00')
+    # 注意, 周报表里面的time是当时统计周报数据的时间, 所以记录的数据实际是相对time上一周的数据
+    # 那么我要查7-16这一周的数据, time就应该为7-23
+    start_time = datetime.datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S')
+    start_time = start_time + datetime.timedelta(days=7)
+    end_time = start_time + datetime.timedelta(days=2)
     
+    jsondata_array = Report.objects.filter(type='week', time__gte=start_time, time__lt=end_time).values('jsondata')
+    if jsondata_array:
+        jsondata = jsondata_array[0]['jsondata']
+        data = anyjson.loads(jsondata)
+        response = HttpResponse(anyjson.dumps(data['']))
+        return response
+#        # 这是旧时的数据, 可以永久缓存
+#        now = datetime.datetime.now()
+#        expire = now + datetime.timedelta(days=7)
+#        response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
+#        return response
+        
+        
+        
+        
+        
 # 编码时测试用
 @login_required
 def test(start_time, end_time, data_grain='day'):

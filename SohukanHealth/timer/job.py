@@ -295,15 +295,6 @@ def day_report_job(now=None):
     day_report = Report(type='day', time=now, version=c.report_version, jsondata=anyjson.dumps(jsondata))
     day_report.save();
 
-#start = datetime.datetime(2012, 8, 25, 23, 58, 0)
-#day_report_job(start)
-#now = datetime.datetime.now()
-#step = datetime.timedelta(days=1)
-#
-#while start < now:
-#    day_report_job(start)
-#    start += step
-
 @print_info(name='week_report_job')
 def week_report_job(today=None):
     '''week_report created at mon 07:00:00'''
@@ -315,10 +306,13 @@ def week_report_job(today=None):
         return
     # 从上周的周一开始 
     last_mon = today - datetime.timedelta(days=7)
-    jsondata_array = Report.objects.filter(type='day', time__gte=last_mon, time__lt=today).values('jsondata')
+    start_time = datetime.datetime(last_mon.year, last_mon.month, last_mon.day)
+    start_time = start_time.replace(hour=0, minute=0, second=0, microsecond=0)
+    jsondata_array = Report.objects.filter(type='day', time__gte=start_time, time__lt=today).values('jsondata')
     
     new_user = {}
     new_bookmark = {}
+    failed_bookmark = {}
     if jsondata_array:
         count = 1
         for jsondata in jsondata_array:
@@ -327,20 +321,27 @@ def week_report_job(today=None):
             new_user[count] = data['user']['total'] - data['user']['total_yd']
             # 本周每天新增文章
             new_bookmark[count] = data['bookmark']['total'] - data['bookmark']['total_yd']
+            # 本周每天失败文章
+            try:
+                each_failed_bookmark = data['bookmark']['failed']
+            except Exception, e:
+                each_failed_bookmark = []
+
+            failed_bookmark[count] = {'count':len(each_failed_bookmark), 'data': each_failed_bookmark} 
             count = count + 1
     
-    start_time = datetime.datetime(last_mon.year, last_mon.month, last_mon.day)
-    start_time = start_time.replace(hour=0, minute=0, second=0, microsecond=0)
     end_time = start_time + datetime.timedelta(days=6)
     end_time = end_time.replace(hour=23, minute=59, second=59, microsecond=0)
+    
     bookmark_website = {}
     bookmark_website['data'] = get_bookmark_website_raw_data(start_time, end_time, limit=100)
     add_way_and_platform = {}
     add_way_and_platform['data'] = get_week_report_add_way_and_platform(start_time, end_time);
-            
+    
     jsondata = {}
     jsondata['new_user'] = new_user
     jsondata['new_bookmark'] = new_bookmark
+    jsondata['failed_bookmark'] = failed_bookmark
     jsondata['bookmark_website'] = bookmark_website
     jsondata['add_way_and_platform'] = add_way_and_platform
 
@@ -365,20 +366,27 @@ def fix_ua_job():
         c.logger.error(e)
 
 if __name__ == '__main__':
+#    start = datetime.datetime(2012, 10, 01, 0, 0, 0)
+#    now = datetime.datetime.now()
+#    step = datetime.timedelta(days=1)
+#    
+#    while start < now:
+#        day_report_job(start)
+#        start += step
 #    rabbitmq_queue_alarm_job()
 #    bookmark_total_job()
 #    start = datetime.date(2012, 8, 27)
 #    week_report_job(start)
 #    add_job()
-    start = datetime.date(2012, 7, 13)
-    today = datetime.date.today()
-    step = datetime.timedelta(days=1)
-
-    while start <= today:
-        week_report_job(start)
-        start += step
+#    start = datetime.date(2012, 7, 13)
+#    today = datetime.date.today()
+#    step = datetime.timedelta(days=1)
+#
+#    while start <= today:
+#        week_report_job(start)
+#        start += step
 #    start = datetime.datetime(2012, 8, 25, 23, 58, 0)
-#    day_report_job(start)
+    week_report_job()
     
 #    start_time = datetime.datetime.now() - datetime.timedelta(minutes=36)
 #    print start_time 

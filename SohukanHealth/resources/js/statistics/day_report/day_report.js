@@ -89,16 +89,11 @@ var load_day_report_abstract = function(params) {
 	clearElement(bookmark_total);
 	var bookmark_new = document.getElementById('day_report_bookmark_new');
 	clearElement(bookmark_new);
+	var bookmark_failed = document.getElementById('day_report_bookmark_failed');
+	clearElement(bookmark_failed);
 
 	myAjax(url, params, function(obj) {
 		data = obj;
-
-		// var inc = document.createTextNode('[' +
-		// data['user_total_inc']
-		// + ']');
-		// inc.style.color = '#c00';
-		// user_total.appendChild(value);
-		// user_total.appendChild(inc);
 
 		var value = document.createTextNode(data['user_total'] + ' ');
 		var inc = document.createElement('font');
@@ -137,6 +132,11 @@ var load_day_report_abstract = function(params) {
 		inc.appendChild(inc_text);
 		bookmark_new.appendChild(value);
 		bookmark_new.appendChild(inc);
+
+		var value = document.createTextNode(data['bookmark_failed_count'] + ' ['
+				+ (parseFloat(data['bookmark_failed_percent']) * 100).toFixed(2)
+				+ '%]');
+		bookmark_failed.appendChild(value);
 	});
 }
 
