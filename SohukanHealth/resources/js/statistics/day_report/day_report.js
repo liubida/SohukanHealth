@@ -133,12 +133,73 @@ var load_day_report_abstract = function(params) {
 		bookmark_new.appendChild(value);
 		bookmark_new.appendChild(inc);
 
-		var value = document.createTextNode(data['bookmark_failed_count'] + ' ['
-				+ (parseFloat(data['bookmark_failed_percent']) * 100).toFixed(2)
-				+ '%]');
+		var value = document.createTextNode(data['bookmark_failed_count']
+				+ ' ['
+				+ (parseFloat(data['bookmark_failed_percent']) * 100)
+						.toFixed(2) + '%]');
 		bookmark_failed.appendChild(value);
+
+	(function(bookmark_failed_array) {
+			var array = bookmark_failed_array;
+			bookmark_failed.onclick = function() {
+				$('#box').empty().append('<div class="clearfix"></div>');
+				var str_table = "<table id = 'table_bookmark_failed'><th>user_id</th><th>url</th></table>";
+				$('#box div').append(str_table);
+				$.blockUI({
+							message : $('#box'),
+							css : {
+								top : '20%',
+								left : '30%',
+								textAlign : 'left',
+								marginLeft : '-320px',
+								marginTop : '-145px',
+								background : 'none'
+							}
+						});
+				$('.blockOverlay').attr('title', '单击关闭').click($.unblockUI);
+
+				for (var i = 0; i < array.length; i++) {
+					var tr = "<tr><td>" + array[i].user_id
+							+ "</td><td><a href='" + array[i].url
+							+ "' target='_blank'>" + array[i].url
+							+ "</a></td></tr>";
+					$('#table_bookmark_failed').append(tr);
+				}
+				$('#table_bookmark_failed').css({
+							"width" : "800px",
+							"font-size" : "12px"
+						});
+				$('#table_bookmark_failed td').css({
+							"text-align" : "left"
+						});
+			}
+		})(data['bookmark_failed']);
+		$('#day_report_bookmark_failed').mouseover(function() {
+			$('#day_report_bookmark_failed').css('background-color', '#DFF7F8');
+		});
+		$('#day_report_bookmark_failed').mouseout(function() {
+					$('#day_report_bookmark_failed').css('background-color',
+							'white');
+				});
 	});
 }
+
+var load_sys_alarm = function(params, callback) {
+	// 加载系统可用率数据
+	var url = '/monitor/sys_alarm/'
+	var e = document.getElementById('sys_alarm')
+
+	if (e) {
+		clearElement(e);
+
+		var loading = document.createElement('p')
+		var loading_text = document.createTextNode('数据加载中...')
+		loading.appendChild(loading_text);
+		e.appendChild(loading);
+	}
+	url = url + params + '/'
+	$('#sys_alarm').load(url);
+};
 
 $(document).ready(function() {
 			prepare_day_report();

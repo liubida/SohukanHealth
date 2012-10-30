@@ -1,37 +1,37 @@
 {% extends "statistics/statistics_base.html" %} {% block title %} 统计信息
 {% endblock %} {% block content1 %}
-<div id="day_report_date" style="height:150px;">内测阶段, 数据仅供参考</div>
+<div id="day_report_date" style="height: 150px;">内测阶段, 数据仅供参考</div>
 
 <div id="day_report_content">
-	<div class="clearfix" style="height:120px;">
-			<h2>1. 用户数</h2>
-			<table>
-				<th>用户总数</th>
-				<th>新注册</th>
-				<tr>
-					<td><span id="day_report_user_total"></span></td>
-					<td><span id="day_report_user_new"></span></td>
-				</tr>
-			</table>
+	<div class="clearfix" style="height: 120px;">
+		<h2>1. 用户数</h2>
+		<table>
+			<th>用户总数</th>
+			<th>新注册</th>
+			<tr>
+				<td><span id="day_report_user_total"></span></td>
+				<td><span id="day_report_user_new"></span></td>
+			</tr>
+		</table>
 	</div>
-	<div class="clearfix" style="height:120px;">
-			<h2>2. 收藏文章</h2>
-			<table>
-				<th>文章总数</th>
-				<th>新收藏文章</th>
-				<th>收藏失败文章</th>
-				<th>kan首页次数</th>
-				<th>其他首页次数</th>
-				<tr>
-					<td><span id="day_report_bookmark_total"></span></td>
-					<td><span id="day_report_bookmark_new"></span></td>
-					<td><span id="day_report_bookmark_failed"></span></td>
-					<td></td>
-					<td></td>
-				</tr>
-			</table>
+	<div class="clearfix" style="height: 120px;">
+		<h2>2. 收藏文章</h2>
+		<table>
+			<th>文章总数</th>
+			<th>新收藏文章</th>
+			<th>收藏失败文章</th>
+			<th>kan首页次数</th>
+			<th>其他首页次数</th>
+			<tr>
+				<td><span id="day_report_bookmark_total"></span></td>
+				<td><span id="day_report_bookmark_new"></span></td>
+				<td id="day_report_bookmark_failed"></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</table>
 	</div>
-	<div class="clearfix" style="height:350px;">
+	<div class="clearfix" style="height: 350px;">
 		<h2>3. 用户收藏统计</h2>
 		<div id="user_bookmark_percent_day_report_div"></div>
 		<div id="user_bookmark_percent_day_report_raw_div"></div>
