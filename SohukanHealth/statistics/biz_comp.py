@@ -16,6 +16,8 @@ def get_share_channels(start_time, end_time, data_grain='day'):
         [params] data_grain: the time_interval of the statistics
         [return] 
     '''
+    jiathis = '"from": "jiathis"'
+    bshare =  '"from": "bshare"'
     try:
         conn = MySQLdb.connect(**c.db_self_config)
         cursor = conn.cursor()
@@ -53,9 +55,9 @@ def get_share_channels(start_time, end_time, data_grain='day'):
 
                 if key not in m.keys():
                     m[key] = {'bshare':0, 'jiathis':0, 'other':0}
-                if -1 != object_key.find("bshare"):
+                if -1 != object_key.find(bshare):
                     m[key]['bshare'] += 1
-                elif -1 != object_key.find("jiathis"):
+                elif -1 != object_key.find(jiathis):
                     m[key]['jiathis'] += 1
                 else:
                     m[key]['other'] += 1
