@@ -8,9 +8,11 @@ from django.template.context import Context
 from monitor.models import SomeTotal
 from statistics.biz import get_bookmark_per_user, get_bookmark_time, \
     get_bookmark_percent, get_data_interval, add_inc_for_data, get_activate_user, \
-    get_bookmark_website, _get_week_num, get_user_platform, _get_week_list, \
+    get_bookmark_website, get_user_platform, _get_week_list, \
     get_bookmark_website_for_user
+from statistics.biz_comp import get_share_channels
 from statistics.models import Report
+from util import get_week_num
 import anyjson
 import datetime
 
@@ -105,6 +107,32 @@ def bookmark_total(request):
     
     response = HttpResponse(anyjson.dumps(data))
     # 缓存一天
+    now = datetime.datetime.now()
+    expire = now + datetime.timedelta(days=1)
+    response['Expires'] = expire.strftime('%a, %d %b %Y 01:00:00 %Z')
+    return response
+
+
+# 综合 分享渠道统计
+@login_required
+def share_channels(request):
+    start_time = request.GET.get('start_time', c.SHARE_CHANNEL_MIN_TIME)
+    end_time = request.GET.get('end_time', datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    data_grain = request.GET.get('data_grain', 'day')
+    data_grain = data_grain if data_grain else 'day'
+    
+    if start_time == 'NaN-aN-aN aN:aN:aN': 
+        start_time = c.SHARE_CHANNEL_MIN_TIME
+    if end_time == 'NaN-aN-aN aN:aN:aN': 
+        end_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    print start_time
+    print end_time
+    data = get_share_channels(start_time, end_time, data_grain)
+    response = HttpResponse(anyjson.dumps(data))
+    
+    # 缓存一天, 也只能缓存一天
+    # 因为start_time和end_time可能是NA, 那么一天之后, 这个NA的数据实际上是会发生变化的.
     now = datetime.datetime.now()
     expire = now + datetime.timedelta(days=1)
     response['Expires'] = expire.strftime('%a, %d %b %Y 01:00:00 %Z')
@@ -317,10 +345,6 @@ def day_report_abstract(request):
         data = anyjson.loads(jsondata)
 
         bookmark_new = data['bookmark']['total'] - data['bookmark']['total_yd']
-        bookmark_failed_count = len(data['bookmark']['failed'])
-        bookmark_failed_percent = (bookmark_failed_count + 0.00000001) / bookmark_new
-        bookmark_failed_percent = round(bookmark_failed_percent, 4)
-        print bookmark_failed_percent
         
         s = {
             'name': 'liubida',
@@ -334,10 +358,21 @@ def day_report_abstract(request):
             'bookmark_new'      : bookmark_new,
             'bookmark_new_inc'  : data['bookmark']['new_inc'],
             'bookmark_new_inc_color': c.red if data['bookmark']['new_inc'] > 0  else c.green,
-            'bookmark_failed_count' : bookmark_failed_count,
-            'bookmark_failed_percent' : bookmark_failed_percent,
-            'bookmark_failed' : data['bookmark']['failed'],
         }
+        
+        try:
+            bookmark_failed_count = len(data['bookmark']['failed'])
+            s['bookmark_failed_count'] = bookmark_failed_count
+            
+            bookmark_failed_percent = (bookmark_failed_count + 0.00000001) / bookmark_new
+            bookmark_failed_percent = round(bookmark_failed_percent, 4)
+            s['bookmark_failed_percent'] = bookmark_failed_percent
+
+            s['bookmark_failed'] = data['bookmark']['failed']
+        except Exception:
+            s['bookmark_failed_count'] = 0
+            s['bookmark_failed_percent'] = 0
+            s['bookmark_failed'] = None            
         
         response = HttpResponse(anyjson.dumps(s))
         # 这是旧时的数据, 可以永久缓存
@@ -504,7 +539,7 @@ def test(start_time, end_time, data_grain='day'):
         # 每天取一个23点的数据
         data['list'] = get_data_interval(raw_data, delta)
     elif data_grain == 'week':
-        week_start = _get_week_num(raw_data[0]['time'])
+        week_start = get_week_num(raw_data[0]['time'])
         
         first_day = datetime.date.today().replace(month=1, day=1)
         day = first_day + datetime.timedelta(weeks=week_start)

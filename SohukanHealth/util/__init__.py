@@ -62,6 +62,7 @@ def get_date_and_time():
     return date, time
 
 def get_start_end_for_month(month=1):
+    '''计算出某一个月的第一天和最后一天'''
     now = datetime.datetime.now()
     
     # 这个月的第一天
@@ -107,15 +108,43 @@ def from_file(filename):
         lines.append(line)
     f.close()
     return lines      
+
+def get_week_num(date):
+    '''某个日期是属于这一年的第几周, 返回那个周的周数
+    以周一为一周的开始，但1月1日不是周一时,算作上一年的最后一周,返回0'''
+    year = date.year
+    wd = date.replace(month=1, day=1).weekday()
+    days = (date - datetime.datetime(year, 1, 1)).days
+    nweek = 0
+    if wd:
+        nweek = (days + wd) / 7
+    else:
+        nweek = days / 7 + 1
+    return nweek
+
+def get_week_sun(date):
+    '''某个日期所在周的周日的日期
+    以周一为一周的开始，但1月1日不是周一时,算作上一年的最后一周,返回0'''
+    diff = 6 - date.weekday()
+    step = datetime.timedelta(days=diff)
+    return date + step 
     
 if __name__ == '__main__':
-#    start_time = datetime.datetime.strptime("2012-08-17 10:35:08","%Y-%m-%d %H:%M:%S")
-#    end_time = datetime.datetime.strptime("2012-08-17 01:05:43","%Y-%m-%d %H:%M:%S")
-#    print start_time
-#    print end_time
+    start_time = datetime.datetime.strptime("2012-10-24 10:35:08", "%Y-%m-%d %H:%M:%S")
+    end_time = datetime.datetime.strptime("2012-10-27 01:05:43", "%Y-%m-%d %H:%M:%S")
+    a = datetime.datetime.strptime("2012-10-21 01:05:43", "%Y-%m-%d %H:%M:%S")
+    b = datetime.datetime.strptime("2012-10-28 01:05:43", "%Y-%m-%d %H:%M:%S")
+    print start_time
+    print end_time
 #    tdiff = timediff(start_time,end_time)
 #    print tdiff
-    print to_percent(1)
+    print get_week_num(start_time)
+    print start_time.weekday()
+    step = datetime.timedelta(days=(6 - start_time.weekday()))
+    print get_week_sun(start_time)
+    print get_week_sun(end_time)
+    print get_week_sun(a)
+    print get_week_sun(b)
     
 #    while True:
 #        now = datetime.datetime.now()

@@ -1,9 +1,7 @@
-{% extends "statistics/statistics_base.html" %} 
-{% block title %} 统计信息 {% endblock %} {% block css %}
+{% extends "statistics/statistics_base.html" %} {% block title %} 统计信息
+{% endblock %} {% block css %}
 <!-- link rel="stylesheet" href="/static/css/demo1.css"> -->
-{% endblock %} 
-
-{% block content1 %}
+{% endblock %} {% block content1 %}
 <div id="note">
 	<p>1. "用户统计和文章统计"去掉了测试数据, 故图中出现数据波动</p>
 	<p>2. 日报功能处于测试阶段, 数据仅供参考</p>
@@ -71,6 +69,46 @@
 			</tr>
 			<tr>
 				<td><input type="submit" id="bookmark_total_submit" /></td>
+			</tr>
+		</table>
+	</div>
+</div>
+<div class="clearfix" style="height: 420">
+	<div id="statistics_share_channels" class="statistics_div"></div>
+	<div style="padding-top: 60px">
+		<table id="table_share_channels" class="table_1">
+			<tr>
+				<td colspan=2><strong>通过第三方分享收藏文章</strong></td>
+			</tr>
+			<tr>
+				<td colspan=2><strong>此统计从2012-10-24开始</strong></td>
+			</tr>
+			<tr>
+				<td>开始时间:</td>
+				<td><input type="text" id="statistics_share_channels_from"
+					style="width: 120px" /><input type="submit" id="reset"
+					value="reset" /></td>
+			</tr>
+			<tr>
+				<td>结束时间:</td>
+				<td><input type="text" id="statistics_share_channels_to"
+					style="width: 120px" /></td>
+			</tr>
+			<!-- tr>
+				<td><input type="radio" name="bookmark_total_items" value="0"
+					checked="checked">默认</input></td>
+				<td><input type="radio" name="bookmark_total_items" value="1">增长率</input></td>
+			</tr> -->
+			<tr>
+				<td>数据粒度:</td>
+				<td><select id="data_grain">
+						<option value="day" selected='selected'>日</option>
+						<option value="week">周</option>
+						<option value="month">月</option>
+				</select></td>
+			</tr>
+			<tr>
+				<td><input type="submit" id="share_channels_submit" /></td>
 			</tr>
 		</table>
 	</div>
@@ -160,7 +198,7 @@
 			</tr>
 		</table>
 	</div>
-	
+
 </div>
 
 {% endblock %} {%block js %}
@@ -169,6 +207,8 @@
 	src="/static/js/statistics/bookmark_percent.js"></script>
 <script type="text/javascript"
 	src="/static/js/statistics/bookmark_total.js"></script>
+<script type="text/javascript"
+	src="/static/js/statistics/share_channels.js"></script>
 <script type="text/javascript"
 	src="/static/js/statistics/bookmark_per_user.js"></script>
 <script type="text/javascript"

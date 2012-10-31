@@ -20,23 +20,11 @@ setup_environ(settings)
 from statistics.models import Report
 from config.config import c
 from monitor.models import SomeTotal
-from util import to_percent
+from util import to_percent, get_week_num
 import MySQLdb
 import anyjson
 import datetime
 import urlparse
-
-
-#ring = HashRing([str(i) for i in range(64)])
-
-#color = ['#FF0F00', '#FF6600', '#FF9E01', '#FCD202', '#F8FF01', '#B0DE09', \
-#         '#04D215', '#0D8ECF', '#0D52D1', '#2A0CD0', '#8A0CCF', '#CD0D74']
-color = ['#FF0F00', '#FF9E01', '#FCD202', '#F8FF01', '#B0DE09', \
-         '#04D215', '#0D8ECF', '#0D52D1', '#2A0CD0', '#8A0CCF', '#CD0D74']
-
-test_id = [2, 3, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 22, \
-          23, 24, 25, 29, 32, 33, 35, 43, 46, 53, 58, 91, \
-          108, 125, 165, 591, 1288, 1486, 2412, 3373]
 
 def get_data_interval(raw_data, delta=datetime.timedelta(days=1), time_format='str'):
     ret = []
@@ -65,7 +53,7 @@ def add_inc_for_data(data):
             
 def _is_test(user_id):
     
-    if user_id in test_id:
+    if user_id in c.test_id:
         return True;
     else:
         return False;
@@ -145,9 +133,9 @@ def get_bookmark_per_user(start_time=None, end_time=None, limit=100):
     
     # dd是获取的原始数据, 加入颜色值等其他信息
     i = 0 
-    max = len(color) - 1
+    max = len(c.color) - 1
     for d in raw_data:
-        d['color'] = color[i if i <= max else max]
+        d['color'] = c.color[i if i <= max else max]
         i += 1
         
     ret = {'list':raw_data}
@@ -167,10 +155,10 @@ def get_bookmark_time(start_time=None, end_time=None):
     # 先按照count排序, 目的是为了上色; 顺便计算下总文章数, 目的是为了后面计算percent
     data.sort(key=lambda x:x['count'], reverse=True)
     i = 0
-    max = len(color) - 1
+    max = len(c.color) - 1
     sum_count = 0
     for d in data:
-        d['color'] = color[i if i <= max else max]
+        d['color'] = c.color[i if i <= max else max]
         sum_count += d['count']
         i += 1
     # 再按照hour排序, 最后的展现顺序
@@ -253,9 +241,9 @@ def get_activate_user(start_time=None, end_time=None, data_grain='day'):
                 r = reg_user[i]
                 r_n = reg_user[i + 1] 
                 # 要保证是本周的最后一天的注册用户总数
-                if _get_week_num(r['time']) == _get_week_num(r_n['time']):
+                if get_week_num(r['time']) == get_week_num(r_n['time']):
                     continue
-                elif _get_week_num(r['time']) == au_week_num:
+                elif get_week_num(r['time']) == au_week_num:
                     percent = round((a['count'] + 0.00001) / r['count'], 4)
                     data.append({'time':r['time'].strftime("%Y-%m-%d"), 'reg':r['count'], 'au':a['count'], 'percent':percent})
                 
@@ -272,7 +260,7 @@ def get_activate_user_raw_data(start_time=None, end_time=None, data_grain='day')
         ret = []
         # 去掉测试用户的id
         tmp = ' and user_id !='
-        tmp += ' and user_id !='.join(map(lambda x:str(x), test_id))
+        tmp += ' and user_id !='.join(map(lambda x:str(x), c.test_id))
 
         if data_grain == 'week':
             data_grain_format = r'%Y-%u'
@@ -400,7 +388,7 @@ def get_user_platform_raw_data(start_time=None, end_time=None):
         
         # 去掉测试用户的id
         tmp = 'user_id !='
-        tmp += ' and user_id !='.join(map(lambda x:str(x), test_id))
+        tmp += ' and user_id !='.join(map(lambda x:str(x), c.test_id))
 
         ret = []
         data_grain_format = r'%Y-%m-%d'
@@ -857,19 +845,6 @@ def tmp_raw_data(include_test=False):
             if conn:
                 conn.close()
 
-def _get_week_num(date):
-    '''获得给定日期是这一年的第几周。
-    每周以周一为一周的开始，但1月1日不是周一时,算作上一年的最后一周,返回0'''
-    year = date.year
-    wd = date.replace(month=1, day=1).weekday()
-    days = (date - datetime.datetime(year, 1, 1)).days
-    nweek = 0
-    if wd:
-        nweek = (days + wd) / 7
-    else:
-        nweek = days / 7 + 1
-    return nweek
-
 def get_week_report_add_way_and_platform(start_time, end_time):
     '''为[周报_收藏方式&&平台]获取数据'''
     try:
@@ -882,7 +857,7 @@ def get_week_report_add_way_and_platform(start_time, end_time):
 
         # 去掉测试用户的id
         tmp = ' and user_id !='
-        tmp += ' and user_id !='.join(map(lambda x:str(x), test_id))
+        tmp += ' and user_id !='.join(map(lambda x:str(x), c.test_id))
         tmp = tmp.replace("user_id", "o.user_id")
 
         # 收藏总数       

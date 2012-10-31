@@ -19,8 +19,6 @@ class Config:
     #["Cookie", "access_token = 80f0630f6a410b559155dd8b87223be1976d558f"],
     #["Cookie", "access_token = 432925e688a245092439b1532408cbccc5dc5e67"]
     
-    # 监控所使用用户的cookie
-    cookie = ["Cookie", "access_token = 0381d220305f5acc8dab9a2ab9692a9d09be5e1d"]
     # log文件的位置
     log_file = ROOT_PATH + '/sohukan.log' 
     report_version = 0
@@ -33,9 +31,13 @@ class Config:
     monitor_user = ['supersohukan', ]
     
     # request查询的最小时间
-    MIN_TIME = '2012-01-01 00:00:00';
+    MIN_TIME = '2012-01-01 00:00:00'
     # request查询的最大时间
-    MAX_TIME = '2222-06-10 00:00:00';
+    MAX_TIME = '2222-06-10 00:00:00'
+    #  share_channel查询的最小时间, 因为这个功能10-24才上线
+    SHARE_CHANNEL_MIN_TIME = '2012-10-24 13:50:00'
+    #  share_channel查询的最大时间
+    SHARE_CHANNEL_MAX_TIME = MAX_TIME
     # 监控: 添加文章时限
     add_time_limit = 120
     # 报警: 添加文章失败次数上限
@@ -50,18 +52,25 @@ class Config:
     
     # sys_alarm表中type为'read_bookmar'和'add_bookmark'的为内部原因导致的系统不可用
     self_alarm_type = ['read_bookmark', 'add_bookmark']
+    
+    color = ['#FF0F00', '#FF9E01', '#FCD202', '#F8FF01', '#B0DE09', '#04D215',
+             '#0D8ECF', '#0D52D1', '#2A0CD0', '#8A0CCF', '#CD0D74']
 
+    test_id = [2, 3, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 22, 23, 24, 25, 29,
+               32, 33, 35, 43, 46, 53, 58, 91, 108, 125, 165, 591, 1288, 1486, 2412, 3373]
+    
 class DevConfig(Config):
 #    cookie = ["Cookie", "access_token = 0381d220305f5acc8dab9a2ab9692a9d09be5e1d"]
     cookie = ["Cookie", "access_token = eeeb8e686a2a148de62b2352ea88b9c6d4b8bd24"]
     
     db_config = {'host':'10.10.58.17', 'port':3306, 'user':'sohupocketlib', 'passwd':'SejJGGk2', 'db':'sohupocketlib'}
     db_self_config = {'host':'10.10.69.53', 'port':3306, 'user':'sohukan', 'passwd':'sohukan', 'db':'sohukanhealth'}
-#    liubida 13476852610
-#    fangmeng 18627839148
-#    fangmeng_tmp 18971149285
-#    chenwei 13545257885
-#    zhangheng 13437104382'
+    # phone num:
+    # liubida 13476852610
+    # fangmeng 18627839148
+    # fangmeng_tmp 18971149285
+    # chenwei 13545257885
+    # zhangheng 13437104382'
     mobile_list = '13476852610,18627839148,13545257885,13437104382,18971149285'
     logger = logging.getLogger("SohukanHealth")
     
@@ -71,17 +80,7 @@ class DevConfig(Config):
         self.logger.setLevel(logging.ERROR)
     
 class ProdConfig(Config):
-    cookie = ["Cookie", "access_token = eeeb8e686a2a148de62b2352ea88b9c6d4b8bd24"]
-    db_config = {'host':'10.10.58.16', 'port':3306, 'user':'sohupocketlib', 'passwd':'SejJGGk2', 'db':'sohupocketlib'}
-    mobile_list = '13476852610,18627839148,13545257885'
-
-    logger = logging.getLogger("SohukanHealth")
-
-    def do(self):
-        handler = logging.FileHandler(self.log_file)
-        self.logger.addHandler(handler)
-        self.logger.setLevel(logging.ERROR)
-        
+    pass
 class QaConfig(Config):
     pass
 

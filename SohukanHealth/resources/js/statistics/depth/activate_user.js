@@ -102,7 +102,6 @@ var load_activate_user = function(params, callback) {
 	loading.appendChild(loading_text);
 	e.appendChild(loading);
 
-	make_activate_user_chart(null, radio_type);
 	myAjax(url, params, function(obj) {
 				data = obj.list;
 				len = data.length;
