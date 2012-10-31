@@ -126,8 +126,6 @@ def share_channels(request):
     if end_time == 'NaN-aN-aN aN:aN:aN': 
         end_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    print start_time
-    print end_time
     data = get_share_channels(start_time, end_time, data_grain)
     response = HttpResponse(anyjson.dumps(data))
     
