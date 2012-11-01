@@ -21,7 +21,7 @@ from monitor.models import AppAvailableData, SomeTotal, SysAlarm
 from monitor.system.worker import add_worker, read_worker
 from statistics.biz import get_userdata_for_day_report, \
     get_bookmarkdata_for_day_report, get_bookmark_website_raw_data, \
-    get_bookmark_percent_raw_data, test_id, _is_test, get_week_report_add_way_and_platform
+    get_bookmark_percent_raw_data, _is_test, get_week_report_add_way_and_platform
 from statistics.models import Report, UA
 from timer.sms import sms
 from util import print_info, query_ua, timediff, from_file, get_date_and_time
@@ -60,7 +60,7 @@ def user_total_job():
 
         #去掉测试用户的id
         tmp = ' where id !='
-        tmp += ' and id !='.join(map(lambda x:str(x), test_id))
+        tmp += ' and id !='.join(map(lambda x:str(x), c.test_id))
         cursor.execute('select count(*) from account_user %s' % tmp)
         result = cursor.fetchone()
         now = datetime.datetime.now()
@@ -366,7 +366,8 @@ def fix_ua_job():
         c.logger.error(e)
 
 if __name__ == '__main__':
-#    start = datetime.datetime(2012, 10, 01, 0, 0, 0)
+    start = datetime.datetime(2012, 10, 31, 0, 0, 0)
+    day_report_job(start)
 #    now = datetime.datetime.now()
 #    step = datetime.timedelta(days=1)
 #    
@@ -386,7 +387,8 @@ if __name__ == '__main__':
 #        week_report_job(start)
 #        start += step
 #    start = datetime.datetime(2012, 8, 25, 23, 58, 0)
-    week_report_job()
+#    bookmark_total_job()
+#    week_report_job()
     
 #    start_time = datetime.datetime.now() - datetime.timedelta(minutes=36)
 #    print start_time 
