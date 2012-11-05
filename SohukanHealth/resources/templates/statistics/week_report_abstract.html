@@ -39,55 +39,56 @@
 		<td>{{ s.failed_bookmark.7.count }}</td>
 	</tr>
 </table>
-<table style="font-size: 12px;float:left;">
+<table style="font-size: 11px;float:left; width: 750px; word-break: break-all; text-overflow:ellipsis;">
 <th colspan=2>失败文章</th>
 	<tr>
 		<td>周一</td>
 		<td style="text-align:left;">
 		{% for w in s.failed_bookmark.1.data %}
-			<a href={{w.url}} target="_blank">{{ w.url }}</a><br/>
+			 {{ forloop.counter }}--- <a href={{w.url}} target="_blank">{{ w.url }}</a><br/>
 		{% endfor %}</td>
 	</tr><tr>
 		<td>周二</td>
 		<td style="text-align:left;">
 		{% for w in s.failed_bookmark.2.data %}
-			<a href={{w.url}} target="_blank">{{ w.url }}</a><br/>
+			{{ forloop.counter }}--- <a href={{w.url}} target="_blank">{{ w.url }}</a><br/>
 		{% endfor %}</td>
 	</tr><tr>
 		<td>周三</td>
 		<td style="text-align:left;">
 		{% for w in s.failed_bookmark.3.data %}
-			<a href={{w.url}} target="_blank">{{ w.url }}</a><br/>
+			{{ forloop.counter }}--- <a href={{w.url}} target="_blank">{{ w.url }}</a><br/>
 		{% endfor %}</td>
 	</tr><tr>
 		<td>周四</td>
 		<td style="text-align:left;">
 		{% for w in s.failed_bookmark.4.data %}
-			<a href={{w.url}} target="_blank">{{ w.url }}</a><br/>
+			{{ forloop.counter }}--- <a href={{w.url}} target="_blank">{{ w.url }}</a><br/>
 		{% endfor %}</td>
 	</tr><tr>
 		<td>周五</td>
 		<td style="text-align:left;">
 		{% for w in s.failed_bookmark.5.data %}
-			<a href={{w.url}} target="_blank">{{ w.url }}</a><br/>
+			{{ forloop.counter }}--- <a href={{w.url}} target="_blank">{{ w.url }}</a><br/>
 		{% endfor %}</td>
 	</tr><tr>
 		<td>周六</td>
 		<td style="text-align:left;">
 		{% for w in s.failed_bookmark.6.data %}
-			<a href={{w.url}} target="_blank">{{ w.url }}</a><br/>
+			{{ forloop.counter }}--- <a href={{w.url}} target="_blank">{{ w.url }}</a><br/>
 		{% endfor %}</td>
 	</tr><tr>
 		<td>周日</td>
 		<td style="text-align:left;">
 		{% for w in s.failed_bookmark.7.data %}
-			<a href={{w.url}} target="_blank">{{ w.url }}</a><br/>
+			{{ forloop.counter }}--- <a href={{w.url}} target="_blank">{{ w.url }}</a><br/>
 		{% endfor %}</td>
 	</tr>
 </table>
 </div>
 <div style="height:280px; width: 1200px">
-<h3>2. 收藏方式&&收藏平台</h3>
+<div style="height:50px; width: 1200px;float:left; ">
+<h3>2. 收藏方式&&收藏平台</h3></div>
 <table style="font-size: 12px; float:left; text-align: left;">
 	<th colspan=3>收藏方式</th>
 	<tr>
