@@ -72,9 +72,9 @@ def get_share_channels(start_time, end_time, data_grain='day'):
             while cur <= end:
                 key = cur.strftime("%Y-%m-%d")
                 if key in m.keys():
-                    ret.append({'time': key, 'bshare':m[key]['bshare'], 'jiathis':m[key]['jiathis'], 'other':m[key]['other']})
+                    ret.append({'time': cur.strftime("%m-%d"), 'bshare':m[key]['bshare'], 'jiathis':m[key]['jiathis'], 'other':m[key]['other']})
                 else:
-                    ret.append({'time': key, 'bshare':0, 'jiathis':0, 'other':0})
+                    ret.append({'time': cur.strftime("%m-%d"), 'bshare':0, 'jiathis':0, 'other':0})
                 cur += step
         elif data_grain == 'week':
             step = datetime.timedelta(days=7)
@@ -105,9 +105,9 @@ def get_share_channels(start_time, end_time, data_grain='day'):
                 conn.close()
 
 if __name__ == '__main__':
-    start_time = datetime.datetime(2012, 10, 24, 0, 0, 0)
-    end_time = datetime.datetime(2012, 10, 31, 23, 59, 59)
-    b = get_share_channels('2012-10-19 00:00:00', '2012-10-31 23:59:59', data_grain='week')
+#    start_time = datetime.datetime(2012, 11, 9, 0, 0, 0)
+#    end_time = datetime.datetime(2012, 11, 11, 23, 59, 59)
+    b = get_share_channels('2012-11-09 00:00:00', '2012-11-11 23:59:59', data_grain='day')
     print b
 #    b = get_bookmark_website_for_user_raw_data(start_time,end_time)
 #    print b

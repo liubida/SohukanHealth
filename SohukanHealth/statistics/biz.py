@@ -466,6 +466,16 @@ def get_bookmark_website_raw_data(start_time=None, end_time=None, limit=100):
         for r in ret:
             if r['domain'] == 'kan.sohu.com':
                 ret.remove(r)
+        
+#        pp = []
+#        ssum = 0
+#        for r in ret:
+#            if r['domain'].find('.sohu.com') != -1:
+#                pp.append({'domain':r['domain'], 'count':r['count']})
+#                ssum += r['count']                        
+#        print pp
+#        print ssum
+        
         return ret[:limit];
     except Exception, e:
         c.logger.error(e)
@@ -951,10 +961,11 @@ def get_week_report_abstract(start_time, end_time):
     step = datetime.timedelta(days=1)
     
 if __name__ == '__main__':
-    start_time = datetime.datetime(2012, 10, 26, 0, 0, 0)
-    end_time = datetime.datetime(2012, 10, 26, 23, 59, 59)
-    b = get_bookmarkdata_for_day_report(start_time, end_time)
-    print b
+    start_time = datetime.datetime(2012, 11, 5, 0, 0, 20)
+    end_time = datetime.datetime(2012, 11, 11, 23, 59, 59)
+    b = get_bookmark_website_raw_data(start_time, end_time)
+#    b = get_bookmarkdata_for_day_report(start_time, end_time)
+#    print b
 #    b = get_bookmark_website_for_user_raw_data(start_time,end_time)
 #    print b
 #    get_bookmark_website_raw_data('2012-08-20 00:00:00', '2012-08-26 23:59:59')
