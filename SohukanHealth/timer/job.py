@@ -367,11 +367,8 @@ def fix_ua_job():
         c.logger.error(e)
 
 @print_info(name='day_aggregation')
-def day_aggregation_job(start_time):
+def day_aggregation_job(start_time=datetime.datetime.now()):
     try:
-        if not start_time:
-            start_time = datetime.datetime.now()
-            
         aggregation.share_channels(start_time)
         aggregation.activate_user(start_time)
     except Exception, e:
