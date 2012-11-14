@@ -5,26 +5,26 @@ Created on Jun 19, 2012
 @author: liubida
 '''
 
-import sys
+from SohukanHealth import settings
+from config.config import c
+from django.core.management import setup_environ
+from monitor.models import SomeTotal
+from statistics.models import Report, Aggregation
+from util import to_percent, get_week_num
+import MySQLdb
+import anyjson
+import datetime
 import os
+import sys
+import urlparse
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print root_path
 sys.path.append(root_path)
 print sys.path
 
-from django.core.management import setup_environ
-from SohukanHealth import settings
 print settings
 setup_environ(settings)
 
-from statistics.models import Report
-from config.config import c
-from monitor.models import SomeTotal
-from util import to_percent, get_week_num
-import MySQLdb
-import anyjson
-import datetime
-import urlparse
 
 def get_data_interval(raw_data, delta=datetime.timedelta(days=1), time_format='str'):
     ret = []
@@ -197,110 +197,79 @@ def get_user_platform(start_time=None, end_time=None):
     ret = {'list':data}
     return anyjson.dumps(ret)
 
-def get_activate_user(start_time=None, end_time=None, data_grain='day'):
+def get_activate_user(start_time, end_time, data_grain='day'):
+    '''start_time, end_time is string'''
+    raw_data = Aggregation.objects.filter(type='active_user', time__gte=start_time, time__lte=end_time).values('time', 'content')
 
-    # 获取注册用户数, 图中对比用
-    raw_data = SomeTotal.objects.filter(name='user', time__gte=start_time, time__lte=end_time).values('time', 'count')
-    # 每天取一个23点的数据
-    reg_user = get_data_interval(raw_data, datetime.timedelta(days=1), time_format='datetime')
-    
-#    new_user = []
-#    raw_data = DayReport.objects.filter(time__gte=start_time, time__lte=end_time).values('time', 'jsondata')
-#    for d in raw_data:
-#        jsondata = anyjson.loads(d['jsondata'])
-#        new_user.append({'time':d['time'], 'new':jsondata['user']['total'] - jsondata['user']['total_yd']})
-#    print 'new_user', new_user
-    au_user = get_activate_user_raw_data(start_time, end_time, data_grain)
+    data = {}
+    for d in raw_data:
+        data[d['time'].strftime("%Y-%m-%d")] = anyjson.loads(d['content'])
 
-    data = []
+    ret = []
+    start = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
+    end = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S")
+    cur = start
     if data_grain == 'day':
-        for a in au_user:
-            for r in reg_user:
-                if r['time'].year == a['time'].year and r['time'].month == a['time'].month and r['time'].day == a['time'].day:
-                    percent = round((a['count'] + 0.00001) / r['count'], 4)
-                    data.append({'time':a['time'].strftime("%m-%d"), 'reg':r['count'], 'au':a['count'], 'percent':percent})
-            
-    if data_grain == 'month':
-        # 注意, 这里是 len(reg_user)-1    
-        for i in range(0, len(reg_user) - 1):
-            r = reg_user[i]
-            r_n = reg_user[i + 1] 
-            # 要保证是本月的最后一天的注册用户总数
-            if r['time'].month == r_n['time'].month:
-                continue
-            else :
-                for a in au_user:
-                    if r['time'].year == a['time'].year and r['time'].month == a['time'].month:
-                        percent = round((a['count'] + 0.00001) / r['count'], 4)
-                        data.append({'time':a['time'].strftime("%Y-%m-%d"), 'reg':r['count'], 'au':a['count'], 'percent':percent})
+        step = datetime.timedelta(days=1)
+        while cur <= end:
+            key = cur.strftime("%Y-%m-%d")
+            if key in data.keys():
+                ret.append({'time': cur.strftime("%m-%d"),
+                            'au':data[key]['au'],
+                            'reg':data[key]['reg']})
+            else:
+                break;
+            cur += step
+    elif data_grain == 'week':
+        step = datetime.timedelta(days=1)
+        tmp_au = 0
+        user_ids = set()
         
-    if data_grain == 'week':
-        for a in au_user:
-            au_week_num = int(a['time'].split('-')[1])
-            for i in range(0, len(reg_user) - 1):
-                r = reg_user[i]
-                r_n = reg_user[i + 1] 
-                # 要保证是本周的最后一天的注册用户总数
-                if get_week_num(r['time']) == get_week_num(r_n['time']):
-                    continue
-                elif get_week_num(r['time']) == au_week_num:
-                    percent = round((a['count'] + 0.00001) / r['count'], 4)
-                    data.append({'time':r['time'].strftime("%Y-%m-%d"), 'reg':r['count'], 'au':a['count'], 'percent':percent})
-                
-    data.sort(key=lambda x:x['time'], reverse=False)
-    ret = {'list':data}
+        while cur <= end:
+            key = cur.strftime("%Y-%m-%d")
+            if key not in data.keys():
+                ret.append({'time': (cur - step).strftime("%m-%d"),
+                            'au':tmp_au,
+                            'reg':data[(cur - step).strftime("%Y-%m-%d")]['reg']})
+                break;
+            
+            user_ids = user_ids | c.redis_instance.smembers('activate:user:id:%s'% cur.strftime("%Y-%m-%d"))
+            tmp_au = len(user_ids)
+            
+            if cur.weekday() == 6 or cur.date() == end.date():
+                # 这一天是周日
+                ret.append({'time': cur.strftime("%m-%d"),
+                            'au':tmp_au,
+                            'reg':data[key]['reg']})
+                tmp_au = 0
+                user_ids = set()
+            cur += step
+    elif data_grain == 'month':
+        step = datetime.timedelta(days=1)
+        tmp_au = 0
+        user_ids = set()
+        
+        while cur <= end:
+            key = cur.strftime("%Y-%m-%d")
+            if key not in data.keys():
+                ret.append({'time': (cur - step).strftime("%m-%d"),
+                            'au':tmp_au,
+                            'reg':data[(cur - step).strftime("%Y-%m-%d")]['reg']})
+                break;
+            
+            user_ids = user_ids | c.redis_instance.smembers('activate:user:id:%s'% cur.strftime("%Y-%m-%d"))
+            tmp_au = len(user_ids)
+            
+            if (cur + step).month != cur.month or cur.date() == end.date():
+                # 这一天是月末
+                ret.append({'time': cur.strftime("%Y-%m-%d"),
+                            'au':tmp_au,
+                            'reg':data[key]['reg']})
+                tmp_au = 0
+                user_ids = set()
+            cur += step
     return anyjson.dumps(ret)
     
-def get_activate_user_raw_data(start_time=None, end_time=None, data_grain='day'):
-    '''为[活跃用户统计]获取原始数据'''
-    try:
-        conn = MySQLdb.connect(**c.db_self_config)
-        cursor = conn.cursor()
-
-        ret = []
-        # 去掉测试用户的id
-        tmp = ' and user_id !='
-        tmp += ' and user_id !='.join(map(lambda x:str(x), c.test_id))
-
-        if data_grain == 'week':
-            data_grain_format = r'%Y-%u'
-        elif data_grain == 'month':
-            data_grain_format = r'%Y-%m'
-        else:
-            data_grain_format = r'%Y-%m-%d'
-
-        sql = "select count(u_id), tmp.data_grain from \
-               (select distinct(user_id) as u_id, date_format(gmt_create,'%s') as data_grain from stats_oper \
-               where gmt_create >= '%s' and gmt_create <='%s' %s) tmp group by tmp.data_grain" \
-                % (data_grain_format, start_time, end_time, tmp)
-        cursor.execute(sql)
-        results = cursor.fetchall()
-        
-        if data_grain == 'day' or data_grain == 'month':
-            for d in results:
-                au = int(d[0])
-                time = datetime.datetime.strptime(str(d[1]), data_grain_format)
-                ret.append({'time':time, 'count':au})
-
-        if data_grain == 'week':
-            for d in results:
-                au = int(d[0])
-                time = str(d[1])
-                ret.append({'time':time, 'count':au})
-        return ret
-    except Exception, e:
-        c.logger.error(e)
-        raise e
-    finally:
-        try:
-            if cursor:
-                cursor.close()
-        except Exception, e:
-            c.logger.error(e)
-        finally:
-            if conn:
-                conn.close()
-
 def get_bookmark_percent_raw_data(start_time=None, end_time=None, limit=100):
     '''为[用户收藏文章数统计]获取原始数据'''
     try:

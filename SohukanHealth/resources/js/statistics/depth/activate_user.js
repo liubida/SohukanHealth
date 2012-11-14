@@ -51,18 +51,6 @@ var make_activate_user_chart = function(chartData, radio_type) {
 	graph.lineColor = "#DAF0FD";
 	chart.addGraph(graph);
 
-	// third graph
-	var graph2 = new AmCharts.AmGraph();
-	graph2.title = "yellow line";
-	graph2.valueField = "percent";
-	graph2.bullet = "round";
-	graph2.valueAxis = valueAxis2;
-	graph2.hideBulletsCount = 50;
-	graph2.lineColor = "#FCD202";
-	if (radio_type == 1) {
-		chart.addGraph(graph2);
-	}
-
 	// LEGEND
 	var legend = new AmCharts.AmLegend();
 	legend.borderAlpha = 0.2;
@@ -103,15 +91,14 @@ var load_activate_user = function(params, callback) {
 	e.appendChild(loading);
 
 	myAjax(url, params, function(obj) {
-				data = obj.list;
+				data = obj;
 				len = data.length;
 				chartData = [];
 				for (var i = 0; i < len; i++) {
 					chartData.push({
 								time : data[i].time,
 								reg : data[i].reg,
-								au : data[i].au,
-								percent : data[i].percent
+								au : data[i].au
 							});
 				}
 				make_activate_user_chart(chartData, radio_type);
@@ -128,11 +115,12 @@ var prepare_activate_user = function() {
 	$("#depth_activate_user_from").datepicker({
 		changeMonth : true,
 		numberOfMonths : 2,
-		dateFormat : "yy-mm-dd",
-		onSelect : function(selectedDate) {
-			$("#depth_activate_user_to").datepicker("option", "minDate",
-					selectedDate);
-		}
+		dateFormat : "yy-mm-dd"
+//		,
+//		onSelect : function(selectedDate) {
+//			$("#depth_activate_user_to").datepicker("option", "minDate",
+//					selectedDate);
+//		}
 	});
 	$("#depth_activate_user_to").datepicker({
 				changeMonth : true,

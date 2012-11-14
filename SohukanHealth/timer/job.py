@@ -373,12 +373,12 @@ def day_aggregation_job(start_time):
             start_time = datetime.datetime.now()
             
         aggregation.share_channels(start_time)
+        aggregation.activate_user(start_time)
     except Exception, e:
         c.logger.error(e)
         
 if __name__ == '__main__':
-    start = datetime.datetime(2012, 10, 24, 0, 0, 0)
-    
+    start = datetime.datetime(2012, 7, 16, 23, 52, 0)
     step = datetime.timedelta(days=1)
 
     now = datetime.datetime.now()

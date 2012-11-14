@@ -5,17 +5,12 @@ Created on Nov 13, 2012
 @author: liubida
 '''
 from config.config import c
-from monitor.models import AppAvailableData
-from monitor.system.worker import add_worker
+from monitor.models import SomeTotal
 from statistics.biz import _is_test
 from statistics.models import Aggregation
-from util import print_info, get_week_sun
-from util.random_spider import RandomSpider
 import MySQLdb
 import anyjson
 import datetime
-
-
 
 jiathis = 'jiathis'
 bshare = 'bshare'
@@ -30,12 +25,10 @@ def share_channels(start_time):
     step = datetime.timedelta(days=1)
     end_time = start_time + step
     
-    
     try:
         conn = MySQLdb.connect(**c.db_self_config)
         cursor = conn.cursor()
 
-        ret = []
         # 去掉测试用户的id
         exclude_test_user_id = ' and o.user_id !='
         exclude_test_user_id += ' and o.user_id !='.join(map(lambda x:str(x), c.test_id))
@@ -78,7 +71,6 @@ def share_channels(start_time):
                 
         data = Aggregation(type='share_channels', time=start_time.date(), content=anyjson.dumps(m))
         data.save()
-        return ret
     except Exception, e:
         c.logger.error(e)
         raise e
@@ -92,15 +84,67 @@ def share_channels(start_time):
             if conn:
                 conn.close()
 
-@print_info(name='add_job')
-def add_job():
-    url = RandomSpider().get_valid_url()
-    value = add_worker(url, c.cookie).test()
-    data = AppAvailableData(name='add', category='', result=value.get('result', False), \
-                            time=datetime.datetime.now(), time_used=value.get('time_used', c.add_time_limit), \
-                            comments=value.get('comments', url))
-    data.save()
-    return value
+
+def activate_user(start_time):
+
+    start_time = start_time.replace(hour=0, minute=0, second=0)
+    step = datetime.timedelta(days=1)
+    end_time = start_time + step
+    
+    try:
+        conn = MySQLdb.connect(**c.db_self_config)
+        cursor = conn.cursor()
+
+        # 去掉测试用户的id
+        exclude_test_user_id = ' and user_id !='
+        exclude_test_user_id += ' and user_id !='.join(map(lambda x:str(x), c.test_id))
+
+        sql = "select distinct(user_id) from stats_oper where gmt_create >= '%s' and gmt_create <'%s' \
+               and oper_type_id != 28 and user_id is not null %s" \
+               % (start_time, end_time, exclude_test_user_id)
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        
+        user_ids = []
+        for d in results:
+            user_ids.append(int(d[0]))
+        
+        c.redis_instance.sadd('activate:user:id:%s' % datetime.datetime.strftime(start_time, "%Y-%m-%d"), *user_ids)
+
+        au = len(user_ids)
+        
+        # 获取注册用户数
+        reg = SomeTotal.objects.filter(name='user', time__gte=start_time, time__lte=end_time).\
+                   order_by('-gmt_create')[0].count
+        percent = round((au + 0.00001) / reg, 4)
+        
+        m = {'time':datetime.datetime.strftime(start_time, "%Y-%m-%d"), 'percent': percent, 'au':au, 'reg':reg}
+        
+        data = Aggregation(type='active_user', time=start_time.date(), content=anyjson.dumps(m))
+        data.save()
+    except Exception, e:
+        c.logger.error(e)
+        raise e
+    finally:
+        try:
+            if cursor:
+                cursor.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()
 
 if __name__ == '__main__':
-    share_channels(datetime.datetime.now())
+#    share_channels(datetime.datetime.now())
+    activate_user(datetime.datetime.now())
+    
+#    r = redis.Redis(host='10.10.69.53', port=6379, db=4)
+#    a = [1, 2, 3, ]
+#    b = [3, 4, 5]
+#    r.sadd('key1', *a)
+#    r.sadd('key2', *b)
+#    r1 = r.smembers('key1')
+#    r2 = r.smembers('key2')
+#    print r1, r2
+#    print r1 | r2

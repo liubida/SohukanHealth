@@ -6,6 +6,7 @@ Created on Jun 18, 2012
 '''
 import logging
 import os
+import redis
 
 class Config:
     ROOT_PATH = os.path.dirname(os.path.dirname(__file__))
@@ -65,6 +66,8 @@ class DevConfig(Config):
     
     db_config = {'host':'10.10.58.17', 'port':3306, 'user':'sohupocketlib', 'passwd':'SejJGGk2', 'db':'sohupocketlib'}
     db_self_config = {'host':'10.10.69.53', 'port':3306, 'user':'sohukan', 'passwd':'sohukan', 'db':'sohukanhealth'}
+    redis_config = {'host':'10.10.69.53', 'port':6379, 'db':4}
+    redis_instance = redis.StrictRedis(**redis_config)
     # phone num:
     # liubida 13476852610
     # fangmeng 18627839148

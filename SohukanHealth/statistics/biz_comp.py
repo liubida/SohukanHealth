@@ -18,7 +18,6 @@ def get_share_channels(start_time, end_time, data_grain='day'):
     for d in raw_data:
         data[d['time'].strftime("%Y-%m-%d")] = anyjson.loads(d['content'])
 
-    # 数据整理, 防止有一天/一周没有数据
     ret = []
     start = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
     end = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S")
