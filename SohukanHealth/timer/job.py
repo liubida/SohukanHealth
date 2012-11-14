@@ -12,7 +12,7 @@ sys.path.append(root_path)
 print sys.path
 
 from django.core.management import setup_environ
-from SohukanHealth import settings
+from SohukanHealth import settings, aggregation
 print settings
 setup_environ(settings)
 
@@ -30,6 +30,7 @@ import re
 import MySQLdb
 import anyjson
 import datetime
+
 
 
 @print_info(name='read_job')
@@ -365,15 +366,26 @@ def fix_ua_job():
     except Exception, e:
         c.logger.error(e)
 
+@print_info(name='day_aggregation')
+def day_aggregation_job(start_time):
+    try:
+        if not start_time:
+            start_time = datetime.datetime.now()
+            
+        aggregation.share_channels(start_time)
+    except Exception, e:
+        c.logger.error(e)
+        
 if __name__ == '__main__':
-    start = datetime.datetime(2012, 10, 31, 0, 0, 0)
-    day_report_job(start)
-#    now = datetime.datetime.now()
-#    step = datetime.timedelta(days=1)
-#    
-#    while start < now:
-#        day_report_job(start)
-#        start += step
+    start = datetime.datetime(2012, 10, 24, 0, 0, 0)
+    
+    step = datetime.timedelta(days=1)
+
+    now = datetime.datetime.now()
+    while start < now:
+        day_aggregation_job(start)
+        start += step
+
 #    rabbitmq_queue_alarm_job()
 #    bookmark_total_job()
 #    start = datetime.date(2012, 8, 27)

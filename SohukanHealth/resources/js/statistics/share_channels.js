@@ -58,10 +58,22 @@ var make_share_channels_chart = function(chartData) {
 
 	// third graph
 	var graph = new AmCharts.AmGraph();
-	graph.title = "other";
+	graph.title = "webapp";
 	graph.labelText = "[[value]]";
 	graph.balloonText = "[[value]] ([[percents]]%)";
-	graph.valueField = "other";
+	graph.valueField = "webapp";
+	graph.type = "column";
+	graph.lineAlpha = 0;
+	graph.fillAlphas = 1;
+	graph.lineColor = "#FCD202";
+	chart.addGraph(graph);
+	
+	// 4th graph
+	var graph = new AmCharts.AmGraph();
+	graph.title = "sohu_cms";
+	graph.labelText = "[[value]]";
+	graph.balloonText = "[[value]] ([[percents]]%)";
+	graph.valueField = "sohu_cms";
 	graph.type = "column";
 	graph.lineAlpha = 0;
 	graph.fillAlphas = 1;
@@ -122,7 +134,8 @@ var load_share_channels = function(params, callback) {
 								time : data[i].time,
 								bshare : data[i].bshare,
 								jiathis : data[i].jiathis,
-								other : data[i].other
+								webapp: data[i].webapp,
+								sohu_cms : data[i].sohu_cms
 							});
 				}
 				make_share_channels_chart(chartData);

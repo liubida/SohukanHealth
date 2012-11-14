@@ -19,7 +19,7 @@ setup_environ(settings)
 
 from job import add_job, read_job, user_total_job, \
     bookmark_total_job, add_alarm_job, read_alarm_job, day_report_job, week_report_job, fix_ua_job, \
-    rabbitmq_queue_alarm_job
+    rabbitmq_queue_alarm_job, day_aggregation_job
 
 
 if __name__ == '__main__':
@@ -37,6 +37,7 @@ if __name__ == '__main__':
         elif method_name == 'week_report_job': week_report_job()
         elif method_name == 'fix_ua_job' : fix_ua_job()
         elif method_name == 'rabbitmq_queue_alarm_job' : rabbitmq_queue_alarm_job()
+        elif method_name == 'day_aggregation' : day_aggregation_job()
         else: pass
 
 # */5  *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py add_job
@@ -49,4 +50,5 @@ if __name__ == '__main__':
 # 50   6    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py week_report_job
 # 15   */3  *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py fix_ua_job
 # */14 *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py rabbitmq_queue_alarm_job
+# 52   23   *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py day_aggregation_job
 

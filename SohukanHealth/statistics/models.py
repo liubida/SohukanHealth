@@ -108,3 +108,17 @@ class UA(models.Model):
         unique_together = ('ua_string',)
         db_table = 'stats_ua'
         ordering = ['gmt_create']
+
+class Aggregation(models.Model):
+    
+    type = models.CharField(max_length=64, db_index=True)
+    time = models.DateTimeField(db_index=True)
+    content = models.TextField(blank=True, null=True)
+    comments = models.CharField(max_length=512)
+    gmt_create = models.DateTimeField(auto_now_add=True, null=True)
+    gmt_modify = models.DateTimeField(auto_now=True, null=True)
+    
+    class Meta:
+        db_table = 'aggregation'
+        ordering = ['time', 'gmt_create']
+        get_latest_by = "time" # Entry.objects.latest()
