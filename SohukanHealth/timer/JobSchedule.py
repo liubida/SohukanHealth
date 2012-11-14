@@ -37,7 +37,7 @@ if __name__ == '__main__':
         elif method_name == 'week_report_job': week_report_job()
         elif method_name == 'fix_ua_job' : fix_ua_job()
         elif method_name == 'rabbitmq_queue_alarm_job' : rabbitmq_queue_alarm_job()
-        elif method_name == 'day_aggregation' : day_aggregation_job()
+        elif method_name == 'day_aggregation_job' : day_aggregation_job()
         else: pass
 
 # */5  *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py add_job
