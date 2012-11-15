@@ -179,12 +179,91 @@ def get_bookmark_percent(start_time=None, end_time=None, raw=True):
         ret['raw'] = raw_data
     return anyjson.dumps(ret)
 
-def get_bookmark_website(start_time=None, end_time=None, limit=100):
-    data = get_bookmark_website_raw_data(start_time, end_time, limit);
-    
-    ret = {'list':data}
-    return anyjson.dumps(ret)
+def get_bookmark_website(start_time, end_time, limit=100):
+    '''start_time, end_time is string'''
+    raw_data = Aggregation.objects.filter(type='bookmark_website', time__gte=start_time, time__lte=end_time).values('time', 'content')
 
+    data = {}
+    for d in raw_data:
+        data[d['time'].strftime("%Y-%m-%d")] = anyjson.loads(d['content'])
+        
+        
+        
+        
+        
+        
+        
+
+    step = datetime.timedelta(days=1)
+    start = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
+    end = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S")
+    cur = start
+    
+    ret = []
+    urls = {} 
+    mm = {}   
+    while cur <= end:
+        key = cur.strftime("%Y-%m-%d")
+
+        if key not in data.keys():
+            break;
+        
+        for d in data[key]:
+            if d['domain'] in mm.keys():
+                mm[d['domain']] += d['count']
+#                urls[d['domain']].append(d['urls'])
+            else:
+                mm[d['domain']] = d['count']
+#                urls[d['domain']] = d['urls']
+        cur += step
+
+    for k in mm:
+#        ret.append({'count':mm[k], 'domain':k, 'urls':urls[k]})
+        ret.append({'count':mm[k], 'domain':k})
+        
+    ret.sort(key=lambda x:x['count'], reverse=True)
+
+    return anyjson.dumps(ret[:limit])
+
+def get_bookmark_website_detail(start_time, end_time, limit=100):
+    '''start_time, end_time is string'''
+    raw_data = Aggregation.objects.filter(type='bookmark_website', time__gte=start_time, time__lte=end_time).values('time', 'content')
+
+    data = {}
+    for d in raw_data:
+        data[d['time'].strftime("%Y-%m-%d")] = anyjson.loads(d['content'])
+
+    step = datetime.timedelta(days=1)
+    start = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
+    end = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S")
+    cur = start
+    
+    ret = []
+    urls = {} 
+    mm = {}   
+    while cur <= end:
+        key = cur.strftime("%Y-%m-%d")
+
+        if key not in data.keys():
+            break;
+        
+        for d in data[key]:
+            if d['domain'] in mm.keys():
+                mm[d['domain']] += d['count']
+                if len(urls[d['domain']]) <= 30:
+                    urls[d['domain']].extend(d['urls'])
+            else:
+                mm[d['domain']] = d['count']
+                urls[d['domain']] = d['urls']
+        cur += step
+
+    for k in mm:
+        ret.append({'count':mm[k], 'domain':k, 'urls':urls[k][:24]})
+        
+    ret.sort(key=lambda x:x['count'], reverse=True)
+    return ret[:limit]
+    
+    
 def get_bookmark_website_for_user(start_time=None, end_time=None, limit=100):
     data = get_bookmark_website_for_user_raw_data(start_time, end_time, limit);
 
@@ -233,7 +312,7 @@ def get_activate_user(start_time, end_time, data_grain='day'):
                             'reg':data[(cur - step).strftime("%Y-%m-%d")]['reg']})
                 break;
             
-            user_ids = user_ids | c.redis_instance.smembers('activate:user:id:%s'% cur.strftime("%Y-%m-%d"))
+            user_ids = user_ids | c.redis_instance.smembers('activate:user:id:%s' % cur.strftime("%Y-%m-%d"))
             tmp_au = len(user_ids)
             
             if cur.weekday() == 6 or cur.date() == end.date():
@@ -257,7 +336,7 @@ def get_activate_user(start_time, end_time, data_grain='day'):
                             'reg':data[(cur - step).strftime("%Y-%m-%d")]['reg']})
                 break;
             
-            user_ids = user_ids | c.redis_instance.smembers('activate:user:id:%s'% cur.strftime("%Y-%m-%d"))
+            user_ids = user_ids | c.redis_instance.smembers('activate:user:id:%s' % cur.strftime("%Y-%m-%d"))
             tmp_au = len(user_ids)
             
             if (cur + step).month != cur.month or cur.date() == end.date():
@@ -395,69 +474,68 @@ def get_user_platform_raw_data(start_time=None, end_time=None):
             if conn:
                 conn.close()
                 
-def get_bookmark_website_raw_data(start_time=None, end_time=None, limit=100):
-    '''为[收藏文章的域名统计_PV]获取原始数据'''
-    try:
-        conn = MySQLdb.connect(**c.db_config)
-        cursor = conn.cursor()
-        
-        having_fix, and_fix = _get_fix(start_time, end_time)
-        mm = {}
-        urls = {}
-        ret = []
-        
-        # 由于bookmark表以前没有gmt_create, 所以凡是查询bookmark表都要替换成create_time
-        and_fix = and_fix.replace('gmt_create', 'create_time')
-        # 这里不需要去掉guide, 因为后面会有专门的domain删除
-        # remove_guide = " url not regexp '^http://kan.sohu.com/help/guide-' "
-        for i in range(64):
-            cursor.execute("select user_id, url from bookmark_bookmark_%s where 1=1 %s " % (i, and_fix))
-            results = cursor.fetchall()
-            for d in results:
-                user_id = int(d[0])
-                url = str(d[1])
-                domain = urlparse.urlparse(url)[1]
-                if not _is_test(user_id):
-                    if domain in mm.keys():
-                        mm[domain] += 1
-                    else:
-                        mm[domain] = 1
-                        urls[domain] = [] 
-                    if(len(urls[domain]) <= 100):
-                        urls[domain].append(url)
-                    
-        for k in mm.keys():
-            ret.append({'domain':k, 'count':mm[k], 'urls':urls[k]})
-            
-        ret.sort(key=lambda x:x['count'], reverse=True)
-        
-        # 需要去除domain='kan.sohu.com'的数据
-        for r in ret:
-            if r['domain'] == 'kan.sohu.com':
-                ret.remove(r)
-        
-#        pp = []
-#        ssum = 0
+#def get_bookmark_website_raw_data(start_time=None, end_time=None, limit=100):
+#    '''为[收藏文章的域名统计_PV]获取原始数据'''
+#    try:
+#        conn = MySQLdb.connect(**c.db_config)
+#        cursor = conn.cursor()
+#        
+#        having_fix, and_fix = _get_fix(start_time, end_time)
+#        mm = {}
+#        urls = {}
+#        ret = []
+#        
+#        # 由于bookmark表以前没有gmt_create, 所以凡是查询bookmark表都要替换成create_time
+#        and_fix = and_fix.replace('gmt_create', 'create_time')
+#        
+#        for i in range(64):
+#            cursor.execute("select user_id, url from bookmark_bookmark_%s where 1=1 %s " % (i, and_fix))
+#            results = cursor.fetchall()
+#            for d in results:
+#                user_id = int(d[0])
+#                url = str(d[1])
+#                domain = urlparse.urlparse(url)[1]
+#                if not _is_test(user_id):
+#                    if domain in mm.keys():
+#                        mm[domain] += 1
+#                    else:
+#                        mm[domain] = 1
+#                        urls[domain] = [] 
+#                    if(len(urls[domain]) <= 100):
+#                        urls[domain].append(url)
+#                    
+#        for k in mm.keys():
+#            ret.append({'domain':k, 'count':mm[k], 'urls':urls[k]})
+#            
+#        ret.sort(key=lambda x:x['count'], reverse=True)
+#        
+#        # 需要去除domain='kan.sohu.com'的数据
 #        for r in ret:
-#            if r['domain'].find('.sohu.com') != -1:
-#                pp.append({'domain':r['domain'], 'count':r['count']})
-#                ssum += r['count']                        
-#        print pp
-#        print ssum
-        
-        return ret[:limit];
-    except Exception, e:
-        c.logger.error(e)
-        raise e
-    finally:
-        try:
-            if cursor:
-                cursor.close()
-        except Exception, e:
-            c.logger.error(e)
-        finally:
-            if conn:
-                conn.close()
+#            if r['domain'] == 'kan.sohu.com':
+#                ret.remove(r)
+#        
+##        pp = []
+##        ssum = 0
+##        for r in ret:
+##            if r['domain'].find('.sohu.com') != -1:
+##                pp.append({'domain':r['domain'], 'count':r['count']})
+##                ssum += r['count']                        
+##        print pp
+##        print ssum
+#        
+#        return ret[:limit];
+#    except Exception, e:
+#        c.logger.error(e)
+#        raise e
+#    finally:
+#        try:
+#            if cursor:
+#                cursor.close()
+#        except Exception, e:
+#            c.logger.error(e)
+#        finally:
+#            if conn:
+#                conn.close()
 
 def get_bookmark_website_for_user_raw_data(start_time=None, end_time=None, limit=100):
     '''为[收藏文章的域名统计_UV]获取原始数据'''
@@ -932,7 +1010,7 @@ def get_week_report_abstract(start_time, end_time):
 if __name__ == '__main__':
     start_time = datetime.datetime(2012, 11, 5, 0, 0, 20)
     end_time = datetime.datetime(2012, 11, 11, 23, 59, 59)
-    b = get_bookmark_website_raw_data(start_time, end_time)
+    b = get_bookmark_website('2012-11-05 00:00:00', '2012-11-11 23:59:59')
 #    b = get_bookmarkdata_for_day_report(start_time, end_time)
 #    print b
 #    b = get_bookmark_website_for_user_raw_data(start_time,end_time)
