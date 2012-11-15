@@ -65,12 +65,13 @@ var prepare_bookmark_percent = function() {
 	$("#statistics_bookmark_percent_from").datepicker({
 		changeMonth : true,
 		numberOfMonths : 2,
-		dateFormat : "yy-mm-dd",
-		onSelect : function(selectedDate) {
-			$("#statistics_bookmark_percent_to").datepicker("option",
-					"minDate", selectedDate);
-		}
-	});
+		dateFormat : "yy-mm-dd"
+			// ,
+			// onSelect : function(selectedDate) {
+			// $("#statistics_bookmark_percent_to").datepicker("option",
+			// "minDate", selectedDate);
+			// }
+		});
 	$("#statistics_bookmark_percent_to").datepicker({
 				changeMonth : true,
 				numberOfMonths : 2,

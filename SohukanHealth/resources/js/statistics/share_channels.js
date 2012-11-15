@@ -67,7 +67,7 @@ var make_share_channels_chart = function(chartData) {
 	graph.fillAlphas = 1;
 	graph.lineColor = "#FCD202";
 	chart.addGraph(graph);
-	
+
 	// 4th graph
 	var graph = new AmCharts.AmGraph();
 	graph.title = "sohu_cms";
@@ -134,7 +134,7 @@ var load_share_channels = function(params, callback) {
 								time : data[i].time,
 								bshare : data[i].bshare,
 								jiathis : data[i].jiathis,
-								webapp: data[i].webapp,
+								webapp : data[i].webapp,
 								sohu_cms : data[i].sohu_cms
 							});
 				}
@@ -151,12 +151,14 @@ var prepare_share_channel = function() {
 	$("#statistics_share_channels_from").datepicker({
 		changeMonth : true,
 		numberOfMonths : 2,
-		dateFormat : "yy-mm-dd",
-		onSelect : function(selectedDate) {
-			$("#statistics_share_channels_to").datepicker("option", "minDate",
-					selectedDate);
-		}
-	});
+		dateFormat : "yy-mm-dd"
+			// ,
+			// onSelect : function(selectedDate) {
+			// $("#statistics_share_channels_to").datepicker("option",
+			// "minDate",
+			// selectedDate);
+			// }
+		});
 	$("#statistics_share_channels_to").datepicker({
 				changeMonth : true,
 				numberOfMonths : 2,

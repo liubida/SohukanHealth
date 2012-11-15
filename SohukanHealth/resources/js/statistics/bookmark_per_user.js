@@ -84,12 +84,13 @@ var prepare_bookmark_per_user = function() {
 	$("#statistics_bookmark_per_user_from").datepicker({
 		changeMonth : true,
 		numberOfMonths : 2,
-		dateFormat : "yy-mm-dd",
-		onSelect : function(selectedDate) {
-			$("#statistics_bookmark_per_user_to").datepicker("option",
-					"minDate", selectedDate);
-		}
-	});
+		dateFormat : "yy-mm-dd"
+			// ,
+			// onSelect : function(selectedDate) {
+			// $("#statistics_bookmark_per_user_to").datepicker("option",
+			// "minDate", selectedDate);
+			// }
+		});
 	$("#statistics_bookmark_per_user_to").datepicker({
 				changeMonth : true,
 				numberOfMonths : 2,

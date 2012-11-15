@@ -134,8 +134,7 @@ var load_platform = function(params, callback) {
 				if (callback && typeof callback == 'function') {
 					callback();
 				}
-				$("#depth_platform_from").val(from.substr(0,
-						10));
+				$("#depth_platform_from").val(from.substr(0, 10));
 				$("#depth_platform_to").val(to.substr(0, 10));
 			});
 };
@@ -144,12 +143,13 @@ var prepare_platform = function() {
 	$("#depth_platform_from").datepicker({
 		changeMonth : true,
 		numberOfMonths : 2,
-		dateFormat : "yy-mm-dd",
-		onSelect : function(selectedDate) {
-			$("#depth_platform_to").datepicker("option", "minDate",
-					selectedDate);
-		}
-	});
+		dateFormat : "yy-mm-dd"
+			// ,
+			// onSelect : function(selectedDate) {
+			// $("#depth_platform_to").datepicker("option", "minDate",
+			// selectedDate);
+			// }
+		});
 	$("#depth_platform_to").datepicker({
 				changeMonth : true,
 				numberOfMonths : 2,

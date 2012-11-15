@@ -103,12 +103,13 @@ var prepare_bookmark_time = function() {
 	$("#statistics_bookmark_time_from").datepicker({
 		changeMonth : true,
 		numberOfMonths : 2,
-		dateFormat : "yy-mm-dd",
-		onSelect : function(selectedDate) {
-			$("#statistics_bookmark_time_to").datepicker("option", "minDate",
-					selectedDate);
-		}
-	});
+		dateFormat : "yy-mm-dd"
+			// ,
+			// onSelect : function(selectedDate) {
+			// $("#statistics_bookmark_time_to").datepicker("option", "minDate",
+			// selectedDate);
+			// }
+		});
 	$("#statistics_bookmark_time_to").datepicker({
 				changeMonth : true,
 				numberOfMonths : 2,

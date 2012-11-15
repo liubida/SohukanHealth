@@ -33,14 +33,14 @@ var load_bookmark_website_for_user = function(params, callback) {
 	var now = new Date();
 	var to = $("#depth_bookmark_website_for_user_to").val();
 	to = to || now.format('yyyy-MM-dd hh:mm:ss');
-	
+
 	var from = $("#depth_bookmark_website_for_user_from").val();
 	tmp = now;
 	tmp.setMonth(now.getMonth() - 1)
 	from = from || tmp.format('yyyy-MM-dd hh:mm:ss');
 
 	var date_range = get_date_range(from, to);
-	
+
 	var size = $("#table_bookmark_website_for_user #size").val();
 	var radio_type = parseInt(
 			$("#table_bookmark_website_for_user :radio:checked").val(), 10);
@@ -67,8 +67,9 @@ var load_bookmark_website_for_user = function(params, callback) {
 				if (callback && typeof callback == 'function') {
 					callback();
 				}
-				$('#depth_bookmark_website_for_user_from').val(from.substr(0,10));
-				$('#depth_bookmark_website_for_user_to').val(to.substr(0,10));
+				$('#depth_bookmark_website_for_user_from').val(from.substr(0,
+						10));
+				$('#depth_bookmark_website_for_user_to').val(to.substr(0, 10));
 			});
 };
 
@@ -76,12 +77,13 @@ var prepare_bookmark_website_for_user = function() {
 	$("#depth_bookmark_website_for_user_from").datepicker({
 		changeMonth : true,
 		numberOfMonths : 2,
-		dateFormat : "yy-mm-dd",
-		onSelect : function(selectedDate) {
-			$("#depth_bookmark_website_for_user_to").datepicker("option",
-					"minDate", selectedDate);
-		}
-	});
+		dateFormat : "yy-mm-dd"
+			// ,
+			// onSelect : function(selectedDate) {
+			// $("#depth_bookmark_website_for_user_to").datepicker("option",
+			// "minDate", selectedDate);
+			// }
+		});
 	$("#depth_bookmark_website_for_user_to").datepicker({
 				changeMonth : true,
 				numberOfMonths : 2,
