@@ -1,0 +1,19 @@
+{% for d in s.data %}
+<table border="1px" bordercolor="#000000" cellspacing="0px"
+	style="font-size: 12px; border-collapse: collapse; margin: 0 0 8px 0; word-break: break-all; text-overflow:ellipsis;" width="100%" >
+	<td style="font-size: 15px; font-weight:bold;" colspan=3>{{d.domain}}</td>
+	<tr>
+	{% for url in d.urls %}
+		
+		{% if forloop.counter0|divisibleby:4 %}
+			{% ifnotequal forloop.counter0 0 %}
+			</tr><tr>
+			{% endifnotequal %}
+		{% else %}
+			<td width="33%"><a href='{{ url }}' target='_blank'>{{url}}</a></td>
+		{% endif %}
+		
+	{% endfor %}
+	</tr>
+</table>
+{% endfor %}

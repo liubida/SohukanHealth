@@ -4,26 +4,26 @@ Created on Jun 19, 2012
 
 @author: liubida
 '''
-
-from SohukanHealth import settings
-from config.config import c
-from django.core.management import setup_environ
-from monitor.models import SomeTotal
-from statistics.models import Report, Aggregation
-from util import to_percent, get_week_num
-import MySQLdb
-import anyjson
-import datetime
-import os
 import sys
-import urlparse
+import os
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print root_path
 sys.path.append(root_path)
 print sys.path
 
+from django.core.management import setup_environ
+from SohukanHealth import settings
 print settings
 setup_environ(settings)
+
+from statistics.models import Aggregation
+from config.config import c
+from monitor.models import SomeTotal
+from util import to_percent
+import MySQLdb
+import anyjson
+import datetime
+import urlparse
 
 
 def get_data_interval(raw_data, delta=datetime.timedelta(days=1), time_format='str'):
@@ -186,13 +186,6 @@ def get_bookmark_website(start_time, end_time, limit=100):
     data = {}
     for d in raw_data:
         data[d['time'].strftime("%Y-%m-%d")] = anyjson.loads(d['content'])
-        
-        
-        
-        
-        
-        
-        
 
     step = datetime.timedelta(days=1)
     start = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
@@ -203,22 +196,23 @@ def get_bookmark_website(start_time, end_time, limit=100):
     urls = {} 
     mm = {}   
     while cur <= end:
+        s3 = datetime.datetime.now()
         key = cur.strftime("%Y-%m-%d")
 
         if key not in data.keys():
-            break;
+            cur += step
+            continue
         
         for d in data[key]:
-            if d['domain'] in mm.keys():
-                mm[d['domain']] += d['count']
-#                urls[d['domain']].append(d['urls'])
+            domain_key = d['domain']
+            if domain_key in mm.keys():
+                mm[domain_key] += d['count']
             else:
-                mm[d['domain']] = d['count']
-#                urls[d['domain']] = d['urls']
+                mm[domain_key] = d['count']
         cur += step
+        s4 = datetime.datetime.now()
 
     for k in mm:
-#        ret.append({'count':mm[k], 'domain':k, 'urls':urls[k]})
         ret.append({'count':mm[k], 'domain':k})
         
     ret.sort(key=lambda x:x['count'], reverse=True)
@@ -245,7 +239,8 @@ def get_bookmark_website_detail(start_time, end_time, limit=100):
         key = cur.strftime("%Y-%m-%d")
 
         if key not in data.keys():
-            break;
+            cur += step
+            continue
         
         for d in data[key]:
             if d['domain'] in mm.keys():
@@ -1010,7 +1005,7 @@ def get_week_report_abstract(start_time, end_time):
 if __name__ == '__main__':
     start_time = datetime.datetime(2012, 11, 5, 0, 0, 20)
     end_time = datetime.datetime(2012, 11, 11, 23, 59, 59)
-    b = get_bookmark_website('2012-11-05 00:00:00', '2012-11-11 23:59:59')
+    b = get_bookmark_website('2012-06-15 00:00:00', '2012-11-11 23:59:59')
 #    b = get_bookmarkdata_for_day_report(start_time, end_time)
 #    print b
 #    b = get_bookmark_website_for_user_raw_data(start_time,end_time)

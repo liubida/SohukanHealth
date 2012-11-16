@@ -9,7 +9,7 @@ from monitor.models import SomeTotal
 from statistics.biz import get_bookmark_per_user, get_bookmark_time, \
     get_bookmark_percent, get_data_interval, add_inc_for_data, get_activate_user, \
     get_bookmark_website, get_user_platform, _get_week_list, \
-    get_bookmark_website_for_user
+    get_bookmark_website_for_user, get_bookmark_website_detail
 from statistics.biz_comp import get_share_channels
 from statistics.models import Report
 from util import get_week_num
@@ -244,8 +244,32 @@ def bookmark_website(request):
     if end_time == 'NaN-aN-aN aN:aN:aN': 
         end_time = c.MAX_TIME
     jsondata = get_bookmark_website(start_time, end_time, limit=limit)
+    print jsondata
     
     response = HttpResponse(jsondata)
+    # 缓存一天
+    now = datetime.datetime.now()
+    expire = now + datetime.timedelta(days=1)
+    response['Expires'] = expire.strftime('%a, %d %b %Y 01:00:00 %Z')
+    return response
+
+def bookmark_website_detail(request):
+    start_time = request.GET.get('start_time', c.MIN_TIME)
+    end_time = request.GET.get('end_time', c.MAX_TIME)
+    limit = request.GET.get('size', '100')
+    limit = int(limit if limit else 100)
+    
+    if start_time == 'NaN-aN-aN aN:aN:aN': 
+        start_time = c.MIN_TIME
+    if end_time == 'NaN-aN-aN aN:aN:aN': 
+        end_time = c.MAX_TIME
+    
+    data = get_bookmark_website_detail(start_time, end_time, limit=limit)
+    s = { 'data': data }
+                    
+    t = loader.get_template('statistics/bookmark_website_detail_table.html')
+    response = HttpResponse(t.render(Context({'s':s})))
+    
     # 缓存一天
     now = datetime.datetime.now()
     expire = now + datetime.timedelta(days=1)

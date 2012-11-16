@@ -4,18 +4,33 @@ Created on Nov 13, 2012
 
 @author: liubida
 '''
+import sys
+import os
+root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print root_path
+sys.path.append(root_path)
+print sys.path
+    
+from django.core.management import setup_environ
+from SohukanHealth import settings
+print settings
+setup_environ(settings)
+
 from config.config import c
 from monitor.models import SomeTotal
-from statistics.biz import _is_test
+from statistics.biz import _is_test, _get_fix
 from statistics.models import Aggregation
 import MySQLdb
 import anyjson
 import datetime
+import urlparse
 
 jiathis = 'jiathis'
 bshare = 'bshare'
 webapp = 'webapp'
-other = 'sohu_cms'
+sohu_blog = 'sohu_blog'
+sohu_news = 'sohu_news'
+other = 'share'
     
 def share_channels(start_time):
     '''为[收藏渠道统计]聚合数据
@@ -44,26 +59,32 @@ def share_channels(start_time):
         object_key = None
         
         m = {'time':datetime.datetime.strftime(start_time, "%Y-%m-%d"),
-             'bshare':{'count':0, 'object_key':[]},
-             'jiathis':{'count':0, 'object_key':[]},
-             'webapp':{'count':0, 'object_key':[]},
-             'sohu_cms':{'count':0, 'object_key':[]}}
-        
+             jiathis:{'count':0, 'object_key':[]},
+             bshare:{'count':0, 'object_key':[]},
+             webapp:{'count':0, 'object_key':[]},
+             sohu_blog:{'count':0, 'object_key':[]},
+             sohu_news:{'count':0, 'object_key':[]},
+             other:{'count':0, 'object_key':[]}}
+
         for d in results:
             user_id = int(d[0])
             object_key = anyjson.loads(d[1])
             object_key['user_id'] = user_id
             
-#            # 去掉测试用户
+            # 去掉测试用户
             if not _is_test(user_id):
                 if jiathis == object_key['from']:
-                    m['jiathis']['object_key'].append(object_key)
+                    m[jiathis]['object_key'].append(object_key)
                 elif bshare == object_key['from']:
-                    m['bshare']['object_key'].append(object_key)
+                    m[bshare]['object_key'].append(object_key)
                 elif webapp == object_key['from']:
-                    m['webapp']['object_key'].append(object_key)
+                    m[webapp]['object_key'].append(object_key)
+                elif sohu_blog == object_key['from']:
+                    m[sohu_blog]['object_key'].append(object_key)
+                elif sohu_news == object_key['from']:
+                    m[sohu_news]['object_key'].append(object_key)
                 else:
-                    m['sohu_cms']['object_key'].append(object_key)
+                    m[other]['object_key'].append(object_key)
         
         for k in m:
             if k != 'time':
@@ -135,10 +156,90 @@ def activate_user(start_time):
             if conn:
                 conn.close()
 
+def bookmark_website(start_time):
+    '''为[收藏文章的域名统计_PV]聚合数据'''
+    
+    start_time = start_time.replace(hour=0, minute=0, second=0)
+    step = datetime.timedelta(days=1)
+    end_time = start_time + step
+    
+    try:
+        conn = MySQLdb.connect(**c.db_config)
+        cursor = conn.cursor()
+        
+        having_fix, and_fix = _get_fix(start_time, end_time)
+        mm = {}   # mm = {'www.douban.com':100, 'www.dapenti.com':80}
+        urls = {} #	urls = {'www.douban.com':['http://www.douban.com/1','http://www.douban.com/2'], 'www.dapenti.com':[...]}
+
+        ret = []
+        
+        # 由于bookmark表以前没有gmt_create, 所以凡是查询bookmark表都要替换成create_time
+        and_fix = and_fix.replace('gmt_create', 'create_time')
+        
+        for i in range(64):
+            cursor.execute("select user_id, url from bookmark_bookmark_%s where 1=1 %s " % (i, and_fix))
+            results = cursor.fetchall()
+            for d in results:
+                user_id = int(d[0])
+                url = str(d[1])
+                domain = urlparse.urlparse(url)[1]
+                if not _is_test(user_id):
+                    if domain in mm.keys():
+                        mm[domain] += 1
+                    else:
+                        mm[domain] = 1
+                        urls[domain] = [] 
+                    if len(urls[domain]) <= 50:
+                        urls[domain].append(url)
+        
+        for k in mm:
+            # 需要去除domain='kan.sohu.com'的数据
+            if k == 'kan.sohu.com':
+                continue
+            ret.append({'domain':k, 'count':mm[k], 'urls':urls[k]})
+                
+            
+        ret.sort(key=lambda x:x['count'], reverse=True)
+        # 只存储每日排名前100的domain
+        #print ret[:100]
+        data = Aggregation(type='bookmark_website', time=start_time.date(), content=anyjson.dumps(ret[:100]))
+        data.save()
+        
+#        pp = []
+#        ssum = 0
+#        for r in ret:
+#            if r['domain'].find('.sohu.com') != -1:
+#                pp.append({'domain':r['domain'], 'count':r['count']})
+#                ssum += r['count']                        
+#        print pp
+#        print ssum
+        return ret
+    except Exception, e:
+        c.logger.error(e)
+        print e
+        return None
+    finally:
+        try:
+            if cursor:
+                cursor.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()
 if __name__ == '__main__':
 #    share_channels(datetime.datetime.now())
-    activate_user(datetime.datetime.now())
+    start = datetime.datetime(2012, 6, 14, 23, 52, 0)
+    step = datetime.timedelta(days=1)
     
+    now = datetime.datetime.now()
+    while start < now:
+   #     day_aggregation_job(start)
+        result = bookmark_website(start)
+        if result:
+            print "success -- ", start.strftime("%Y-%m-%d")
+        start += step
+    print 'over'
 #    r = redis.Redis(host='10.10.69.53', port=6379, db=4)
 #    a = [1, 2, 3, ]
 #    b = [3, 4, 5]

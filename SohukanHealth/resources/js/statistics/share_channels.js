@@ -70,10 +70,34 @@ var make_share_channels_chart = function(chartData) {
 
 	// 4th graph
 	var graph = new AmCharts.AmGraph();
-	graph.title = "sohu_cms";
+	graph.title = "sohu_blog";
 	graph.labelText = "[[value]]";
 	graph.balloonText = "[[value]] ([[percents]]%)";
-	graph.valueField = "sohu_cms";
+	graph.valueField = "sohu_blog";
+	graph.type = "column";
+	graph.lineAlpha = 0;
+	graph.fillAlphas = 1;
+	graph.lineColor = "#0d8ecf";
+	chart.addGraph(graph);
+    
+	// 5th graph
+	var graph = new AmCharts.AmGraph();
+	graph.title = "sohu_news";
+	graph.labelText = "[[value]]";
+	graph.balloonText = "[[value]] ([[percents]]%)";
+	graph.valueField = "sohu_news";
+	graph.type = "column";
+	graph.lineAlpha = 0;
+	graph.fillAlphas = 1;
+	graph.lineColor = "#04d215";
+	chart.addGraph(graph);
+
+	// 6th graph
+	var graph = new AmCharts.AmGraph();
+	graph.title = "other";
+	graph.labelText = "[[value]]";
+	graph.balloonText = "[[value]] ([[percents]]%)";
+	graph.valueField = "other";
 	graph.type = "column";
 	graph.lineAlpha = 0;
 	graph.fillAlphas = 1;
@@ -135,7 +159,9 @@ var load_share_channels = function(params, callback) {
 								bshare : data[i].bshare,
 								jiathis : data[i].jiathis,
 								webapp : data[i].webapp,
-								sohu_cms : data[i].sohu_cms
+                                sohu_blog : data[i].sohu_blog,
+                                sohu_news : data[i].sohu_news,
+								other : data[i].share
 							});
 				}
 				make_share_channels_chart(chartData);

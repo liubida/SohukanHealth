@@ -20,8 +20,8 @@ from config.config import c
 from monitor.models import AppAvailableData, SomeTotal, SysAlarm
 from monitor.system.worker import add_worker, read_worker
 from statistics.biz import get_userdata_for_day_report, \
-    get_bookmarkdata_for_day_report, get_bookmark_website_raw_data, \
-    get_bookmark_percent_raw_data, _is_test, get_week_report_add_way_and_platform
+    get_bookmarkdata_for_day_report, get_bookmark_percent_raw_data, \
+    _is_test, get_week_report_add_way_and_platform, get_bookmark_website
 from statistics.models import Report, UA
 from timer.sms import sms
 from util import print_info, query_ua, timediff, from_file, get_date_and_time
@@ -285,7 +285,7 @@ def day_report_job(now=None):
     bookmark_count = {}
     bookmark_count['percent'], bookmark_count['data'] = get_bookmark_percent_raw_data(today_start, today_end, limit=20)
     bookmark_website = {}
-    bookmark_website['data'] = get_bookmark_website_raw_data(today_start, today_end, limit=20)
+#    bookmark_website['data'] = get_bookmark_website_raw_data(today_start, today_end, limit=20)
     
     jsondata = {}
     jsondata['user'] = user
@@ -325,7 +325,7 @@ def week_report_job(today=None):
             # 本周每天失败文章
             try:
                 each_failed_bookmark = data['bookmark']['failed']
-            except Exception, e:
+            except Exception:
                 each_failed_bookmark = []
 
             failed_bookmark[count] = {'count':len(each_failed_bookmark), 'data': each_failed_bookmark} 
@@ -335,7 +335,8 @@ def week_report_job(today=None):
     end_time = end_time.replace(hour=23, minute=59, second=59, microsecond=0)
     
     bookmark_website = {}
-    bookmark_website['data'] = get_bookmark_website_raw_data(start_time, end_time, limit=100)
+    bookmark_website['data'] = get_bookmark_website(start_time.strftime('%Y-%m-%d %H:%M:%S'), end_time.strftime('%Y-%m-%d %H:%M:%S'), limit=100)
+
     add_way_and_platform = {}
     add_way_and_platform['data'] = get_week_report_add_way_and_platform(start_time, end_time);
     
@@ -370,14 +371,16 @@ def fix_ua_job():
 def day_aggregation_job(start_time=datetime.datetime.now()):
     try:
         aggregation.share_channels(start_time)
-        aggregation.activate_user(start_time)
+        #aggregation.activate_user(start_time)
+        #aggregation.bookmark_website(start_time)
     except Exception, e:
         c.logger.error(e)
         
 if __name__ == '__main__':
-    start = datetime.datetime(2012, 7, 16, 23, 52, 0)
+    # start = datetime.datetime(2012, 6, 14, 23, 52, 0)
+    start = datetime.datetime(2012, 10, 24, 23, 52, 0)
     step = datetime.timedelta(days=1)
-
+    
     now = datetime.datetime.now()
     while start < now:
         day_aggregation_job(start)
@@ -385,8 +388,8 @@ if __name__ == '__main__':
 
 #    rabbitmq_queue_alarm_job()
 #    bookmark_total_job()
-#    start = datetime.date(2012, 8, 27)
-#    week_report_job(start)
+    #start = datetime.date(2012, 11, 12)
+    #week_report_job(start)
 #    add_job()
 #    start = datetime.date(2012, 7, 13)
 #    today = datetime.date.today()
@@ -399,44 +402,3 @@ if __name__ == '__main__':
 #    bookmark_total_job()
 #    week_report_job()
     
-#    start_time = datetime.datetime.now() - datetime.timedelta(minutes=36)
-#    print start_time 
-#    read_failure_data = AppAvailableData.objects.filter(name='read', result=False, time__gte=start_time).values('time')
-#    failure_count = len(read_failure_data)
-#    print failure_count
-#    
-#    add_alarm_job()
-#    read_alarm_job()
-#    read_job()
-#    now = datetime.datetime.now()
-#    start_time = datetime.datetime(2012, 8, 2, 7, 50, 1)
-#    end_time = datetime.datetime(2012, 8, 2, 7, 50, 0)
-#    start_time = start_time - datetime.timedelta(hours=0.5)
-##    start_time = datetime.datetime.now() - datetime.timedelta(minutes=35) 
-#    print start_time
-#    
-#    read_failure_data = AppAvailableData.objects.filter(name='read', result=False, time__gte=start_time, time__lte=end_time).values('time')
-#    failure_count = len(read_failure_data)
-#    print failure_count
-    
-#    end_time = datetime.datetime.now()
-#    print (start_time - end_time).total_seconds()
-    
-#    timediff = timediff(start_time, end_time)
-#    print timediff
-#    while start < now:
-#        print start
-#        day_report_job(start)
-#        start += datetime.timedelta(days=1)
-#    today = datetime.date.today()
-#    today = today.replace(day=31)
-#    print today
-#    d = datetime.timedelta(days=1)
-#    print today + d
-#    
-#    fix_ua_job()
-#    mysql_ping_job();
-#    user_total_job()
-#    bookmark_total_job()
-#    add_and_read_alarm_job()
-#    url = RandomSpider().get_valid_url()

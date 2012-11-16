@@ -248,6 +248,7 @@ var get_avg_time_used = function(chartData) {
 	}
 	return sum / len;
 };
+
 var prepare_monitor = function() {
 	$('#app_available tr').mouseover(function() {
 				this.style.backgroundColor = '#DFF7F8';
@@ -256,7 +257,7 @@ var prepare_monitor = function() {
 				this.style.backgroundColor = 'white';
 			});
 	$('#app_available tr').click(function() {
-				if(this.id){
+				if (this.id) {
 					load_sys_alarm(this.id.split('_')[2]);
 				}
 			});
