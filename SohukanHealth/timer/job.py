@@ -4,32 +4,33 @@ Created on Jun 7, 2012
 
 @author: liubida
 '''
-import sys
+from SohukanHealth import settings, aggregation
+from config.config import c
+from django.core.management import setup_environ
+from monitor.models import AppAvailableData, SomeTotal, SysAlarm
+from monitor.system.worker import add_worker, read_worker
+from statistics.biz import get_userdata_for_day_report, \
+    get_bookmarkdata_for_day_report, get_bookmark_percent_raw_data, _is_test, \
+    get_week_report_add_way_and_platform, get_bookmark_website, \
+    get_bookmark_website_detail
+from statistics.models import Report, UA
+from timer.sms import sms
+from util import print_info, query_ua, timediff, from_file, get_date_and_time
+from util.random_spider import RandomSpider
+import MySQLdb
+import anyjson
+import datetime
 import os
+import re
+import sys
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print root_path
 sys.path.append(root_path)
 print sys.path
 
-from django.core.management import setup_environ
-from SohukanHealth import settings, aggregation
 print settings
 setup_environ(settings)
 
-from config.config import c
-from monitor.models import AppAvailableData, SomeTotal, SysAlarm
-from monitor.system.worker import add_worker, read_worker
-from statistics.biz import get_userdata_for_day_report, \
-    get_bookmarkdata_for_day_report, get_bookmark_percent_raw_data, \
-    _is_test, get_week_report_add_way_and_platform, get_bookmark_website
-from statistics.models import Report, UA
-from timer.sms import sms
-from util import print_info, query_ua, timediff, from_file, get_date_and_time
-from util.random_spider import RandomSpider
-import re
-import MySQLdb
-import anyjson
-import datetime
 
 
 
@@ -285,7 +286,7 @@ def day_report_job(now=None):
     bookmark_count = {}
     bookmark_count['percent'], bookmark_count['data'] = get_bookmark_percent_raw_data(today_start, today_end, limit=20)
     bookmark_website = {}
-#    bookmark_website['data'] = get_bookmark_website_raw_data(today_start, today_end, limit=20)
+    bookmark_website['data'] = get_bookmark_website(today_start.strftime('%Y-%m-%d %H:%M:%S'), today_end.strftime('%Y-%m-%d %H:%M:%S'), limit=20)
     
     jsondata = {}
     jsondata['user'] = user
@@ -335,7 +336,8 @@ def week_report_job(today=None):
     end_time = end_time.replace(hour=23, minute=59, second=59, microsecond=0)
     
     bookmark_website = {}
-    bookmark_website['data'] = get_bookmark_website(start_time.strftime('%Y-%m-%d %H:%M:%S'), end_time.strftime('%Y-%m-%d %H:%M:%S'), limit=100)
+    bookmark_website['data'] = get_bookmark_website_detail(start_time.strftime('%Y-%m-%d %H:%M:%S'), \
+                                                           end_time.strftime('%Y-%m-%d %H:%M:%S'), limit=100, urls_limit=50)
 
     add_way_and_platform = {}
     add_way_and_platform['data'] = get_week_report_add_way_and_platform(start_time, end_time);
@@ -371,19 +373,21 @@ def fix_ua_job():
 def day_aggregation_job(start_time=datetime.datetime.now()):
     try:
         aggregation.share_channels(start_time)
-        #aggregation.activate_user(start_time)
-        #aggregation.bookmark_website(start_time)
+        aggregation.activate_user(start_time)
+        aggregation.bookmark_website(start_time)
     except Exception, e:
         c.logger.error(e)
         
 if __name__ == '__main__':
     # start = datetime.datetime(2012, 6, 14, 23, 52, 0)
-    start = datetime.datetime(2012, 10, 24, 23, 52, 0)
+    start = datetime.datetime(2012, 11, 16, 6, 58, 0)
     step = datetime.timedelta(days=1)
     
     now = datetime.datetime.now()
-    while start < now:
-        day_aggregation_job(start)
+    while start <= now:
+#        day_aggregation_job(start)
+#        day_report_job(start)
+        week_report_job(start)
         start += step
 
 #    rabbitmq_queue_alarm_job()

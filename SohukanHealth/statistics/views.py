@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.template import loader
 from django.template.context import Context
+from django.views.decorators.http import last_modified
 from monitor.models import SomeTotal
 from statistics.biz import get_bookmark_per_user, get_bookmark_time, \
     get_bookmark_percent, get_data_interval, add_inc_for_data, get_activate_user, \
@@ -12,7 +13,7 @@ from statistics.biz import get_bookmark_per_user, get_bookmark_time, \
     get_bookmark_website_for_user, get_bookmark_website_detail
 from statistics.biz_comp import get_share_channels
 from statistics.models import Report
-from util import get_week_num
+from util import get_week_num, http_conditions
 import anyjson
 import datetime
 
@@ -115,6 +116,7 @@ def bookmark_total(request):
 
 # 综合 分享渠道统计
 @login_required
+#@last_modified(http_conditions.share_channels_last_modified)
 def share_channels(request):
     start_time = request.GET.get('start_time', c.SHARE_CHANNEL_MIN_TIME)
     end_time = request.GET.get('end_time', datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
@@ -243,8 +245,8 @@ def bookmark_website(request):
         start_time = c.MIN_TIME
     if end_time == 'NaN-aN-aN aN:aN:aN': 
         end_time = c.MAX_TIME
-    jsondata = get_bookmark_website(start_time, end_time, limit=limit)
-    print jsondata
+    data = get_bookmark_website(start_time, end_time, limit=limit)
+    jsondata = anyjson.dumps(data)
     
     response = HttpResponse(jsondata)
     # 缓存一天

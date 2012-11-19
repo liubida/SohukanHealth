@@ -196,7 +196,6 @@ def get_bookmark_website(start_time, end_time, limit=100):
     urls = {} 
     mm = {}   
     while cur <= end:
-        s3 = datetime.datetime.now()
         key = cur.strftime("%Y-%m-%d")
 
         if key not in data.keys():
@@ -210,16 +209,15 @@ def get_bookmark_website(start_time, end_time, limit=100):
             else:
                 mm[domain_key] = d['count']
         cur += step
-        s4 = datetime.datetime.now()
 
     for k in mm:
         ret.append({'count':mm[k], 'domain':k})
         
     ret.sort(key=lambda x:x['count'], reverse=True)
 
-    return anyjson.dumps(ret[:limit])
+    return ret[:limit]
 
-def get_bookmark_website_detail(start_time, end_time, limit=100):
+def get_bookmark_website_detail(start_time, end_time, limit=100, urls_limit = 24):
     '''start_time, end_time is string'''
     raw_data = Aggregation.objects.filter(type='bookmark_website', time__gte=start_time, time__lte=end_time).values('time', 'content')
 
@@ -253,7 +251,7 @@ def get_bookmark_website_detail(start_time, end_time, limit=100):
         cur += step
 
     for k in mm:
-        ret.append({'count':mm[k], 'domain':k, 'urls':urls[k][:24]})
+        ret.append({'count':mm[k], 'domain':k, 'urls':urls[k][:urls_limit]})
         
     ret.sort(key=lambda x:x['count'], reverse=True)
     return ret[:limit]
@@ -302,9 +300,10 @@ def get_activate_user(start_time, end_time, data_grain='day'):
         while cur <= end:
             key = cur.strftime("%Y-%m-%d")
             if key not in data.keys():
-                ret.append({'time': (cur - step).strftime("%m-%d"),
-                            'au':tmp_au,
-                            'reg':data[(cur - step).strftime("%Y-%m-%d")]['reg']})
+                if (cur - step).weekday() != 6:
+                    ret.append({'time': (cur - step).strftime("%m-%d"),
+                                'au':tmp_au,
+                                'reg':data[(cur - step).strftime("%Y-%m-%d")]['reg']})
                 break;
             
             user_ids = user_ids | c.redis_instance.smembers('activate:user:id:%s' % cur.strftime("%Y-%m-%d"))
@@ -1005,7 +1004,9 @@ def get_week_report_abstract(start_time, end_time):
 if __name__ == '__main__':
     start_time = datetime.datetime(2012, 11, 5, 0, 0, 20)
     end_time = datetime.datetime(2012, 11, 11, 23, 59, 59)
-    b = get_bookmark_website('2012-06-15 00:00:00', '2012-11-11 23:59:59')
+#    b = get_bookmark_website('2012-06-15 00:00:00', '2012-11-11 23:59:59')
+    b = get_activate_user('2012-11-16 00:00:00', '2012-11-21 23:59:59', data_grain='week')
+    print b
 #    b = get_bookmarkdata_for_day_report(start_time, end_time)
 #    print b
 #    b = get_bookmark_website_for_user_raw_data(start_time,end_time)
