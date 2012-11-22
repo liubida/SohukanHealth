@@ -4,34 +4,31 @@ Created on Jun 7, 2012
 
 @author: liubida
 '''
-from SohukanHealth import settings, aggregation
-from config.config import c
-from django.core.management import setup_environ
-from monitor.models import AppAvailableData, SomeTotal, SysAlarm
-from monitor.system.worker import add_worker, read_worker
-from statistics.biz import get_userdata_for_day_report, \
-    get_bookmarkdata_for_day_report, get_bookmark_percent_raw_data, _is_test, \
-    get_week_report_add_way_and_platform, get_bookmark_website, \
-    get_bookmark_website_detail
-from statistics.models import Report, UA
-from timer.sms import sms
-from util import print_info, query_ua, timediff, from_file, get_date_and_time
-from util.random_spider import RandomSpider
-import MySQLdb
-import anyjson
-import datetime
-import os
-import re
 import sys
+import os
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print root_path
 sys.path.append(root_path)
 print sys.path
 
+from django.core.management import setup_environ
+from SohukanHealth import settings, aggregation
 print settings
 setup_environ(settings)
 
-
+from config.config import c
+from monitor.models import AppAvailableData, SomeTotal, SysAlarm
+from monitor.system.worker import add_worker, read_worker
+from statistics.biz import get_userdata_for_day_report, get_bookmark_website, get_bookmark_website_detail, \
+    get_bookmarkdata_for_day_report, get_bookmark_percent_raw_data, _is_test, get_week_report_add_way_and_platform
+from statistics.models import Report, UA
+from timer.sms import sms
+from util import print_info, query_ua, timediff, from_file, get_date_and_time
+from util.random_spider import RandomSpider
+import re
+import MySQLdb
+import anyjson
+import datetime
 
 
 @print_info(name='read_job')
@@ -379,6 +376,8 @@ def day_aggregation_job(start_time=datetime.datetime.now()):
         c.logger.error(e)
         
 if __name__ == '__main__':
+    add_job()
+    exit
     # start = datetime.datetime(2012, 6, 14, 23, 52, 0)
     start = datetime.datetime(2012, 11, 16, 6, 58, 0)
     step = datetime.timedelta(days=1)

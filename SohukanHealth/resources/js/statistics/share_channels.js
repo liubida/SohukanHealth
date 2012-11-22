@@ -24,7 +24,7 @@ var make_share_channels_chart = function(chartData) {
 
 	// value
 	var valueAxis = new AmCharts.ValueAxis();
-	valueAxis.stackType = "100%"; // this line makes the chart 100%
+	valueAxis.stackType = "regular"; // this line makes the chart 100%
 	// stacked
 	valueAxis.gridAlpha = 0;
 	valueAxis.axisAlpha = 0;

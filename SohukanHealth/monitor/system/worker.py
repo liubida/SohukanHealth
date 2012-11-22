@@ -9,6 +9,7 @@ from exception import MonitorException
 from lxml import etree
 from monitor.system.s3.mod_storage_helper import get_expire_data_url
 from util import mytimer, request
+from util.random_spider import RandomSpider
 import datetime
 import threading
 import time
@@ -189,20 +190,20 @@ class read_worker():
             raise MonitorException('get_image_2_error, url:%s, response.code:%d' % (url_bookmarks_get_raw_s3, response.code))
 
 if __name__ == '__main__':
-#    cookie = ["Cookie", "access_token = eeeb8e686a2a148de62b2352ea88b9c6d4b8bd24"]
-    cookie = ["Cookie", "access_token = 0381d220305f5acc8dab9a2ab9692a9d09be5e1d"]
-#    for i in range(2):
-#        url = RandomSpider().get_valid_url()
-#        print url
-#        a = add_worker(url, cookie)
-#        try:
-#            ret = a.test()
-#            print ret
-#            time.sleep(4)
-#        except Exception, e:
-#            print e
-#        print '...'
+    cookie = ["Cookie", "access_token = eeeb8e686a2a148de62b2352ea88b9c6d4b8bd24"]
+#    cookie = ["Cookie", "access_token = 0381d220305f5acc8dab9a2ab9692a9d09be5e1d"]
+#    for i in range(1):
+    url = RandomSpider().get_valid_url()
+    print url
+    a = add_worker(url, cookie)
+    try:
+        ret = a.test()
+        print ret
+        time.sleep(4)
+    except Exception, e:
+        print e
+    print '...'
 
-    b = read_worker(cookie).test()
-    print b
+#    b = read_worker(cookie).test()
+#    print b
     
