@@ -20,6 +20,14 @@ class Config:
     #["Cookie", "access_token = 80f0630f6a410b559155dd8b87223be1976d558f"],
     #["Cookie", "access_token = 432925e688a245092439b1532408cbccc5dc5e67"]
     
+    
+    # phone num:
+    # liubida 13476852610
+    # fangmeng 18627839148
+    # fangmeng_tmp 18971149285
+    # chenwei 13545257885
+    # zhangheng 13437104382'
+    
     # log文件的位置
     log_file = ROOT_PATH + '/sohukan.log' 
     report_version = 0
@@ -59,22 +67,15 @@ class Config:
 
     test_id = [2, 3, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 22, 23, 24, 25, 29,
                32, 33, 35, 43, 46, 53, 58, 91, 108, 125, 165, 591, 1288, 1486, 2412, 3373]
-    
-class DevConfig(Config):
-#    cookie = ["Cookie", "access_token = 0381d220305f5acc8dab9a2ab9692a9d09be5e1d"]
+
+    # 测试账户的access_token
+    # cookie = ["Cookie", "access_token = 0381d220305f5acc8dab9a2ab9692a9d09be5e1d"]
     cookie = ["Cookie", "access_token = eeeb8e686a2a148de62b2352ea88b9c6d4b8bd24"]
-    
+
     db_config = {'host':'10.10.58.17', 'port':3306, 'user':'sohupocketlib', 'passwd':'SejJGGk2', 'db':'sohupocketlib'}
     db_self_config = {'host':'10.10.69.53', 'port':3306, 'user':'sohukan', 'passwd':'sohukan', 'db':'sohukanhealth'}
     redis_config = {'host':'10.10.69.53', 'port':6379, 'db':4}
     redis_instance = redis.StrictRedis(**redis_config)
-    # phone num:
-    # liubida 13476852610
-    # fangmeng 18627839148
-    # fangmeng_tmp 18971149285
-    # chenwei 13545257885
-    # zhangheng 13437104382'
-    mobile_list = '13476852610,18627839148,13545257885,13437104382,18971149285'
     logger = logging.getLogger("SohukanHealth")
     
     def do(self):
@@ -82,17 +83,38 @@ class DevConfig(Config):
         self.logger.addHandler(handler)
         self.logger.setLevel(logging.ERROR)
     
+class DevConfig(Config):
+    mobile_list = '13476852610'
+    ha_nginx_check_url = 'http://10.11.6.175/status'
+    
 class ProdConfig(Config):
-    pass
-class QaConfig(Config):
-    pass
+    mobile_list = '13476852610,18627839148,13545257885,13437104382,18971149285'
+    ha_nginx_check_url = 'http://../status'
 
 class ConfigFactory:
     
     '''这个办法产用Configuration对象。目前而言针对开发，测试，和产品环境，只需要修改返回的值就可以 
     之后可以考虑用不同的方法来适配不同的开发环境'''
     def getConfig(self):
-        config = DevConfig();
+        import socket
+        hostname = socket.gethostname()
+        ip = socket.gethostbyname(hostname)
+        
+        if ip in ('10.10.69.53'):
+            ENV_TAG = 'prod'
+        elif ip in ('10.7.8.58'):
+            ENV_TAG = 'dev'
+        else:
+            ENV_TAG = None
+        
+        if ENV_TAG == 'prod':
+            config = ProdConfig();
+        elif ENV_TAG == 'dev':
+            config = DevConfig();
+            pass
+        else:
+            return None
+        
         config.do() 
         return config
 

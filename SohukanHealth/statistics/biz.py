@@ -1002,11 +1002,20 @@ def get_week_report_abstract(start_time, end_time):
     step = datetime.timedelta(days=1)
     
 if __name__ == '__main__':
-    start_time = datetime.datetime(2012, 11, 5, 0, 0, 20)
-    end_time = datetime.datetime(2012, 11, 11, 23, 59, 59)
-#    b = get_bookmark_website('2012-06-15 00:00:00', '2012-11-11 23:59:59')
-    b = get_activate_user('2012-11-16 00:00:00', '2012-11-21 23:59:59', data_grain='week')
-    print b
+#    start_time = datetime.datetime(2012, 11, 5, 0, 0, 20)
+#    end_time = datetime.datetime(2012, 11, 11, 23, 59, 59)
+##    b = get_bookmark_website('2012-06-15 00:00:00', '2012-11-11 23:59:59')
+#    b = get_activate_user('2012-11-16 00:00:00', '2012-11-21 23:59:59', data_grain='week')
+#    print b
+    
+    cur1 = datetime.datetime(2012, 11, 20, 0, 0, 0)
+    cur2 = datetime.datetime(2012, 11, 21, 0, 0, 0)
+    user_ids_1 = c.redis_instance.smembers('activate:user:id:%s' % cur1.strftime("%Y-%m-%d"))
+    user_ids_2 = c.redis_instance.smembers('activate:user:id:%s' % cur2.strftime("%Y-%m-%d"))
+    
+    print len(user_ids_1), user_ids_1
+    print len(user_ids_2), user_ids_2
+    
 #    b = get_bookmarkdata_for_day_report(start_time, end_time)
 #    print b
 #    b = get_bookmark_website_for_user_raw_data(start_time,end_time)

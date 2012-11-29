@@ -379,15 +379,15 @@ if __name__ == '__main__':
     add_job()
     exit
     # start = datetime.datetime(2012, 6, 14, 23, 52, 0)
-    start = datetime.datetime(2012, 11, 16, 6, 58, 0)
-    step = datetime.timedelta(days=1)
-    
-    now = datetime.datetime.now()
-    while start <= now:
-#        day_aggregation_job(start)
-#        day_report_job(start)
-        week_report_job(start)
-        start += step
+#    start = datetime.datetime(2012, 11, 16, 6, 58, 0)
+#    step = datetime.timedelta(days=1)
+#    
+#    now = datetime.datetime.now()
+#    while start <= now:
+##        day_aggregation_job(start)
+##        day_report_job(start)
+#        week_report_job(start)
+#        start += step
 
 #    rabbitmq_queue_alarm_job()
 #    bookmark_total_job()
