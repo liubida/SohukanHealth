@@ -55,7 +55,11 @@ class Config:
     read_time_limit = 100
     # 报警: 阅读文章失败次数上限
     read_alarm_time = 2
-    
+    # 报警: ngxin_tcp_check 的报警次数
+    max_nginx_tcp_alarm = 4
+    # 报警次数在redis中的key
+    nginx_tcp_alarm_key = 'nginx_tcp_alarm_key'
+
     bucket_name = 'sohukan'
     expires_seconds = 300
     
@@ -88,7 +92,7 @@ class DevConfig(Config):
     ha_nginx_check_url = 'http://10.11.6.175/status'
     
 class ProdConfig(Config):
-    mobile_list = '13476852610,18627839148,13545257885,13437104382,18971149285'
+    mobile_list = '13476852610,18627839148,13545257885,13437104382,'
     ha_nginx_check_url = 'http://10.11.6.175/status'
 
 class ConfigFactory:

@@ -19,9 +19,11 @@ import datetime
 
 @print_info(name='nginx_tcp_check_job')
 def nginx_tcp_check_job(count=3):
-    
+    now = datetime.datetime.now()
+    if now.hour == 7:
+        c.redis_instance.delete(c.nginx_tcp_alarm_key)
+
     if count <= 0 :
-        now = datetime.datetime.now()
         c.logger.error(datetime.datetime.strftime(now, '%Y-%m-%d %H:%M:%S') + ' nginx_tcp_check retry 3 times')
         sms(mobile_list=c.mobile_list, message_post='nginx_tcp_check retry 3 times')
         return
@@ -35,11 +37,12 @@ def nginx_tcp_check_job(count=3):
         s = html.fromstring(r.text, None, parser=html.HTMLParser(remove_blank_text=True))
         ip_list = s.xpath('//table/tr/td[2]')
         state_list = s.xpath('//table/tr/td[3]')
-    
+        
         tcp_check_status = []
         i = 0
         for ip in ip_list:
             tcp_check_status.append({'ip':ip.text_content(), 'state':state_list[i].text_content()})
+            i = i + 1
         
         for s in tcp_check_status:
             msg = '%s|%s:%s' % (msg, s['ip'], s['state'])
@@ -51,8 +54,12 @@ def nginx_tcp_check_job(count=3):
         count = count - 1
         nginx_tcp_check_job(count);
     else:
+        print msg
         if need_alarm:
-            sms(mobile_list=c.mobile_list, message_post=msg)
+            s = c.redis_instance.incr(c.nginx_tcp_alarm_key)
+            if s <= c.max_nginx_tcp_alarm:
+                sms(mobile_list=c.mobile_list, message_post=msg)
+            c.logger.error('%s %s' % (str(datetime.datetime.strftime(now, '%Y-%m-%d %H:%M:%S')), msg))
         
 
 if __name__ == '__main__':
