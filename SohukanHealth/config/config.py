@@ -89,7 +89,7 @@ class DevConfig(Config):
     
 class ProdConfig(Config):
     mobile_list = '13476852610,18627839148,13545257885,13437104382,18971149285'
-    ha_nginx_check_url = 'http://../status'
+    ha_nginx_check_url = 'http://10.11.6.175/status'
 
 class ConfigFactory:
     
@@ -122,11 +122,32 @@ c = ConfigFactory().getConfig()
 #lock = threading.Lock()
 
 if __name__ == '__main__':
-#    c = ConfigFactory()
+    import socket
+    hostname = socket.gethostname()
+    ip = socket.gethostbyname(hostname)
+    print hostname
+    print ip
+    if ip in ('10.10.69.53'):
+        ENV_TAG = 'prod'
+    elif ip in ('10.7.8.58'):
+        ENV_TAG = 'dev'
+    else:
+        ENV_TAG = None
+
+    print ENV_TAG
+
+    #if ENV_TAG == 'prod':
+    #    config = ProdConfig();
+    #elif ENV_TAG == 'dev':
+    #    config = DevConfig();
+    #else:
+    #    print 'fefe'
+        
+ #    c = ConfigFactory()
 #    d = c.getConfig()
 #    print d.conn
 #    print d.db_config['host']
-    print 'supersohukan' in c.monitor_user
+    #print 'supersohukan' in c.monitor_user
 #    a = os.path.dirname(__file__)
 #    print a
 #    b = os.path.dirname(a)

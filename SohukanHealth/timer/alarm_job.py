@@ -29,10 +29,10 @@ def nginx_tcp_check_job(count=3):
     need_alarm = False
     msg = ''
     try:
+        print c.ha_nginx_check_url
         r = requests.get(c.ha_nginx_check_url, timeout=2)
         r.raise_for_status()
         s = html.fromstring(r.text, None, parser=html.HTMLParser(remove_blank_text=True))
-        1/0
         ip_list = s.xpath('//table/tr/td[2]')
         state_list = s.xpath('//table/tr/td[3]')
     
