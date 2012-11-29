@@ -1,8 +1,6 @@
 from SohukanHealth.views import about, index, logtest
-from api.v1.app_available_data import LineItemResource
 from django.conf.urls import patterns, include
 from django.contrib import admin
-from djangorestframework.views import ListOrCreateModelView
 from monitor.views import read, add, monitor, sys_alarm
 from statistics.views import user_total, user_bookmark_percent, bookmark_total, \
     statistics, bookmark_per_user, bookmark_time, day_report, \
@@ -16,7 +14,6 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
                        (r'^$', index),
-                       (r'^api/v1/demo', ListOrCreateModelView.as_view(resource=LineItemResource)),
                        (r'^monitor/$', monitor),
                        (r'^monitor/sys_alarm/(?P<month>\d+)/$', sys_alarm),
                        (r'^monitor/read/$', read),
