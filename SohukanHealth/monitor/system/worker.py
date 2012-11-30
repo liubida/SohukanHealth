@@ -34,9 +34,11 @@ class add_worker():
     
     def test(self):
         try:
+            now = datetime.datetime.now()
             time_used = self.add()
         except Exception, e:
-            c.logger.error('%s:%s' % ('read_worker', str(e)))
+            msg = '%s:%s' % ('add_worker', str(e))
+            c.logger.error('%s %s' % (str(datetime.datetime.strftime(now, '%Y-%m-%d %H:%M:%S')), msg))
             ret = {"result" : False, "time_used" : c.add_time_limit, 'comments': str(e)}
         else:
             ret = {"result" : True, "time_used" : time_used}
@@ -93,9 +95,11 @@ class read_worker():
         
     def test(self):
         try:
+            now = datetime.datetime.now()
             time_used = self.read()
         except Exception, e:
-            c.logger.error('%s:%s' % ('read_worker', str(e)))
+            msg = '%s:%s' % ('read_worker', str(e))
+            c.logger.error('%s %s' % (str(datetime.datetime.strftime(now, '%Y-%m-%d %H:%M:%S')), msg))
             ret = {"result" : False, "time_used" : c.read_time_limit, 'comments': str(e)}
         else:
             ret = {"result" : True, "time_used" : time_used}
@@ -120,11 +124,9 @@ class read_worker():
         data = urllib.urlencode({"order_by":"-create_time", "limit":1, "submit":"提交"});
         response = request(url_bookmarks_list, data, self.cookie);
         s = response.read()
-        
         node = etree.fromstring(s, parser=etree.XMLParser(remove_blank_text=True))
         bookmark = node.find('bookmark')
         bookmark_id = bookmark.get('id')
-        
         return bookmark_id
     
     def _get_text(self, bookmark_id=None):
