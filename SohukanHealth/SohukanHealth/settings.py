@@ -144,6 +144,7 @@ INSTALLED_APPS = (
 
 LOGIN_URL = '/monitor/mlogin/'
 LOGOUT_URL = '/monitor/mlogout/'
+CACHE_BACKEND = 'memcached://10.10.69.54:11222/?timeout=3600'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

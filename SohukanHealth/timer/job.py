@@ -372,6 +372,7 @@ def day_aggregation_job(start_time=datetime.datetime.now()):
         aggregation.share_channels(start_time)
         aggregation.activate_user(start_time)
         aggregation.bookmark_website(start_time)
+        aggregation.user_platform(start_time)
     except Exception, e:
         c.logger.error(e)
         

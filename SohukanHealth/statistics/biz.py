@@ -217,7 +217,7 @@ def get_bookmark_website(start_time, end_time, limit=100):
 
     return ret[:limit]
 
-def get_bookmark_website_detail(start_time, end_time, limit=100, urls_limit = 24):
+def get_bookmark_website_detail(start_time, end_time, limit=100, urls_limit=24):
     '''start_time, end_time is string'''
     raw_data = Aggregation.objects.filter(type='bookmark_website', time__gte=start_time, time__lte=end_time).values('time', 'content')
 
@@ -264,10 +264,14 @@ def get_bookmark_website_for_user(start_time=None, end_time=None, limit=100):
     return anyjson.dumps(ret)
 
 def get_user_platform(start_time=None, end_time=None):
-    data = get_user_platform_raw_data(start_time, end_time)
+    '''start_time, end_time is string'''
+    raw_data = Aggregation.objects.filter(type='user_platform', time__gte=start_time, time__lte=end_time).values('time', 'content')
+
+    data = []
+    for d in raw_data:
+        data.append(anyjson.loads(d['content'])['platform'])
     
-    ret = {'list':data}
-    return anyjson.dumps(ret)
+    return anyjson.dumps(data)
 
 def get_activate_user(start_time, end_time, data_grain='day'):
     '''start_time, end_time is string'''
@@ -440,6 +444,9 @@ def get_user_platform_raw_data(start_time=None, end_time=None):
            where gmt_create >= '%s' and gmt_create <='%s' and  %s ) o 
            left join stats_ua u on o.ua_id = u.id group by u.platform, o.data_grain order by o.data_grain''' \
            % (data_grain_format, start_time, end_time, tmp)
+        print sql
+        
+
         cursor.execute(sql)
         results = cursor.fetchall()
         mm = {'time':''};
@@ -1008,13 +1015,16 @@ if __name__ == '__main__':
 #    b = get_activate_user('2012-11-16 00:00:00', '2012-11-21 23:59:59', data_grain='week')
 #    print b
     
-    cur1 = datetime.datetime(2012, 11, 20, 0, 0, 0)
-    cur2 = datetime.datetime(2012, 11, 21, 0, 0, 0)
-    user_ids_1 = c.redis_instance.smembers('activate:user:id:%s' % cur1.strftime("%Y-%m-%d"))
-    user_ids_2 = c.redis_instance.smembers('activate:user:id:%s' % cur2.strftime("%Y-%m-%d"))
+    b = get_user_platform('2012-11-16 00:00:00', '2012-12-21 23:59:59')
+    print b
     
-    print len(user_ids_1), user_ids_1
-    print len(user_ids_2), user_ids_2
+#    cur1 = datetime.datetime(2012, 11, 20, 0, 0, 0)
+#    cur2 = datetime.datetime(2012, 11, 21, 0, 0, 0)
+#    user_ids_1 = c.redis_instance.smembers('activate:user:id:%s' % cur1.strftime("%Y-%m-%d"))
+#    user_ids_2 = c.redis_instance.smembers('activate:user:id:%s' % cur2.strftime("%Y-%m-%d"))
+#    
+#    print len(user_ids_1), user_ids_1
+#    print len(user_ids_2), user_ids_2
     
 #    b = get_bookmarkdata_for_day_report(start_time, end_time)
 #    print b

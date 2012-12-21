@@ -120,7 +120,7 @@ def activate_user(start_time):
         exclude_test_user_id = ' and user_id !='
         exclude_test_user_id += ' and user_id !='.join(map(lambda x:str(x), c.test_id))
 
-        sql = "select distinct(user_id) from stats_oper where gmt_create >= '%s' and gmt_create <'%s' \
+        sql = "select distinct(user_id) from stats_oper where gmt_create >= '%s' and gmt_create < '%s' \
                and oper_type_id != 28 and user_id is not null %s" \
                % (start_time, end_time, exclude_test_user_id)
         cursor.execute(sql)
@@ -227,15 +227,74 @@ def bookmark_website(start_time):
         finally:
             if conn:
                 conn.close()
+                
+def user_platform(start_time):
+    '''为[用户使用平台]聚合数据: 每天用户的使用平台数据分布
+       start_time is datetime
+    '''
+    start_time = start_time.replace(hour=0, minute=0, second=0)
+    step = datetime.timedelta(days=1)
+    end_time = start_time + step
+    start_time_str = datetime.datetime.strftime(start_time, "%Y-%m-%d")
+    
+    try:
+        conn = MySQLdb.connect(**c.db_self_config)
+        cursor = conn.cursor()
+
+        # 去掉测试用户的id
+        exclude_test_user_id = ' and user_id !='
+        exclude_test_user_id += ' and user_id !='.join(map(lambda x:str(x), c.test_id))
+               
+        sql_platform = "select count(distinct a.user_id), b.platform from stats_oper a \
+                        left join stats_ua b on a.ua_id =b.id where a.user_id is not null %s \
+                        and a.gmt_create >= '%s' and a.gmt_create < '%s' group by b.platform" \
+                        % (exclude_test_user_id, start_time, end_time)
+        cursor.execute(sql_platform)
+        results = cursor.fetchall()
+        platform = {'time':start_time_str}
+        for d in results:
+            platform[str(d[1])] = int(d[0])
+        
+        sql_browser = "select count(distinct a.user_id), b.browser from stats_oper a \
+                        left join stats_ua b on a.ua_id =b.id where a.user_id is not null %s \
+                        and a.gmt_create >= '%s' and a.gmt_create < '%s' group by b.browser" \
+                        % (exclude_test_user_id, start_time, end_time)
+        cursor.execute(sql_browser)
+        results = cursor.fetchall()
+        browser = {'time':start_time_str}
+        for d in results:
+            browser[str(d[1])] = int(d[0])
+                        
+        m = {'time':start_time_str, 'platform': platform, 'browser':browser}
+        data = Aggregation(type='user_platform', time=start_time.date(), content=anyjson.dumps(m))
+        data.save()
+        return m
+    except Exception, e:
+        c.logger.error(e)
+        raise e
+    finally:
+        try:
+            if cursor:
+                cursor.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()                
+                
 if __name__ == '__main__':
-#    share_channels(datetime.datetime.now())
+    
+    
+#    start = datetime.datetime(2012, 11, 16, 23, 52, 0)
+#    result = user_platform(start)
+#    print result
+
     start = datetime.datetime(2012, 6, 14, 23, 52, 0)
     step = datetime.timedelta(days=1)
     
     now = datetime.datetime.now()
     while start < now:
-   #     day_aggregation_job(start)
-        result = bookmark_website(start)
+        result = user_platform(start)
         if result:
             print "success -- ", start.strftime("%Y-%m-%d")
         start += step

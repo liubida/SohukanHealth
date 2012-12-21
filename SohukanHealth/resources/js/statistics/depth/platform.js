@@ -125,7 +125,7 @@ var load_platform = function(params, callback) {
 	e.appendChild(loading);
 
 	myAjax(url, params, function(obj) {
-				data = obj.list;
+				data = obj;
 				len = data.length;
 
 				make_platform_chart(data);
