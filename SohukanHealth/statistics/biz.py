@@ -444,8 +444,6 @@ def get_user_platform_raw_data(start_time=None, end_time=None):
            where gmt_create >= '%s' and gmt_create <='%s' and  %s ) o 
            left join stats_ua u on o.ua_id = u.id group by u.platform, o.data_grain order by o.data_grain''' \
            % (data_grain_format, start_time, end_time, tmp)
-        print sql
-        
 
         cursor.execute(sql)
         results = cursor.fetchall()
