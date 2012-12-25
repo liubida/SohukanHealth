@@ -831,18 +831,23 @@ def get_bookmarkdata_for_day_report(today_start, today_end):
 
 def get_bookmark_failed(start, end):
     try:
+        purify_timeout = 'connect purify timeout'
         conn = MySQLdb.connect(**c.db_self_config)
         cursor = conn.cursor()
         
         bookmark_fail = [];
-        sql = "select user_id, url from stats_failcase where gmt_create >= '%s' and gmt_create <= '%s'" % (start, end)
+        sql = "select user_id, url, reason, id from stats_failcase where gmt_create >= '%s' and gmt_create <= '%s'" % (start, end)
         cursor.execute(sql)
         results = cursor.fetchall()
         for d in results:
             user_id = int(d[0])
             url = str(d[1])
             if not _is_test(user_id):
-                bookmark_fail.append({'user_id':user_id, 'url':url})
+                if (not d[2]) or (purify_timeout == str(d[2])):
+                    reason = purify_timeout
+                else:
+                    reason = "purify error | table stats_failure id: %s" % str(d[3])                    
+                bookmark_fail.append({'user_id':user_id, 'url':url, 'reason': reason})
         return bookmark_fail;
     except Exception, e:
         c.logger.error(e)
