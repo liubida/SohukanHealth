@@ -54,7 +54,7 @@ def nginx_tcp_check_job(count=3):
         count = count - 1
         nginx_tcp_check_job(count);
     else:
-        print msg
+        print 'msg:', msg
         if need_alarm:
             s = c.redis_instance.incr(c.nginx_tcp_alarm_key)
             if s <= c.max_nginx_tcp_alarm:
