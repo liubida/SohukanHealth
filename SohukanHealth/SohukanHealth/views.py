@@ -32,3 +32,4 @@ def logtest(request):
     else:
         c.logger.error("SohukanHealth logtest error")
     return HttpResponse("hehe")        
+

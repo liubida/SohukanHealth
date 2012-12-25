@@ -289,7 +289,7 @@ if __name__ == '__main__':
 #    result = user_platform(start)
 #    print result
 
-    start = datetime.datetime(2012, 6, 14, 23, 52, 0)
+    start = datetime.datetime(2012, 7, 21, 23, 52, 0)
     step = datetime.timedelta(days=1)
     
     now = datetime.datetime.now()

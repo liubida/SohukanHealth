@@ -301,7 +301,7 @@ def week_report_job(today=None):
     if not today:
         today = datetime.date.today()
     # 双重保证, 不是周一就返回
-    if today.isoweekday() != 1: 
+    if today.isoweekday() != 1:
         return
     # 从上周的周一开始 
     last_mon = today - datetime.timedelta(days=7)
@@ -377,18 +377,18 @@ def day_aggregation_job(start_time=datetime.datetime.now()):
         c.logger.error(e)
         
 if __name__ == '__main__':
-    add_job()
-    exit
-    # start = datetime.datetime(2012, 6, 14, 23, 52, 0)
+    #add_job()
+    #exit
+    start = datetime.datetime(2012, 12, 21, 6, 52, 0)
 #    start = datetime.datetime(2012, 11, 16, 6, 58, 0)
-#    step = datetime.timedelta(days=1)
+    step = datetime.timedelta(days=1)
 #    
-#    now = datetime.datetime.now()
-#    while start <= now:
-##        day_aggregation_job(start)
-##        day_report_job(start)
-#        week_report_job(start)
-#        start += step
+    now = datetime.datetime.now()
+    while start <= now:
+        #day_aggregation_job(start)
+        #day_report_job(start)
+        week_report_job(start)
+        start += step
 
 #    rabbitmq_queue_alarm_job()
 #    bookmark_total_job()
