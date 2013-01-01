@@ -10,15 +10,9 @@ from util import get_start_end_for_month, timediff, to_percent
 import anyjson
 import datetime
 
-@login_required
-def monitor(request):
-    t = loader.get_template('monitor/monitor.html')
 
-    username = str(request.user)
-    if username not in c.monitor_user:
-        return HttpResponse("<strong>Sry, u can not see this page</strong>", status=403)
-    
-    av = []
+
+def tmp():
     this_month = datetime.datetime.now().month
     # 本年度从5月份开始
     for i in range(5, this_month + 1):
@@ -52,7 +46,66 @@ def monitor(request):
         
         av.append({'month':i, 'time':av_time, 'self_time':av_self_time, 'percent':av_percent, 'self_percent':av_self_percent,
                    'color':av_color, 'self_color':av_self_color})
-        
+    return av    
+    #response = HttpResponse(t.render(Context({
+    #    'av':av,
+    #    'user':request.user
+    #})))
+    #
+    ## 业务监控的系统可用率
+    #now = datetime.datetime.now()
+    #expire = now + datetime.timedelta(hours=8)
+    #response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
+    #return response
+
+@login_required
+def monitor(request):
+    t = loader.get_template('monitor/monitor.html')
+
+    username = str(request.user)
+    if username not in c.monitor_user:
+        return HttpResponse("<strong>Sry, u can not see this page</strong>", status=403)
+    
+    av = []
+    this_year = datetime.datetime.now().year
+    this_month = datetime.datetime.now().month
+
+    print this_year
+    if this_year <= 2012:
+        av = tmp()
+    else:
+        for i in range(1, this_month + 1):
+            # 本月的起止时间点
+            start_time, end_time = get_start_end_for_month(i)
+
+            alarm = SysAlarm.objects.filter(start_time__gte=start_time, start_time__lte=end_time)
+            
+            # 本月总时间
+            all_min = timediff(start_time, end_time, 'minute')
+            # 初始: 本月可用时间=本月总时间
+            av_time = all_min
+            # 初始: 本月可用时间(因自身原因导致故障)=本月总时间
+            av_self_time = all_min
+            
+            for a in alarm:
+                if a.type in c.self_alarm_type:
+                    av_self_time = av_time - timediff(a.start_time, a.end_time, 'minute')
+                av_time = av_time - timediff(a.start_time, a.end_time, 'minute')
+                     
+            # 全部原因导致的系统可用率
+            av_percent = round(((av_time + 0.0000000000001) / all_min), 6)
+            # 自身原因导致的系统可用率
+            av_self_percent = round(((av_self_time + 0.0000000000001) / all_min), 6)
+            
+            av_color = c.green if av_percent > 0.9999 else c.red
+            av_self_color = c.green if av_self_percent > 0.9999 else c.red
+            
+            av_percent = to_percent(av_percent)
+            av_self_percent = to_percent(av_self_percent)
+            
+            av.append({'month':i, 'time':av_time, 'self_time':av_self_time, 'percent':av_percent, 'self_percent':av_self_percent,
+                       'color':av_color, 'self_color':av_self_color})
+            
     response = HttpResponse(t.render(Context({
         'av':av,
         'user':request.user
@@ -63,6 +116,50 @@ def monitor(request):
     expire = now + datetime.timedelta(hours=8)
     response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
     return response
+
+    # 本年度从5月份开始
+    #for i in range(5, this_month + 1):
+    #    # 本月的起止时间点
+    #    start_time, end_time = get_start_end_for_month(i)
+
+    #    alarm = SysAlarm.objects.filter(start_time__gte=start_time, start_time__lte=end_time)
+    #    
+    #    # 本月总时间
+    #    all_min = timediff(start_time, end_time, 'minute')
+    #    # 初始: 本月可用时间=本月总时间
+    #    av_time = all_min
+    #    # 初始: 本月可用时间(因自身原因导致故障)=本月总时间
+    #    av_self_time = all_min
+    #    
+    #    for a in alarm:
+    #        if a.type in c.self_alarm_type:
+    #            av_self_time = av_time - timediff(a.start_time, a.end_time, 'minute')
+    #        av_time = av_time - timediff(a.start_time, a.end_time, 'minute')
+    #             
+    #    # 全部原因导致的系统可用率
+    #    av_percent = round(((av_time + 0.0000000000001) / all_min), 6)
+    #    # 自身原因导致的系统可用率
+    #    av_self_percent = round(((av_self_time + 0.0000000000001) / all_min), 6)
+    #    
+    #    av_color = c.green if av_percent > 0.9999 else c.red
+    #    av_self_color = c.green if av_self_percent > 0.9999 else c.red
+    #    
+    #    av_percent = to_percent(av_percent)
+    #    av_self_percent = to_percent(av_self_percent)
+    #    
+    #    av.append({'month':i, 'time':av_time, 'self_time':av_self_time, 'percent':av_percent, 'self_percent':av_self_percent,
+    #               'color':av_color, 'self_color':av_self_color})
+    #    
+    #response = HttpResponse(t.render(Context({
+    #    'av':av,
+    #    'user':request.user
+    #})))
+    #
+    ## 业务监控的系统可用率
+    #now = datetime.datetime.now()
+    #expire = now + datetime.timedelta(hours=8)
+    #response['Expires'] = expire.strftime('%a, %d %b %Y %H:%M:%S %Z')
+    #return response
 
 @login_required
 def sys_alarm(request, month=0):
