@@ -61,18 +61,19 @@ def get_date_and_time():
     
     return date, time
 
-def get_start_end_for_month(month=1):
-    '''计算出某一个月的第一天和最后一天'''
-    now = datetime.datetime.now()
+def get_start_end_for_month(d):
+    '''d是某一天, 计算出d所在的某一个月的第一天和最后一天'''
+#    now = datetime.datetime.now()
     
     # 这个月的第一天
-    start = now.replace(month=month, day=1, hour=0, minute=0, second=0)
+    month = int(d.month)
+    start = d.replace(month=month, day=1, hour=0, minute=0, second=0)
     
     # 下个月的第一天
     if month + 1 > 12:
-        end = now.replace(month=month, day=31, hour=23, minute=59, second=59)
+        end = d.replace(month=month, day=31, hour=23, minute=59, second=59)
     else:
-        next_month_first = now.replace(month=month + 1, day=1, hour=23, minute=59, second=59)
+        next_month_first = d.replace(month=month + 1, day=1, hour=23, minute=59, second=59)
         end = next_month_first - datetime.timedelta(days=1)
 
     return start, end
@@ -145,6 +146,19 @@ if __name__ == '__main__':
     print get_week_sun(end_time)
     print get_week_sun(a)
     print get_week_sun(b)
+    
+    print '((((((((((((((((((('
+    
+    final_start = datetime.datetime(2012, 5, 1, 0, 0, 0)
+    start = final_start
+    end = datetime.datetime.now()
+    one_day = datetime.timedelta(days=1)
+    
+    while start < end:
+        # 本月(start)的起止时间点
+        start_time, end_time = get_start_end_for_month(start)
+        print start_time, end_time
+        start = end_time + one_day
     
 #    while True:
 #        now = datetime.datetime.now()
