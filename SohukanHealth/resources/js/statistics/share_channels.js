@@ -94,6 +94,18 @@ var make_share_channels_chart = function(chartData) {
 
 	// 6th graph
 	var graph = new AmCharts.AmGraph();
+	graph.title = "baidu";
+	graph.labelText = "[[value]]";
+	graph.balloonText = "[[value]] ([[percents]]%)";
+	graph.valueField = "baidu";
+	graph.type = "column";
+	graph.lineAlpha = 0;
+	graph.fillAlphas = 1;
+	graph.lineColor = "#CD0D74";
+	chart.addGraph(graph);
+
+	// 7th graph
+	var graph = new AmCharts.AmGraph();
 	graph.title = "other";
 	graph.labelText = "[[value]]";
 	graph.balloonText = "[[value]] ([[percents]]%)";
@@ -161,6 +173,7 @@ var load_share_channels = function(params, callback) {
 								webapp : data[i].webapp,
                                 sohu_blog : data[i].sohu_blog,
                                 sohu_news : data[i].sohu_news,
+                                baidu : data[i].baidu,
 								other : data[i].share
 							});
 				}

@@ -326,9 +326,8 @@ def week_report_job(today=None):
             except Exception:
                 each_failed_bookmark = []
 
-            failed_bookmark[count] = {'count':len(each_failed_bookmark), 'data': each_failed_bookmark} 
+            failed_bookmark[count] = {'count':len(each_failed_bookmark), 'data': each_failed_bookmark}
             count = count + 1
-    
     end_time = start_time + datetime.timedelta(days=6)
     end_time = end_time.replace(hour=23, minute=59, second=59, microsecond=0)
     

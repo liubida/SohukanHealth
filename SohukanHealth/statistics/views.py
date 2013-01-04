@@ -477,6 +477,14 @@ def week_report_abstract(request):
     if jsondata_array:
         jsondata = jsondata_array[0]['jsondata']
         data = anyjson.loads(jsondata)
+        
+        purify_timeout_bookmarks = [];
+        purify_error_bookmarks = [];
+        
+        for b in data['failed_bookmark']:
+            
+            pass
+                    
         s = {
             'name': 'liubida',
             'new_user'    : data['new_user'],

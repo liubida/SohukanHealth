@@ -30,6 +30,7 @@ bshare = 'bshare'
 webapp = 'webapp'
 sohu_blog = 'sohu_blog'
 sohu_news = 'sohu_news'
+baidu = 'baidu'
 other = 'share'
     
 def share_channels(start_time):
@@ -64,6 +65,7 @@ def share_channels(start_time):
              webapp:{'count':0, 'object_key':[]},
              sohu_blog:{'count':0, 'object_key':[]},
              sohu_news:{'count':0, 'object_key':[]},
+             baidu:{'count':0, 'object_key':[]},
              other:{'count':0, 'object_key':[]}}
 
         for d in results:
@@ -83,6 +85,8 @@ def share_channels(start_time):
                     m[sohu_blog]['object_key'].append(object_key)
                 elif sohu_news == object_key['from']:
                     m[sohu_news]['object_key'].append(object_key)
+                elif baidu == object_key['from']:
+                    m[baidu]['object_key'].append(object_key)
                 else:
                     m[other]['object_key'].append(object_key)
         
@@ -285,16 +289,16 @@ def user_platform(start_time):
 if __name__ == '__main__':
     
     
-#    start = datetime.datetime(2012, 11, 16, 23, 52, 0)
 #    result = user_platform(start)
 #    print result
 
-    start = datetime.datetime(2012, 7, 21, 23, 52, 0)
+#    start = datetime.datetime(2012, 7, 21, 23, 52, 0)
+    start = datetime.datetime(2012, 11, 16, 23, 52, 0)
     step = datetime.timedelta(days=1)
     
     now = datetime.datetime.now()
     while start < now:
-        result = user_platform(start)
+        result = share_channels(start)
         if result:
             print "success -- ", start.strftime("%Y-%m-%d")
         start += step
