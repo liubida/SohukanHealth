@@ -218,7 +218,7 @@ def rabbitmq_queue_alarm_job():
                 if queue[q] is None or queue[q] >= 128:
                     error_q.append("%s:%s" % (q, queue[q]))
             else:
-                if queue[q] is None or queue[q] >= 64:
+                if queue[q] is None or queue[q] >= 32:
                     error_q.append("%s:%s" % (q, queue[q]))
         
         if error_q:
@@ -228,43 +228,6 @@ def rabbitmq_queue_alarm_job():
             sms(mobile_list=c.mobile_list, message_post=msg)
     except Exception, e:
         c.logger.error(e)
-    
-#    
-#    if failure_count >= c.read_alarm_time: 
-#        try:
-#            start_time = read_failure_data[0]['time']
-#            end_time = read_failure_data[failure_count - 1]['time']
-#            print start_time
-#            print end_time
-#            type = 'rabbitmq_queue'
-#            msg = 'read failure count:%s,%s' % (str(failure_count), datetime.datetime.now())
-#            sms(mobile_list=c.mobile_list, message_post=msg)
-#
-#            # 获取上一次的报警信息
-#            latest = SysAlarm.objects.filter(type=type).order_by('-gmt_create')
-#            if latest:
-#                latest = latest[0]
-#                # start_time是本次报警的开始时间
-#                # latest.end_time是上次报警的结束时间
-#                # 所有在算时间差的时候, start_time应该是时间差的end, latest.end_time应该是时间差的start
-#                tdiff = timediff(latest.end_time, start_time)
-#                if (not latest) or start_time > latest.end_time and tdiff > 600:
-#                    # 一次新的故障
-#                    alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
-#                    alarm.save()
-#                else:
-#                    # 添加-报警的定时任务是每10min执行一次, 如果本次报警的时间和上次开始的时间<10min, 则认为是同一次故障
-#                    # 同一次故障的持续报警, 只需修改上次的结束时间即可
-#                    latest.end_time = end_time
-#                    latest.save()
-#            else:
-#                # 以前没有过这样类型的故障
-#                alarm = SysAlarm(type=type, start_time=start_time, end_time=end_time)
-#                alarm.save()
-#        except Exception, e:
-#            c.logger.error(e)
-#            c.logger.error(msg)
-#            print msg
         
 @print_info(name='day_report_job')
 def day_report_job(now=None):
