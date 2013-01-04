@@ -337,7 +337,7 @@ def day_report_date(request):
     time_array = Report.objects.filter(type='day').values('time')
     
     day_array = []
-    day_format = "%m-%d"
+    day_format = "%Y-%m-%d"
     for t in time_array:
         day_array.append(t['time'].strftime(day_format))
 

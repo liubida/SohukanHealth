@@ -15,8 +15,7 @@ var prepare_day_report = function() {
 					a.setAttribute('href', data[i]);
 					a.setAttribute('title', data[i]);
 					a.className = 'pageNum';
-
-					var day_str = '2012-' + data[i];
+                    var day_str = data[i];
 	(function		(day_str) {
 						a.onclick = function() {
 							var date_div = document
@@ -56,7 +55,9 @@ var prepare_day_report = function() {
 						};
 					})(day_str)
 
-					var a_text = document.createTextNode(data[i]);
+				    var tmp_str = data[i].split("-");
+                    var display_str = tmp_str[1] + '-' + tmp_str[2];
+					var a_text = document.createTextNode(display_str);
 					a.appendChild(a_text);
 					div_date.appendChild(a);
 				}
@@ -66,10 +67,15 @@ var prepare_day_report = function() {
 				// 获取昨天的日期
 				now.setDate(now.getDate() - 1);
 				$('#day_report_date a').each(function() {
-							var month = this.id.split("-")[0]
-							var day = this.id.split("-")[1]
-							if (now.getMonth() + 1 == month
-									&& now.getDate() == day) {
+                            var id_array = this.id.split("-")
+							var year = id_array[0]
+							var month = id_array[1]
+							var day = id_array[2]
+                            //alert(year+month+day)
+                            //alert(now.getFullYear())
+							if (now.getFullYear() == year && 
+                                now.getMonth() + 1 == month &&
+								now.getDate() == day) {
 								$('#' + this.id).click();
 							}
 						});
