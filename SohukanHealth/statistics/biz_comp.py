@@ -139,7 +139,7 @@ def get_share_channels(start_time, end_time, data_grain='day'):
 if __name__ == '__main__':
 #    start_time = datetime.datetime(2012, 11, 9, 0, 0, 0)
 #    end_time = datetime.datetime(2012, 11, 11, 23, 59, 59)
-    b = get_share_channels('2012-10-30 00:00:00', '2012-11-13 23:59:59', data_grain='month')
+    b = get_share_channels('2013-01-01 00:00:00', '2013-01-03 23:59:59', data_grain='day')
     print b
 #    b = get_bookmark_website_for_user_raw_data(start_time,end_time)
 #    print b
