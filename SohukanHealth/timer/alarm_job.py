@@ -66,11 +66,11 @@ def nginx_tcp_check_job(count=3):
 def web_alarm_job():
     kan_url = 'http://kan.sohu.com/'
     reader_url = 'http://kan.sohu.com/reader/'
-    MAX_ALARM_COUNT = 3
+    MAX_ALARM_COUNT = 8
     
     now = datetime.datetime.now()
     now_str = datetime.datetime.strftime(now, '%Y-%m-%d %H:%M:%S')
-    if now.minute == 7:
+    if int(now.hour) % 2 == 0:
         c.redis_instance.delete(c.web_alarm_key)
 
     #if count <= 0 :
