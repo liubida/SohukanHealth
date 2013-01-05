@@ -99,7 +99,7 @@ def left_seconds(time, mod=5):
     sec = time.second
     return (mod - 1 - min % mod) * 60 + (60 - sec)
           
-def from_file(filename):
+def read_file(filename):
     if not filename:
         return None
     

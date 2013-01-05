@@ -58,9 +58,11 @@ class Config:
     read_alarm_time = 2
     # 报警: ngxin_tcp_check 的报警次数
     max_nginx_tcp_alarm = 4
-    # 报警次数在redis中的key
+    # nginx_tcp_alarm, 报警次数在redis中的key
     nginx_tcp_alarm_key = 'nginx_tcp_alarm_key'
-
+    # web_alarm, 报警次数在redis中的key
+    web_alarm_key = 'web_alarm_key'
+    
     bucket_name = 'sohukan'
     expires_seconds = 300
     

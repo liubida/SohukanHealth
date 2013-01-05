@@ -16,7 +16,7 @@ setup_environ(settings)
 from job import add_job, read_job, user_total_job, \
     bookmark_total_job, add_alarm_job, read_alarm_job, day_report_job, week_report_job, fix_ua_job, \
     rabbitmq_queue_alarm_job, day_aggregation_job
-from alarm_job import nginx_tcp_check_job
+from alarm_job import nginx_tcp_check_job, web_alarm_job
 
 
 if __name__ == '__main__':
@@ -35,7 +35,9 @@ if __name__ == '__main__':
         elif method_name == 'fix_ua_job' : fix_ua_job()
         elif method_name == 'rabbitmq_queue_alarm_job' : rabbitmq_queue_alarm_job()
         elif method_name == 'day_aggregation_job' : day_aggregation_job()
-        elif method_name == 'nginx_tcp_check_job' : nginx_tcp_check_job()
+        elif method_name == 'web_alarm_job' : web_alarm_job()
+        #elif method_name == 'nginx_tcp_check_job' : nginx_tcp_check_job()
+        
         else: pass
 
 # */5  *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py add_job
@@ -50,4 +52,5 @@ if __name__ == '__main__':
 # */14 *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py rabbitmq_queue_alarm_job
 # 52   23   *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py day_aggregation_job
 # */3  *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py nginx_tcp_check_job
+# */3  *    *  *  *   sohukan  python /home/sohukan/SohukanHealth/SohukanHealth/timer/JobSchedule.py web_alarm_job
 

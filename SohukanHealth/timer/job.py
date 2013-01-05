@@ -23,9 +23,8 @@ from statistics.biz import get_userdata_for_day_report, get_bookmark_website, ge
     get_bookmarkdata_for_day_report, get_bookmark_percent_raw_data, _is_test, get_week_report_add_way_and_platform
 from statistics.models import Report, UA
 from timer.sms import sms
-from util import print_info, query_ua, timediff, from_file, get_date_and_time
+from util import print_info, query_ua, timediff, read_file, get_date_and_time
 from util.random_spider import RandomSpider
-import re
 import MySQLdb
 import anyjson
 import datetime
@@ -196,7 +195,7 @@ def rabbitmq_queue_alarm_job():
              'encode': None, 'entry': None, 'store': None}
     try:
         # lines should be only one row
-        lines = from_file("/tmp/rabbitmq_queue.o")
+        lines = read_file("/tmp/rabbitmq_queue.o")
         if not lines:
             c.logger.error("/tmp/rabbitmq_queue.o is blank")
             
