@@ -63,32 +63,33 @@ def nginx_tcp_check_job(count=3):
         
 
 @print_info(name='web_alarm_job')
-def web_alarm_job(count=3):
+def web_alarm_job():
     kan_url = 'http://kan.sohu.com/'
     reader_url = 'http://kan.sohu.com/reader/'
     MAX_ALARM_COUNT = 3
     
     now = datetime.datetime.now()
     now_str = datetime.datetime.strftime(now, '%Y-%m-%d %H:%M:%S')
-    if now.hour == 7:
+    if now.minute == 7:
         c.redis_instance.delete(c.web_alarm_key)
 
-    if count <= 0 :
-        c.logger.error(now_str + ' web_check retry 3 times')
-        sms(mobile_list=c.mobile_list, message_post='web_check retry 3 times')
-        return
+    #if count <= 0 :
+    #    c.logger.error(now_str + ' web_check retry 3 times')
+    #    sms(mobile_list=c.mobile_list, message_post='web_check retry 3 times')
+    #    return
     
     need_alarm = False
     msg = ''
     msg_kan = 'kan is error'
     msg_reader = 'reader is error'
+    msg_exception = 'checking kan/reader throws exception'
     try:
-        r = requests.get(kan_url, timeout=3)
+        r = requests.get(kan_url, timeout=8)
         if r.status_code != 200:
             need_alarm = True
             msg = '[%s]%s' % (now_str, msg_kan)
         
-        r = requests.get(reader_url, timeout=3)
+        r = requests.get(reader_url, timeout=8)
         if r.status_code != 200:
             need_alarm = True
             if msg:
@@ -98,14 +99,13 @@ def web_alarm_job(count=3):
     except Exception, e:
         now = datetime.datetime.now()
         c.logger.error('%s %s' % (str(datetime.datetime.strftime(now, '%Y-%m-%d %H:%M:%S')), str(e)))
-        count = count - 1
-        web_alarm_job(count);
-    else:
-        if need_alarm:
-            s = c.redis_instance.incr(c.web_alarm_key)
-            if s <= MAX_ALARM_COUNT:
-                sms(mobile_list=c.mobile_list, message_post=msg)
-            c.logger.error('%s %s' % (str(datetime.datetime.strftime(now, '%Y-%m-%d %H:%M:%S')), msg))
+        need_alarm = True
+        msg = '[%s]%s' % (now_str, msg_exception)
+    if need_alarm:
+        s = c.redis_instance.incr(c.web_alarm_key)
+        if s <= MAX_ALARM_COUNT:
+            sms(mobile_list=c.mobile_list, message_post=msg)
+        c.logger.error('%s %s' % (str(datetime.datetime.strftime(now, '%Y-%m-%d %H:%M:%S')), msg))
         
 if __name__ == '__main__':
     nginx_tcp_check_job()
