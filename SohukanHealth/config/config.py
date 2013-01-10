@@ -78,6 +78,7 @@ class Config:
     # 测试账户的access_token
     # cookie = ["Cookie", "access_token = 0381d220305f5acc8dab9a2ab9692a9d09be5e1d"]
     cookie = ["Cookie", "access_token = eeeb8e686a2a148de62b2352ea88b9c6d4b8bd24"]
+    #cookie = ["Cookie", "access_token = be5ea9377ef8ccb813b1c8cfa6cfea676aaf5676"]
 
     db_config = {'host':'10.10.58.17', 'port':3306, 'user':'sohupocketlib', 'passwd':'SejJGGk2', 'db':'sohupocketlib'}
     db_self_config = {'host':'10.10.69.53', 'port':3306, 'user':'sohukan', 'passwd':'sohukan', 'db':'sohukanhealth'}
@@ -125,7 +126,7 @@ class ConfigFactory:
         else:
             return None
         
-        config.do() 
+        config.do()
         return config
 
 c = ConfigFactory().getConfig()

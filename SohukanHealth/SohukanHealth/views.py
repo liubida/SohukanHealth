@@ -8,7 +8,11 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.template import loader
 from django.template.context import Context
+
+from timer.job import add_job, read_job
+
 import random
+import json
 
 @login_required
 def index(request):
@@ -33,3 +37,26 @@ def logtest(request):
         c.logger.error("SohukanHealth logtest error")
     return HttpResponse("hehe")        
 
+def add_job_monitor(request):
+    value = add_job()
+    print '2: ', value
+    if value['result'] == True:
+        code = 200
+        message = 'Add is OK!'
+    else:
+        code = 202
+        message = 'Add job is error!!! Reason:' + value['comments']
+    res = {'code': code, 'message': message}
+    return HttpResponse(json.dumps(res))
+
+def read_job_monitor(request):
+    value = read_job()
+    print '2: ', value
+    if value['result'] == True:
+        code = 200
+        message = 'Read is OK!'
+    else:
+        code = 202
+        message = 'Read job is error!!! Reason:' + value['comments']
+    res = {'code': code, 'message': message}
+    return HttpResponse(json.dumps(res))

@@ -30,7 +30,7 @@ import anyjson
 import datetime
 
 
-@print_info(name='read_job')
+#@print_info(name='read_job')
 def read_job():
     value = read_worker(c.cookie).test()
     data = AppAvailableData(name='read', category='', result=value.get('result', False), \
@@ -39,7 +39,7 @@ def read_job():
     data.save()
     return value
 
-@print_info(name='add_job')
+#@print_info(name='add_job')
 def add_job():
     url = RandomSpider().get_valid_url()
     value = add_worker(url, c.cookie).test()
@@ -47,6 +47,7 @@ def add_job():
                             time=datetime.datetime.now(), time_used=value.get('time_used', c.add_time_limit), \
                             comments=value.get('comments', url))
     data.save()
+    print '1:', value
     return value
 
 @print_info(name='user_total_job')
@@ -340,16 +341,18 @@ def day_aggregation_job(start_time=datetime.datetime.now()):
 if __name__ == '__main__':
     #add_job()
     #exit
-    start = datetime.datetime(2012, 12, 21, 6, 52, 0)
+#    start = datetime.datetime(2012, 12, 21, 6, 52, 0)
 #    start = datetime.datetime(2012, 11, 16, 6, 58, 0)
-    step = datetime.timedelta(days=1)
+#    step = datetime.timedelta(days=1)
 #    
-    now = datetime.datetime.now()
-    while start <= now:
+#    now = datetime.datetime.now()
+#    while start <= now:
         #day_aggregation_job(start)
         #day_report_job(start)
-        week_report_job(start)
-        start += step
+#        week_report_job(start)
+#        start += step
+
+    add_job_monitor()
 
 #    rabbitmq_queue_alarm_job()
 #    bookmark_total_job()
