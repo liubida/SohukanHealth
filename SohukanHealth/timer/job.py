@@ -50,7 +50,7 @@ def add_job():
     return value
 
 @print_info(name='user_total_job')
-def user_total_job():
+def user_total_job(now=None):
     try:
         # TODO: there should be a dbhelper
         conn = MySQLdb.connect(**c.db_config)
@@ -59,9 +59,17 @@ def user_total_job():
         #去掉测试用户的id
         tmp = ' where id !='
         tmp += ' and id !='.join(map(lambda x:str(x), c.test_id))
-        cursor.execute('select count(*) from account_user %s' % tmp)
+        
+        # 今天
+        if not now:
+            now = datetime.datetime.now()
+        now_str = now.strftime('%Y-%m-%d %H:%M:%S')
+        
+        sql = "select count(*) from account_user %s and (gmt_create is null or gmt_create <='%s')" % (tmp, now_str)
+        print sql
+        cursor.execute(sql)
         result = cursor.fetchone()
-        now = datetime.datetime.now()
+        
         data = SomeTotal(name='user', time=now, count=result[0])
         data.save()
         return result[0]
@@ -79,14 +87,21 @@ def user_total_job():
                 conn.close()
 
 @print_info(name='bookmark_total_job')
-def bookmark_total_job():
+def bookmark_total_job(now=None):
     try:
         conn = MySQLdb.connect(**c.db_config)
         cursor = conn.cursor()
+        
+        # 今天
+        if not now:
+            now = datetime.datetime.now()
+        now_str = now.strftime('%Y-%m-%d %H:%M:%S')
+        
         remove_guide = " url not regexp '^http://kan.sohu.com/help/guide-' "
         sum = 0
         for i in range(64):
-            sql = "select user_id, count(*) from bookmark_bookmark_%s where %s group by user_id" % (i, remove_guide)
+            sql = "select user_id, count(*) from bookmark_bookmark_%s where %s and \
+            (gmt_create is null or gmt_create <= '%s') group by user_id" % (i, remove_guide, now_str)
             cursor.execute (sql)
             results = cursor.fetchall()
             for d in results:
@@ -338,32 +353,22 @@ def day_aggregation_job(start_time=datetime.datetime.now()):
         c.logger.error(e)
         
 if __name__ == '__main__':
-    #add_job()
-    #exit
-    start = datetime.datetime(2012, 12, 21, 6, 52, 0)
-#    start = datetime.datetime(2012, 11, 16, 6, 58, 0)
-    step = datetime.timedelta(days=1)
-#    
-    now = datetime.datetime.now()
-    while start <= now:
-        #day_aggregation_job(start)
-        #day_report_job(start)
-        week_report_job(start)
-        start += step
+    pass
 
-#    rabbitmq_queue_alarm_job()
-#    bookmark_total_job()
-    #start = datetime.date(2012, 11, 12)
-    #week_report_job(start)
-#    add_job()
-#    start = datetime.date(2012, 7, 13)
-#    today = datetime.date.today()
+    # 重新跑 total 的数据
+#    start = datetime.datetime(2013, 1, 9, 23, 59, 59)
+#    print start
+#    user_total_job(start);
+#    bookmark_total_job(start);
+
+
+    # 重新跑 聚合/日报/周报 的数据
+#    start = datetime.datetime(2013, 1, 9, 23, 59, 59)
 #    step = datetime.timedelta(days=1)
-#
-#    while start <= today:
+#    
+#    now = datetime.datetime.now()
+#    while start <= now:
+#        day_aggregation_job(start)
+#        day_report_job(start)
 #        week_report_job(start)
 #        start += step
-#    start = datetime.datetime(2012, 8, 25, 23, 58, 0)
-#    bookmark_total_job()
-#    week_report_job()
-    
