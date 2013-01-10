@@ -84,12 +84,12 @@ def web_alarm_job():
     msg_reader = 'reader is error'
     msg_exception = 'checking kan/reader throws exception'
     try:
-        r = requests.get(kan_url, timeout=8)
+        r = requests.get(kan_url, timeout=60)
         if r.status_code != 200:
             need_alarm = True
             msg = '[%s]%s' % (now_str, msg_kan)
         
-        r = requests.get(reader_url, timeout=8)
+        r = requests.get(reader_url, timeout=60)
         if r.status_code != 200:
             need_alarm = True
             if msg:
