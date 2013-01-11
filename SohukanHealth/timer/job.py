@@ -354,7 +354,7 @@ def day_aggregation_job(start_time=datetime.datetime.now()):
         c.logger.error(e)
         
 if __name__ == '__main__':
-<<<<<<< HEAD
+#<<<<<<< HEAD
     #add_job()
     #exit
 #    start = datetime.datetime(2012, 12, 21, 6, 52, 0)
@@ -368,8 +368,8 @@ if __name__ == '__main__':
 #        week_report_job(start)
 #        start += step
 
-    add_job_monitor()
-=======
+#    add_job_monitor()
+#=======
     pass
 
     # 重新跑 total 的数据
@@ -378,7 +378,7 @@ if __name__ == '__main__':
 #    user_total_job(start);
 #    bookmark_total_job(start);
 
->>>>>>> cb9203f53cf9b4eb891fbbcccb0c102e54784cae
+#>>>>>>> cb9203f53cf9b4eb891fbbcccb0c102e54784cae
 
     # 重新跑 聚合/日报/周报 的数据
 #    start = datetime.datetime(2013, 1, 9, 23, 59, 59)

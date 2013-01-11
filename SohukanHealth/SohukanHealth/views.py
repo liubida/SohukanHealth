@@ -10,9 +10,11 @@ from django.template import loader
 from django.template.context import Context
 
 from timer.job import add_job, read_job
+from timer.alarm_job import web_alarm_job
 
 import random
 import json
+import urllib
 
 @login_required
 def index(request):
@@ -51,12 +53,44 @@ def add_job_monitor(request):
 
 def read_job_monitor(request):
     value = read_job()
-    print '2: ', value
     if value['result'] == True:
         code = 200
         message = 'Read is OK!'
     else:
         code = 202
         message = 'Read job is error!!! Reason:' + value['comments']
+    res = {'code': code, 'message': message}
+    return HttpResponse(json.dumps(res))
+
+def web_job_monitor(request):
+    code = 200
+    kanMess = 'OK!'
+    readerMess = 'OK!'
+    message = 'Web site is OK!'
+    weburl = 'http://kan.sohu.com/'
+    readerurl = 'http://kan.sohu.com/reader/'
+    try:
+        kan = urllib.urlopen(weburl).read()
+        if(len(kan) < 1000):
+            kanMess = 'Web is Error!!!'
+            code = 202
+    except:
+        kanMess = 'Web is Error!!!'
+        code = 202
+    try:
+        reader = urllib.urlopen(readerurl).read()
+        if(len(reader) < 1000):
+            readerMess = 'Reader is Error!!!'
+            code = 202
+    except:
+        readerMess = 'Reader is Error!!!'
+        code = 202
+    if code == 202:
+        if kanMess == 'OK!':
+            message = readerMess
+        elif readerMess == 'OK!':
+            message = kanMess
+        else:
+            message = 'Web and Reader are both Error!!!'
     res = {'code': code, 'message': message}
     return HttpResponse(json.dumps(res))
