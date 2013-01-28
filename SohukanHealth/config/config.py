@@ -99,7 +99,7 @@ class DevConfig(Config):
     ha_nginx_check_url = 'http://10.11.6.175/status'
     
 class ProdConfig(Config):
-    mobile_list = '13476852610,18627839148,13545257885,13437104382,'
+    mobile_list = '13476852610,18627839148,13545257885,13437104382,15827399056'
     ha_nginx_check_url = 'http://10.11.6.175/status'
 
 class ConfigFactory:
