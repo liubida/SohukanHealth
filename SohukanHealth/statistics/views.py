@@ -592,6 +592,48 @@ def test(start_time, end_time, data_grain='day'):
         delta = datetime.timedelta(weeks=4)
         data['list'] = get_data_interval(raw_data, delta)
     
+@login_required
+def bookmark_shorturl(request):
+    start_time = request.GET.get('start_time', c.MIN_TIME)
+    end_time = request.GET.get('end_time', c.MAX_TIME)
+    data_grain = request.GET.get('data_grain', 'day')
+    data_grain = data_grain if data_grain else 'day'
+    
+    if start_time == 'NaN-aN-aN aN:aN:aN': 
+        start_time = c.MIN_TIME
+    if end_time == 'NaN-aN-aN aN:aN:aN': 
+        end_time = c.MAX_TIME
+
+    data = {'list':[]}
+    raw_data = SomeTotal.objects.filter(name='shorturl', time__gte=start_time, time__lte=end_time).values('time', 'count')
+    
+    if data_grain == 'hour':
+        for d in raw_data:
+            data['list'].append({'time':d['time'].strftime('%m-%d %H:%M:%S'), 'count':d['count']})
+    elif data_grain == 'day':
+        delta = datetime.timedelta(days=1)
+        # 每天取一个23点的数据
+        data['list'] = get_data_interval(raw_data, delta)
+    elif data_grain == 'week':
+        # 每隔7天取一个23点的数据
+        delta = datetime.timedelta(days=7)
+        data['list'] = get_data_interval(raw_data, delta)
+    elif data_grain == 'month':
+        # 每隔4周天取一个23点的数据
+        delta = datetime.timedelta(weeks=4)
+        data['list'] = get_data_interval(raw_data, delta)
+
+    # 计算data的增长率
+    add_inc_for_data(data)
+    
+    response = HttpResponse(anyjson.dumps(data))
+    # 缓存一天, 也只能缓存一天
+    # 因为start_time和end_time可能是NA, 那么一天之后, 这个NA的数据实际上是会发生变化的.
+    now = datetime.datetime.now()
+    expire = now + datetime.timedelta(days=1)
+    response['Expires'] = expire.strftime('%a, %d %b %Y 01:00:00 %Z')
+    return response
+
 if __name__ == '__main__':
     test('NaN-aN-aN aN:aN:aN', 'NaN-aN-aN aN:aN:aN', 'week')
 #    test('2012-07-12', '2012-07-17')

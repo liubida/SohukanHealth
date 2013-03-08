@@ -30,6 +30,7 @@ if __name__ == '__main__':
         elif method_name == 'read_alarm_job': read_alarm_job()
         elif method_name == 'user_total_job': user_total_job()
         elif method_name == 'bookmark_total_job': bookmark_total_job()
+        elif method_name == 'shorturl_total_job': shorturl_total_job()
         elif method_name == 'day_report_job': day_report_job()
         elif method_name == 'week_report_job': week_report_job()
         elif method_name == 'fix_ua_job' : fix_ua_job()

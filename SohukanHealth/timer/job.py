@@ -87,6 +87,39 @@ def user_total_job(now=None):
             if conn:
                 conn.close()
 
+@print_info(name='shorturl_total_job')
+def shorturl_total_job(now=None):
+    try:
+        # TODO: there should be a dbhelper
+        conn = MySQLdb.connect(**c.db_config)
+        cursor = conn.cursor()
+
+        # 今天
+        if not now:
+            now = datetime.datetime.now()
+        now_str = now.strftime('%Y-%m-%d %H:%M:%S')
+        
+        sql = "select count(*) from stats_oper o, stats_opertype t where o.oper_type_id = t.id and t.path = '/j/'"
+        print sql
+        cursor.execute(sql)
+        result = cursor.fetchone()
+        
+        data = SomeTotal(name='shorturl', time=now, count=result[0])
+        data.save()
+        return result[0]
+    except Exception, e:
+        c.logger.error(e)
+        return str(e)
+    finally:
+        try:
+            if cursor:
+                cursor.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()
+
 @print_info(name='bookmark_total_job')
 def bookmark_total_job(now=None):
     try:
