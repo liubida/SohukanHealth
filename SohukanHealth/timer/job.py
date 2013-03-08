@@ -91,7 +91,7 @@ def user_total_job(now=None):
 def shorturl_total_job(now=None):
     try:
         # TODO: there should be a dbhelper
-        conn = MySQLdb.connect(**c.db_config)
+        conn = MySQLdb.connect(**c.db_self_config)
         cursor = conn.cursor()
 
         # 今天
