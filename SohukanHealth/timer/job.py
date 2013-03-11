@@ -121,7 +121,7 @@ def shorturl_total_job(now=None):
                 conn.close()
 
 @print_info(name='set_public_total_job')
-def set_pulbic__total_job(now=None):
+def set_pulbic_total_job(now=None):
     try:
         # TODO: there should be a dbhelper
         conn = MySQLdb.connect(**c.db_self_config)
