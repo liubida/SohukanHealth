@@ -137,7 +137,7 @@ def set_public_total_job(now=None):
         cursor.execute(sql)
         result = cursor.fetchone()
         
-        data = SomeTotal(name='shorturl', time=now, count=result[0])
+        data = SomeTotal(name='set-public', time=now, count=result[0])
         data.save()
         return result[0]
     except Exception, e:
