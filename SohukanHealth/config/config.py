@@ -48,6 +48,10 @@ class Config:
     SHARE_CHANNEL_MIN_TIME = '2012-10-24 13:50:00'
     #  share_channel查询的最大时间
     SHARE_CHANNEL_MAX_TIME = MAX_TIME
+    #  public_client查询的最小时间, 因为这个功能2013-03-11才上线
+    PUBLIC_CLIENT_MIN_TIME = '2013-03-11 13:50:00'
+    #  public_client查询的最大时间
+    PUBLIC_CLIENT_MAX_TIME = MAX_TIME
     # 监控: 添加文章时限
     add_time_limit = 120
     # 报警: 添加文章失败次数上限

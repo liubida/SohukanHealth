@@ -11,7 +11,7 @@ from statistics.biz import get_bookmark_per_user, get_bookmark_time, \
     get_bookmark_percent, get_data_interval, add_inc_for_data, get_activate_user, \
     get_bookmark_website, get_user_platform, _get_week_list, \
     get_bookmark_website_for_user, get_bookmark_website_detail
-from statistics.biz_comp import get_share_channels
+from statistics.biz_comp import get_share_channels, get_public_client
 from statistics.models import Report
 from util import get_week_num, http_conditions
 import anyjson
@@ -131,6 +131,29 @@ def share_channels(request):
     data = get_share_channels(start_time, end_time, data_grain)
     response = HttpResponse(anyjson.dumps(data))
     
+    # 缓存一天, 也只能缓存一天
+    # 因为start_time和end_time可能是NA, 那么一天之后, 这个NA的数据实际上是会发生变化的.
+    now = datetime.datetime.now()
+    expire = now + datetime.timedelta(days=1)
+    response['Expires'] = expire.strftime('%a, %d %b %Y 01:00:00 %Z')
+    return response
+
+# 综合 客户端分享统计
+@login_required
+def public_client(request):
+    start_time = request.GET.get('start_time', c.SHARE_CHANNEL_MIN_TIME)
+    end_time = request.GET.get('end_time', datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    data_grain = request.GET.get('data_grain', 'day')
+    data_grain = data_grain if data_grain else 'day'
+    
+    if start_time == 'NaN-aN-aN aN:aN:aN': 
+        start_time = c.SHARE_CHANNEL_MIN_TIME
+    if end_time == 'NaN-aN-aN aN:aN:aN': 
+        end_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    data = get_public_client(start_time, end_time, data_grain)
+    response = HttpResponse(anyjson.dumps(data))
+
     # 缓存一天, 也只能缓存一天
     # 因为start_time和end_time可能是NA, 那么一天之后, 这个NA的数据实际上是会发生变化的.
     now = datetime.datetime.now()
@@ -647,7 +670,7 @@ def bookmark_set_public(request):
         end_time = c.MAX_TIME
 
     data = {'list':[]}
-    raw_data = SomeTotal.objects.filter(name='set_public', time__gte=start_time, time__lte=end_time).values('time', 'count')
+    raw_data = SomeTotal.objects.filter(name='set-public', time__gte=start_time, time__lte=end_time).values('time', 'count')
     
     if data_grain == 'hour':
         for d in raw_data:

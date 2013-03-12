@@ -5,7 +5,7 @@ Created on Oct 31, 2012
 @author: liubida
 '''
 
-from SohukanHealth.aggregation import bshare, jiathis, other, webapp, sohu_blog, sohu_news, baidu
+from SohukanHealth.aggregation import bshare, jiathis, other, webapp, sohu_blog, sohu_news, baidu, iPhone, iPad, android, unknown
 from statistics.models import Aggregation
 import anyjson
 import datetime
@@ -134,6 +134,106 @@ def get_share_channels(start_time, end_time, data_grain='day'):
                 middle[baidu] = 0
                 middle[other] = 0                            
             cur += step
+    return ret
+
+def get_public_client(start_time, end_time, data_grain='day'):
+    '''start_time, end_time is string'''
+    raw_data = Aggregation.objects.filter(type='public_client', time__gte=start_time, time__lte=end_time).values('time', 'content')
+
+    data = {}
+    for d in raw_data:
+        data[d['time'].strftime("%Y-%m-%d")] = anyjson.loads(d['content'])
+
+    ret = []
+    start = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
+    end = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S")
+    cur = start
+    if data_grain == 'day':
+        step = datetime.timedelta(days=1)
+        while cur <= end:
+            key = cur.strftime("%Y-%m-%d")
+            if key in data.keys():
+                ret.append({'time': cur.strftime("%m-%d"),
+                            iPhone:data[key][iPhone]['count'],
+                            iPad:data[key][iPad]['count'],
+                            android:data[key][android]['count'],
+                            unknown:data[key][unknown]['count']})
+            else:
+                if cur.date() == end.date():
+                    break;
+                else:
+                    cur += step
+                    continue;
+            cur += step
+    elif data_grain == 'week':
+        step = datetime.timedelta(days=1)
+        middle = {iPhone:0, iPad:0,  android:0, unknown:0}
+        
+        while cur <= end:
+            key = cur.strftime("%Y-%m-%d")
+            if key not in data.keys():
+                if cur.date() == end.date():
+                    ret.append({'time': (cur-step).strftime("%m-%d"),
+                                iPhone:middle[iPhone],
+                                iPad:middle[iPad],
+                                android:middle[android],
+                                unknown:middle[unknown]})
+                    break;
+                else:
+                    cur += step
+                    continue;
+                
+            middle[iPhone] += data[key][iPhone]['count']
+            middle[iPad] += data[key][iPad]['count']
+            middle[android] += data[key][android]['count']
+            middle[unknown] += data[key][unknown]['count']
+            
+            if cur.weekday() == 6 or cur.date() == end.date():
+                # 这一天是周日
+                ret.append({'time': cur.strftime("%m-%d"),
+                            iPhone:middle[iPhone],
+                            iPad:middle[iPad],
+                            android:middle[android],
+                            unknown:middle[unknown]})
+                middle[iPhone] = 0
+                middle[iPad] = 0
+                middle[android] = 0
+                middle[unknown] = 0 
+            cur += step
+    elif data_grain == 'month':
+        step = datetime.timedelta(days=1)
+        middle = {iPhone:0, iPad:0,  android:0, unknown:0}
+        
+        while cur <= end:
+            key = cur.strftime("%Y-%m-%d")
+            if key not in data.keys():
+                if cur.date() == end.date():
+                    ret.append({'time': (cur-step).strftime("%m-%d"),
+                            iPhone:middle[iPhone],
+                            iPad:middle[iPad],
+                            android:middle[android],
+                            unknown:middle[unknown]})
+                    break;
+                else:
+                    cur += step
+                    continue;
+            middle[iPhone] += data[key][iPhone]['count']
+            middle[iPad] += data[key][iPad]['count']
+            middle[android] += data[key][android]['count']
+            middle[unknown] += data[key][unknown]['count']
+            
+            if (cur + step).month != cur.month or cur.date() == end.date():
+                ret.append({'time': cur.strftime("%Y-%m-%d"),
+                            iPhone:middle[iPhone],
+                            iPad:middle[iPad],
+                            android:middle[android],
+                            unknown:middle[unknown]})
+                middle[iPhone] = 0
+                middle[iPad] = 0
+                middle[android] = 0
+                middle[unknown] = 0 
+            cur += step
+    print ret
     return ret
 
 if __name__ == '__main__':

@@ -32,7 +32,12 @@ sohu_blog = 'sohu_blog'
 sohu_news = 'sohu_news'
 baidu = 'baidu'
 other = 'share'
-    
+
+iPhone = 'iPhone'
+iPad = 'iPad'
+android = 'android'
+unknown = 'unknown'
+
 def share_channels(start_time):
     '''为[收藏渠道统计]聚合数据
     '''
@@ -95,6 +100,53 @@ def share_channels(start_time):
                 m[k]['count'] = len(m[k]['object_key'])
                 
         data = Aggregation(type='share_channels', time=start_time.date(), content=anyjson.dumps(m))
+        data.save()
+    except Exception, e:
+        c.logger.error(e)
+        raise e
+    finally:
+        try:
+            if cursor:
+                cursor.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()
+
+
+def public_client(start_time):
+    '''为[收藏渠道统计]聚合数据
+    '''
+    
+    start_time = start_time.replace(hour=0, minute=0, second=0)
+    step = datetime.timedelta(days=1)
+    end_time = start_time + step
+    
+    try:
+        conn = MySQLdb.connect(**c.db_self_config)
+        cursor = conn.cursor()
+        
+        sql = '''select o.object_key from stats_oper s, stats_operobject o, stats_opertype t 
+                    where s.oper_type_id=t.id and s.id=o.oper_id and (t.id=64 or t.id=65 or t.id=67) 
+                    and o.gmt_create >= '%s' and o.gmt_create < '%s';''' % (start_time, end_time)
+        cursor.execute(sql)
+        results = cursor.fetchall()
+
+        m = {'time':datetime.datetime.strftime(start_time, "%Y-%m-%d"),
+             iPhone:{'count': 0},
+             iPad:{'count': 0},
+             android:{'count': 0},
+             unknown:{'count': 0}}
+
+        for d in results:
+            object_key = anyjson.loads(d[0])
+            if object_key.has_key('client_type'):
+                m[object_key['client_type']]['count'] += 1
+            else:
+                m[unknown]['count'] += 1
+             
+        data = Aggregation(type='public_client', time=start_time.date(), content=anyjson.dumps(m))
         data.save()
     except Exception, e:
         c.logger.error(e)

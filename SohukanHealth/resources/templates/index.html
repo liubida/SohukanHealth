@@ -1,6 +1,8 @@
 {% extends "base.html" %} {% block title %} 综合页面 {% endblock %} {%block js %}
 <link rel="stylesheet" href="/static/css/style.css" type="text/css">
 <script type="text/javascript" src="/static/js/statistics/user_total.js"></script>
+<script type="text/javascript" src="/static/js/statistics/shorturl_total.js"></script>
+<script type="text/javascript" src="/static/js/statistics/set_public_total.js"></script>
 <script type="text/javascript"
 	src="/static/js/statistics/bookmark_total.js"></script>
 <script type="text/javascript" src="/static/js/monitor/monitor.js"></script>
@@ -26,6 +28,18 @@
 <div
 	style="float: left; width: 520px; height: 325px; margin: 5px 10px 15px 10px;">
 	<div id="read_div" style="width: 98%; height: 95%; margin: 2px;"></div>
+</div>
+
+<div
+	style="float: left; width: 520px; height: 325px; margin: 5px 10px 15px 10px;">
+	<div id="statistics_shorturl_total"
+		style="width: 98%; height: 95%; margin: 2px;"></div>
+</div>
+
+<div
+	style="float: left; width: 520px; height: 325px; margin: 5px 10px 15px 10px;">
+	<div id="statistics_set_public_total"
+		style="width: 98%; height: 95%; margin: 2px;"></div>
 </div>
 
 {% endblock %}
