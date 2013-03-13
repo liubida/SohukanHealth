@@ -186,6 +186,39 @@ def bookmark_email_job(now=None):
             if conn:
                 conn.close()
 
+@print_info(name='fiction_total_job')
+def fiction_total_job(now=None):
+    try:
+        # TODO: there should be a dbhelper
+        conn = MySQLdb.connect(**c.db_self_config)
+        cursor = conn.cursor()
+
+        # 今天
+        if not now:
+            now = datetime.datetime.now()
+        now_str = now.strftime('%Y-%m-%d %H:%M:%S')
+        
+        sql = "select count(*) from stats_oper s, stats_operobject o, stats_opertype t where s.oper_type_id=t.id and s.id=o.oper_id and (t.id=74)"
+        print sql
+        cursor.execute(sql)
+        result = cursor.fetchone()
+        
+        data = SomeTotal(name='fiction', time=now, count=result[0])
+        data.save()
+        return result[0]
+    except Exception, e:
+        c.logger.error(e)
+        return str(e)
+    finally:
+        try:
+            if cursor:
+                cursor.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()
+
 @print_info(name='bookmark_total_job')
 def bookmark_total_job(now=None):
     try:
@@ -212,6 +245,45 @@ def bookmark_total_job(now=None):
                     sum += count
         now = datetime.datetime.now()
         data = SomeTotal(name='bookmark', time=now, count=sum)
+        data.save()
+        return sum
+    except Exception, e:
+        c.logger.error(e)
+        return str(e)
+    finally:
+        try:
+            if cursor:
+                cursor.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()
+
+@print_info(name='fiction_total_job')
+def fiction_total_job(now=None):
+    try:
+        conn = MySQLdb.connect(**c.db_config)
+        cursor = conn.cursor()
+        
+        # 今天
+        if not now:
+            now = datetime.datetime.now()
+        now_str = now.strftime('%Y-%m-%d %H:%M:%S')
+        
+        sum = 0
+        sql = "select user_id, count(*) from user_fiction_r where \
+            (gmt_create is null or gmt_create <= '%s') group by user_id" % (now_str)
+        cursor.execute (sql)
+        results = cursor.fetchall()
+        for d in results:
+            user_id = int(d[0])
+            count = int(d[1])
+            # 去掉测试用户添加的文章
+            if not _is_test(user_id):
+                sum += count
+        now = datetime.datetime.now()
+        data = SomeTotal(name='fiction', time=now, count=sum)
         data.save()
         return sum
     except Exception, e:
