@@ -65,7 +65,7 @@ var make_public_client_chart = function(chartData) {
 	graph.type = "column";
 	graph.lineAlpha = 0;
 	graph.fillAlphas = 1;
-	graph.lineColor = "#FCD202";
+	graph.lineColor = "#CD0D74";
 	chart.addGraph(graph);
 
 	// 4th graph
