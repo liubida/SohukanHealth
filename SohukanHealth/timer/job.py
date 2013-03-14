@@ -525,6 +525,13 @@ def day_aggregation_job(start_time=datetime.datetime.now()):
     except Exception, e:
         c.logger.error(e)
         
+@print_info(name='conversion')
+def conversion_job(start_time=datetime.datetime.now()):
+    try:
+        aggregation.conversion(start_time)
+    except Exception, e:
+        c.logger.error(e)
+        
 if __name__ == '__main__':
 #<<<<<<< HEAD
     #add_job()

@@ -40,6 +40,46 @@
 		</table>
 	</div>
 </div>
+<div class="clearfix" style="height: 420">
+	<div id="depth_conversion" class="statistics_div"></div>
+	<div style="padding-top: 60px">
+		<table id="table_conversion" class="table_1">
+			<tr>
+				<td colspan=2><strong>转化率</strong></td>
+			</tr>
+			<tr>
+				<td colspan=2><strong>此统计从2013-03-12开始</strong></td>
+			</tr>
+			<tr>
+				<td>开始时间:</td>
+				<td><input type="text" id="depth_conversion_from"
+					style="width: 120px" /><input type="submit" id="reset"
+					value="reset" /></td>
+			</tr>
+			<tr>
+				<td>结束时间:</td>
+				<td><input type="text" id="depth_conversion_to"
+					style="width: 120px" /></td>
+			</tr>
+			<!-- tr>
+				<td><input type="radio" name="bookmark_total_items" value="0"
+					checked="checked">默认</input></td>
+				<td><input type="radio" name="bookmark_total_items" value="1">增长率</input></td>
+			</tr> -->
+			<tr>
+				<td>数据粒度:</td>
+				<td><select id="data_grain">
+						<option value="day" selected='selected'>日</option>
+						<option value="week">周</option>
+				</select></td>
+			</tr>
+			<tr>
+				<td><input type="submit" id="conversion_submit" /></td>
+			</tr>
+		</table>
+	</div>
+</div>
+
 <div class="clearfix" style="height: 420px">
 	<div id="depth_bookmark_website" class="statistics_div"></div>
 	<div style="padding-top: 60px">
@@ -143,6 +183,8 @@
 {% endblock %} {% block js%}
 <script type="text/javascript"
 	src="/static/js/statistics/depth/activate_user.js"></script>
+<script type="text/javascript"
+	src="/static/js/statistics/depth/conversion.js"></script>
 <script type="text/javascript"
 	src="/static/js/statistics/depth/bookmark_website.js"></script>
 <script type="text/javascript"

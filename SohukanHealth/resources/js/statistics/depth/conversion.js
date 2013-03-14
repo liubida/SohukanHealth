@@ -1,5 +1,5 @@
-var make_public_client_chart = function(chartData) {
-	var e = document.getElementById('statistics_public_client');
+var make_conversion_chart = function(chartData) {
+	var e = document.getElementById('depth_conversion');
 	clearElement(e);
 
 	chart = new AmCharts.AmSerialChart();
@@ -34,10 +34,10 @@ var make_public_client_chart = function(chartData) {
 	// GRAPHS
 	// first graph
 	var graph = new AmCharts.AmGraph();
-	graph.title = "iPhone";
+	graph.title = "share";
 	graph.labelText = "[[value]]";
 	graph.balloonText = "[[value]] ([[percents]]%)";
-	graph.valueField = "iPhone";
+	graph.valueField = "share";
 	graph.type = "column";
 	graph.lineAlpha = 0;
 	graph.fillAlphas = 1;
@@ -46,38 +46,14 @@ var make_public_client_chart = function(chartData) {
 
 	// second graph
 	var graph = new AmCharts.AmGraph();
-	graph.title = "iPad";
+	graph.title = "plug-in";
 	graph.labelText = "[[value]]";
 	graph.balloonText = "[[value]] ([[percents]]%)";
-	graph.valueField = "iPad";
+	graph.valueField = "plug_in";
 	graph.type = "column";
 	graph.lineAlpha = 0;
 	graph.fillAlphas = 1;
 	graph.lineColor = "#FF9E01";
-	chart.addGraph(graph);
-
-	// third graph
-	var graph = new AmCharts.AmGraph();
-	graph.title = "android";
-	graph.labelText = "[[value]]";
-	graph.balloonText = "[[value]] ([[percents]]%)";
-	graph.valueField = "android";
-	graph.type = "column";
-	graph.lineAlpha = 0;
-	graph.fillAlphas = 1;
-	graph.lineColor = "#CD0D74";
-	chart.addGraph(graph);
-
-	// 4th graph
-	var graph = new AmCharts.AmGraph();
-	graph.title = "unknown";
-	graph.labelText = "[[value]]";
-	graph.balloonText = "[[value]] ([[percents]]%)";
-	graph.valueField = "unknown";
-	graph.type = "column";
-	graph.lineAlpha = 0;
-	graph.fillAlphas = 1;
-	graph.lineColor = "#0D8ECF";
 	chart.addGraph(graph);
 
 	// LEGEND
@@ -94,13 +70,13 @@ var make_public_client_chart = function(chartData) {
 	chart.write(e.getAttribute('id'));
 };
 
-var load_public_client = function(params, callback) {
-	url = '/statistics/bookmark/public_client';
+var load_conversion = function(params, callback) {
+	url = '/statistics/depth/conversion/';
 
 	var now = new Date();
-	var to = $("#statistics_public_client_to").val()
+	var to = $("#depth_conversion_to").val()
 	to = to || now.format('yyyy-MM-dd hh:mm:ss');
-	var from = $("#statistics_public_client_from").val()
+	var from = $("#depth_conversion_from").val()
 	tmp = now;
 	tmp.setMonth(2);
 	tmp.setDate(12);
@@ -108,7 +84,7 @@ var load_public_client = function(params, callback) {
 	from = from || tmp.format('yyyy-MM-dd hh:mm:ss');
 
 	var date_range = get_date_range(from, to);
-	var data_grain = $("#table_public_client #data_grain").val();
+	var data_grain = $("#table_conversion #data_grain").val();
 	// var radio_type = parseInt($("#table_activate_user :radio:checked").val(),
 	// 10);
 
@@ -118,7 +94,7 @@ var load_public_client = function(params, callback) {
 		data_grain : data_grain
 	};
 
-	var e = document.getElementById('statistics_public_client')
+	var e = document.getElementById('depth_conversion')
 	clearElement(e);
 	var loading = document.createElement('p')
 	var loading_text = document.createTextNode('数据加载中...')
@@ -132,48 +108,46 @@ var load_public_client = function(params, callback) {
 				for (var i = 0; i < len; i++) {
 					chartData.push({
                                 time : data[i].time,
-								iPhone : data[i].iPhone,
-								iPad : data[i].iPad,
-								android : data[i].android,
-                                unknown: data[i].unknown
+                                share : data[i].share,
+								plug_in : data[i].plug_in
 							});
 				}
-				make_public_client_chart(chartData);
-				prepare_public_client.chartData = chartData;
+				make_conversion_chart(chartData);
+				prepare_conversion.chartData = chartData;
 				if (callback && typeof callback == 'function') {
 					callback();
 				}
-				$("#statistics_public_client_from").val(from.substr(0, 10));
-				$("#statistics_public_client_to").val(to.substr(0, 10));
+				$("#depth_conversion_from").val(from.substr(0, 10));
+				$("#depth_conversion_to").val(to.substr(0, 10));
 			});
 };
-var prepare_public_client = function() {
-	$("#statistics_public_client_from").datepicker({
+var prepare_conversion = function() {
+	$("#depth_conversion_from").datepicker({
 		changeMonth : true,
 		numberOfMonths : 2,
 		dateFormat : "yy-mm-dd"
 			// ,
 			// onSelect : function(selectedDate) {
-			// $("#statistics_public_client_to").datepicker("option",
+			// $("#depth_conversion_to").datepicker("option",
 			// "minDate",
 			// selectedDate);
 			// }
 		});
-	$("#statistics_public_client_to").datepicker({
+	$("#depth_conversion_to").datepicker({
 				changeMonth : true,
 				numberOfMonths : 2,
 				dateFormat : "yy-mm-dd"
 			});
-	$("#table_public_client #data_grain").change(load_public_client);
-	$("#public_client_submit").click(load_public_client);
-	$("#table_public_client #reset").click(function() {
-				$("#statistics_public_client_from").val('');
-				$("#statistics_public_client_to").val('');
+	$("#table_conversion #data_grain").change(load_conversion);
+	$("#conversion_submit").click(load_conversion);
+	$("#table_conversion #reset").click(function() {
+				$("#depth_conversion_from").val('');
+				$("#depth_conversion_to").val('');
 			});
 
-	load_public_client();
+	load_conversion();
 };
 
 $(document).ready(function() {
-			prepare_public_client();
+			prepare_conversion();
 		});

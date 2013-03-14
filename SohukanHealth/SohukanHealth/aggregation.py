@@ -162,6 +162,89 @@ def public_client(start_time):
                 conn.close()
 
 
+def conversion(end_time=None):
+    '''为[收藏渠道统计]聚合数据
+    ''' 
+    end_time = datetime.datetime.now()
+    end_time = end_time.replace(hour=0, minute=0, second=0)
+    start_time = end_time - datetime.timedelta(days=1)
+    conversion_core(start_time, end_time, 'conversion_day')
+    if end_time.isoweekday() == 1:
+        start_time = end_time - datetime.timedelta(days=7)
+        conversion_core(start_time, end_time, 'conversion_week')
+
+
+def conversion_core(start_time, end_time, type_name):
+    try:
+        conn = MySQLdb.connect(**c.db_self_config)
+        cursor = conn.cursor()
+        sql = """select o.user_id, oo.gmt_create from stats_oper o left join stats_operobject oo on oo.oper_id = o.id 
+                where o.oper_type_id = 1 and oo.gmt_create >= '%s' and oo.gmt_create < '%s' 
+                and oo.object_key like '%%\"from\":%%'""" % (start_time, end_time)
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        m = {}
+        for d in results:
+            if m.has_key(d[0]):
+                if m[d[0]] > d[1]:
+                    m[d[0]] = d[1]
+            else:
+                m[d[0]] = d[1]
+        share_add = len(m)
+        share_customer = 0
+        for k in m.keys():
+            sql = """select object_key from stats_operobject where user_id = %s 
+                and object_key not like '%%\"url\":%%' and gmt_create > '%s' 
+                and gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            if len(result) > 0:
+                share_customer += 1
+
+        sql = """select o.user_id, oo.gmt_create from stats_oper o left join stats_operobject oo on oo.oper_id = o.id 
+                where o.oper_type_id = 1 and oo.gmt_create >= '%s' and oo.gmt_create < '%s' 
+                and oo.object_key like '%%\"from2\":%%'""" % (start_time, end_time)
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        m = {}
+        for d in results:
+            if m.has_key(d[0]):
+                if m[d[0]] > d[1]:
+                    m[d[0]] = d[1]
+            else:
+                m[d[0]] = d[1]
+        plug_in_add = len(m)
+        plug_in_customer = 0
+        for k in m.keys():
+            sql = """select object_key from stats_operobject where user_id = %s 
+                and object_key not like '%%\"url\":%%' and gmt_create > '%s' 
+                and gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            if len(result) > 0:
+                plug_in_customer += 1
+
+        share = float(int(float(share_customer) / share_add * 1000)) / 1000
+        plug_in = float(int(float(plug_in_customer) / plug_in_add * 1000)) / 1000
+        m = {"time":datetime.datetime.strftime(end_time, "%Y-%m-%d"),
+             "share":{"conversion": share, "add": share_add, "customer": share_customer},
+             "plug_in":{"conversion": plug_in, "add": plug_in_add, "customer": plug_in_customer}}
+        data = Aggregation(type=type_name, time=end_time.date(), content=anyjson.dumps(m))
+        data.save()
+    except Exception, e:
+        c.logger.error(e)
+        raise e
+    finally:
+        try:
+            if cursor:
+                cursor.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()
+
+
 def activate_user(start_time):
 
     start_time = start_time.replace(hour=0, minute=0, second=0)

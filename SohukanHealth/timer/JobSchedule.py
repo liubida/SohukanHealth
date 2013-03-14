@@ -40,6 +40,7 @@ if __name__ == '__main__':
         elif method_name == 'fix_ua_job' : fix_ua_job()
         elif method_name == 'rabbitmq_queue_alarm_job' : rabbitmq_queue_alarm_job()
         elif method_name == 'day_aggregation_job' : day_aggregation_job()
+        elif method_name == 'conversion_job': conversion_job()
         elif method_name == 'web_alarm_job' : web_alarm_job()
         #elif method_name == 'nginx_tcp_check_job' : nginx_tcp_check_job()
         

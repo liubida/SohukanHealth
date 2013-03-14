@@ -10,7 +10,7 @@ from monitor.models import SomeTotal
 from statistics.biz import get_bookmark_per_user, get_bookmark_time, \
     get_bookmark_percent, get_data_interval, add_inc_for_data, get_activate_user, \
     get_bookmark_website, get_user_platform, _get_week_list, \
-    get_bookmark_website_for_user, get_bookmark_website_detail
+    get_bookmark_website_for_user, get_bookmark_website_detail, get_conversion
 from statistics.biz_comp import get_share_channels, get_public_client
 from statistics.models import Report
 from util import get_week_num, http_conditions
@@ -332,6 +332,28 @@ def activate_user(request):
         end_time = c.MAX_TIME
 
     jsondata = get_activate_user(start_time, end_time, data_grain=data_grain)
+
+    response = HttpResponse(jsondata)
+    # 缓存一天
+    now = datetime.datetime.now()
+    expire = now + datetime.timedelta(days=1)
+    response['Expires'] = expire.strftime('%a, %d %b %Y 01:00:00 %Z')
+    return response
+
+# 深度 转化率统计    
+@login_required
+def conversion(request):
+    start_time = request.GET.get('start_time', c.MIN_TIME)
+    end_time = request.GET.get('end_time', c.MAX_TIME)
+    data_grain = request.GET.get('data_grain', 'day')
+    data_grain = data_grain if data_grain else 'day'
+    
+    if start_time == 'NaN-aN-aN aN:aN:aN': 
+        start_time = c.MIN_TIME
+    if end_time == 'NaN-aN-aN aN:aN:aN': 
+        end_time = c.MAX_TIME
+
+    jsondata = get_conversion(start_time, end_time, data_grain=data_grain)
 
     response = HttpResponse(jsondata)
     # 缓存一天

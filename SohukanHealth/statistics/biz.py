@@ -273,6 +273,32 @@ def get_user_platform(start_time=None, end_time=None):
     
     return anyjson.dumps(data)
 
+def get_conversion(start_time, end_time, data_grain='day'):
+    '''start_time, end_time is string'''
+    raw_data = Aggregation.objects.filter(type='conversion_%s' % data_grain, time__gte=start_time, time__lte=end_time).values('time', 'content')
+
+    data = {}
+    for d in raw_data:
+        data[d['time'].strftime("%Y-%m-%d")] = anyjson.loads(d['content'])
+
+    ret = []
+    start = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
+    end = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S")
+    cur = start
+    step = datetime.timedelta(days=1)
+    while cur <= end:
+        key = cur.strftime("%Y-%m-%d")
+        if key in data.keys():
+            ret.append({'time': cur.strftime("%m-%d"), 'share':data[key]['share']['conversion'], 'plug_in':data[key]['plug_in']['conversion']})
+        else:
+            if cur.date() == end.date():
+                break;
+            else:
+                cur += step
+                continue;
+        cur += step
+    return anyjson.dumps(ret)
+    
 def get_activate_user(start_time, end_time, data_grain='day'):
     '''start_time, end_time is string'''
     raw_data = Aggregation.objects.filter(type='active_user', time__gte=start_time, time__lte=end_time).values('time', 'content')
