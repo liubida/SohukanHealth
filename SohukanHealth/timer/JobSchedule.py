@@ -16,7 +16,7 @@ setup_environ(settings)
 from job import add_job, read_job, user_total_job, \
     bookmark_total_job, add_alarm_job, read_alarm_job, day_report_job, week_report_job, fix_ua_job, \
     rabbitmq_queue_alarm_job, day_aggregation_job, shorturl_total_job, set_public_total_job, \
-    bookmark_email_job, fiction_total_job
+    bookmark_email_job, fiction_total_job, conversion_job
 from alarm_job import nginx_tcp_check_job, web_alarm_job
 
 

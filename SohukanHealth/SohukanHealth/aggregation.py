@@ -167,6 +167,7 @@ def conversion(end_time=None):
     ''' 
     end_time = datetime.datetime.now()
     end_time = end_time.replace(hour=0, minute=0, second=0)
+    end_time = end_time - datetime.timedelta(days=0)
     start_time = end_time - datetime.timedelta(days=1)
     conversion_core(start_time, end_time, 'conversion_day')
     if end_time.isoweekday() == 1:
