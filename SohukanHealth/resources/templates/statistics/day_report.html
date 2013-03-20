@@ -1,7 +1,6 @@
 {% extends "statistics/statistics_base.html" %} {% block title %} 统计信息
 {% endblock %} {% block content1 %}
-<div id="day_report_date" style="height: 150px;">内测阶段, 数据仅供参考</div>
-
+<div id="day_report_date" style="height: 280px;">内测阶段, 数据仅供参考</div>
 <div id="day_report_content">
 	<div class="clearfix" style="height: 120px;">
 		<h2>1. 用户数</h2>
@@ -14,7 +13,7 @@
 			</tr>
 		</table>
 	</div>
-	<div class="clearfix" style="height: 120px;">
+	<div class="clearfix" style="height: 220px;">
 		<h2>2. 收藏文章</h2>
 		<table>
 			<th>文章总数</th>
@@ -30,6 +29,18 @@
 				<td></td>
 			</tr>
 		</table>
+		<table>
+			<th>邮件收藏</th>
+			<th>新邮件收藏</th>
+			<th>小说收藏</th>
+			<th>新小说收藏</th>
+			<tr>
+				<td><span id="day_report_email_total"></span></td>
+				<td><span id="day_report_email_new"></span></td>
+				<td><span id="day_report_fiction_total"></span></td>
+				<td><span id="day_report_fiction_new"></span></td>
+			</tr>
+        </table>
 	</div>
 	<div class="clearfix" style="height: 350px;">
 		<h2>3. 用户收藏统计</h2>

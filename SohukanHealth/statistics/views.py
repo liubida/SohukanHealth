@@ -498,7 +498,6 @@ def day_report_abstract(request):
         data = anyjson.loads(jsondata)
 
         bookmark_new = data['bookmark']['total'] - data['bookmark']['total_yd']
-        
         s = {
             'name': 'liubida',
             'user_total'    : data['user']['total'],
@@ -511,6 +510,16 @@ def day_report_abstract(request):
             'bookmark_new'      : bookmark_new,
             'bookmark_new_inc'  : data['bookmark']['new_inc'],
             'bookmark_new_inc_color': c.red if data['bookmark']['new_inc'] > 0  else c.green,
+            'email_total'        : '-' if not data.has_key('email') else data['email']['total'],
+            'email_total_inc'    : '-' if not data.has_key('email') else data['email']['total_inc'],
+            'email_new'          : '-' if not data.has_key('email') else data['email']['total'] - data['email']['total_yd'],
+            'email_new_inc'      : '-' if not data.has_key('email') else data['email']['new_inc'],
+            'email_new_inc_color': c.red if not data.has_key('emai') else (c.red if data['email']['new_inc'] > 0  else c.green),
+            'fiction_total'      : '-' if not data.has_key('fiction') else data['fiction']['total'],
+            'fiction_total_inc'  : '-' if not data.has_key('fiction') else data['fiction']['total_inc'],
+            'fiction_new'        : '-' if not data.has_key('fiction') else data['fiction']['total'] - data['fiction']['total_yd'],
+            'fiction_new_inc'    : '-' if not data.has_key('fiction') else data['fiction']['new_inc'],
+            'fiction_new_inc_color': c.red if not data.has_key('fiction') else (c.red if data['fiction']['new_inc'] > 0  else c.green),
         }
         
         try:

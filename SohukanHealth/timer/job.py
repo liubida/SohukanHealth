@@ -20,7 +20,8 @@ from config.config import c
 from monitor.models import AppAvailableData, SomeTotal, SysAlarm
 from monitor.system.worker import add_worker, read_worker
 from statistics.biz import get_userdata_for_day_report, get_bookmark_website, get_bookmark_website_detail, \
-    get_bookmarkdata_for_day_report, get_bookmark_percent_raw_data, _is_test, get_week_report_add_way_and_platform
+    get_bookmarkdata_for_day_report, get_bookmark_percent_raw_data, _is_test, get_week_report_add_way_and_platform, \
+    get_email_for_day_report, get_fiction_for_day_report
 from statistics.models import Report, UA
 from timer.sms import sms
 from util import print_info, query_ua, timediff, read_file, get_date_and_time
@@ -422,12 +423,13 @@ def day_report_job(now=None):
     # 今天
     if not now:
         now = datetime.datetime.now()
-    
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = now.replace(hour=23, minute=59, second=59, microsecond=0)
     
-    user = get_userdata_for_day_report(today_start, today_end);
-    bookmark = get_bookmarkdata_for_day_report(today_start, today_end);
+    user = get_userdata_for_day_report(today_start, today_end)
+    bookmark = get_bookmarkdata_for_day_report(today_start, today_end)
+    email = get_email_for_day_report(today_start, today_end)
+    fiction = get_fiction_for_day_report(today_start, today_end)
     
     bookmark_count = {}
     bookmark_count['percent'], bookmark_count['data'] = get_bookmark_percent_raw_data(today_start, today_end, limit=20)
@@ -436,6 +438,8 @@ def day_report_job(now=None):
     
     jsondata = {}
     jsondata['user'] = user
+    jsondata['email'] = email
+    jsondata['fiction'] = fiction
     jsondata['bookmark'] = bookmark
     jsondata['bookmark_website'] = bookmark_website
     jsondata['bookmark_count'] = bookmark_count

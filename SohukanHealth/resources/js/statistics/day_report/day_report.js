@@ -86,6 +86,8 @@ var load_day_report_abstract = function(params) {
 	var url = '/statistics/day_report/abstract'
 	var day_report_user = document.getElementById('day_report_user');
 	var day_report_bookmark = document.getElementById('day_report_bookmark');
+	var day_report_email = document.getElementById('day_report_email');
+	var day_report_fiction = document.getElementById('day_report_fiction');
 
 	var user_total = document.getElementById('day_report_user_total');
 	clearElement(user_total);
@@ -97,6 +99,14 @@ var load_day_report_abstract = function(params) {
 	clearElement(bookmark_new);
 	var bookmark_failed = document.getElementById('day_report_bookmark_failed');
 	clearElement(bookmark_failed);
+	var email_total = document.getElementById('day_report_email_total');
+	clearElement(email_total);
+	var email_new = document.getElementById('day_report_email_new');
+	clearElement(email_new);
+	var fiction_total = document.getElementById('day_report_fiction_total');
+	clearElement(fiction_total);
+	var fiction_new = document.getElementById('day_report_fiction_new');
+	clearElement(fiction_new);
 
 	myAjax(url, params, function(obj) {
 		data = obj;
@@ -144,6 +154,44 @@ var load_day_report_abstract = function(params) {
 				+ (parseFloat(data['bookmark_failed_percent']) * 100)
 						.toFixed(2) + '%]');
 		bookmark_failed.appendChild(value);
+
+		var value = document.createTextNode(data['email_total'] + ' ');
+		var inc = document.createElement('font');
+		inc.style.color = '#c00';
+		var inc_text = document.createTextNode('['
+				+ (parseFloat(data['email_total_inc']) * 100).toFixed(2) + '%]');
+		inc.appendChild(inc_text);
+		email_total.appendChild(value);
+		email_total.appendChild(inc);
+
+		var value = document.createTextNode(data['email_new'] + ' ');
+		var inc = document.createElement('font');
+		inc.style.color = data['email_new_inc_color'];
+		var inc_text = document.createTextNode('['
+				+ (parseFloat(data['email_new_inc']) * 100).toFixed(2) + '%]');
+		inc.appendChild(inc_text);
+		email_new.appendChild(value);
+		email_new.appendChild(inc);
+
+		var value = document.createTextNode(data['fiction_total'] + ' ');
+		var inc = document.createElement('font');
+		inc.style.color = '#c00';
+		var inc_text = document.createTextNode('['
+				+ (parseFloat(data['fiction_total_inc']) * 100).toFixed(2)
+				+ '%]');
+		inc.appendChild(inc_text);
+		fiction_total.appendChild(value);
+		fiction_total.appendChild(inc);
+
+		var value = document.createTextNode(data['fiction_new'] + ' ');
+		var inc = document.createElement('font');
+		inc.style.color = data['fiction_new_inc_color'];
+		var inc_text = document.createTextNode('['
+				+ (parseFloat(data['fiction_new_inc']) * 100).toFixed(2)
+				+ '%]');
+		inc.appendChild(inc_text);
+		fiction_new.appendChild(value);
+		fiction_new.appendChild(inc);
 
 	(function(bookmark_failed_array) {
 			var array = bookmark_failed_array;

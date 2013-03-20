@@ -798,6 +798,106 @@ def get_userdata_for_day_report(today_start, today_end):
     
     return ret
 
+def get_email_for_day_report(today_start, today_end):
+    today_end = today_end + datetime.timedelta(minutes=8)
+    
+    # 昨天
+    yd_start = today_start - datetime.timedelta(days=1)
+    yd_end = today_end - datetime.timedelta(days=1)
+    
+    # 前天
+    b_yd_start = today_start - datetime.timedelta(days=2)
+    b_yd_end = today_end - datetime.timedelta(days=2)
+    
+    # 今日邮件总数
+    email_total = int(SomeTotal.objects.filter(name='email', time__gte=today_start, time__lte=today_end).values('count').\
+                            reverse()[0]['count'])
+    # 昨日邮件总数
+    email_total_yd = int(SomeTotal.objects.filter(name='email', time__gte=yd_start, time__lte=yd_end).\
+                            values('count').reverse()[0]['count'])
+    # 前日邮件总数
+    email_total_b_yd = int(SomeTotal.objects.filter(name='email', time__gte=b_yd_start, time__lte=b_yd_end).\
+                            values('count').reverse()[0]['count'])
+    
+    # 今日新增邮件数
+    email_new = email_total - email_total_yd
+    
+    # 昨日新增邮件数
+    email_new_yd = email_total_yd - email_total_b_yd
+    
+    # 今日邮件总数_增长率
+    email_total_inc = (abs(email_new) + 0.00000001) / email_total_yd
+    email_total_inc = round(email_total_inc, 4)
+    
+    # 昨日邮件总数_增长率
+    email_total_inc_yd = (abs(email_new_yd) + 0.00000001) / email_total_b_yd
+    email_total_inc_yd = round(email_total_inc_yd, 4)
+        
+    if email_new_yd > 0:
+        email_new_inc = (email_new - email_new_yd + 0.00000001) / email_new_yd 
+        email_new_inc = round(email_new_inc, 4)
+    else:
+        email_new_inc = 0.0
+
+    ret = {}
+    ret['total'] = email_total;
+    ret['total_yd'] = email_total_yd;
+    ret['total_b_yd'] = email_total_b_yd;
+    ret['total_inc'] = email_total_inc;
+    ret['total_inc_yd'] = email_total_inc_yd;
+    ret['new_inc'] = email_new_inc 
+    return ret
+
+def get_fiction_for_day_report(today_start, today_end):
+    today_end = today_end + datetime.timedelta(minutes=8)
+    
+    # 昨天
+    yd_start = today_start - datetime.timedelta(days=1)
+    yd_end = today_end - datetime.timedelta(days=1)
+    
+    # 前天
+    b_yd_start = today_start - datetime.timedelta(days=2)
+    b_yd_end = today_end - datetime.timedelta(days=2)
+    
+    # 今日小说总数
+    fiction_total = int(SomeTotal.objects.filter(name='fiction', time__gte=today_start, time__lte=today_end).values('count').\
+                            reverse()[0]['count'])
+    # 昨日小说总数
+    fiction_total_yd = int(SomeTotal.objects.filter(name='fiction', time__gte=yd_start, time__lte=yd_end).\
+                            values('count').reverse()[0]['count'])
+    # 前日小说总数
+    fiction_total_b_yd = int(SomeTotal.objects.filter(name='fiction', time__gte=b_yd_start, time__lte=b_yd_end).\
+                            values('count').reverse()[0]['count'])
+    
+    # 今日新增小说数
+    fiction_new = fiction_total - fiction_total_yd
+    
+    # 昨日新增小说数
+    fiction_new_yd = fiction_total_yd - fiction_total_b_yd
+    
+    # 今日小说总数_增长率
+    fiction_total_inc = (abs(fiction_new) + 0.00000001) / fiction_total_yd
+    fiction_total_inc = round(fiction_total_inc, 4)
+    
+    # 昨日小说总数_增长率
+    fiction_total_inc_yd = (abs(fiction_new_yd) + 0.00000001) / fiction_total_b_yd
+    fiction_total_inc_yd = round(fiction_total_inc_yd, 4)
+       
+    if fiction_new_yd > 0:
+        fiction_new_inc = (fiction_new - fiction_new_yd + 0.00000001) / fiction_new_yd 
+        fiction_new_inc = round(fiction_new_inc, 4)
+    else:
+        fiction_new_inc = 0.0
+
+    ret = {}
+    ret['total'] = fiction_total;
+    ret['total_yd'] = fiction_total_yd;
+    ret['total_b_yd'] = fiction_total_b_yd;
+    ret['total_inc'] = fiction_total_inc;
+    ret['total_inc_yd'] = fiction_total_inc_yd;
+    ret['new_inc'] = fiction_new_inc; 
+    return ret
+
 def get_bookmarkdata_for_day_report(today_start, today_end):
     # 针对some_total的机制对时间做点处理
     # 文章总数是在整点时间+10分钟统计的, 当天的最后一个数据需要在第二天的00:10:00取得
