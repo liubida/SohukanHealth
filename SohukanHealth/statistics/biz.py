@@ -848,6 +848,56 @@ def get_email_for_day_report(today_start, today_end):
     ret['new_inc'] = email_new_inc 
     return ret
 
+def get_shorturl_for_day_report(today_start, today_end):
+    today_end = today_end + datetime.timedelta(minutes=8)
+    
+    # 昨天
+    yd_start = today_start - datetime.timedelta(days=1)
+    yd_end = today_end - datetime.timedelta(days=1)
+    
+    # 前天
+    b_yd_start = today_start - datetime.timedelta(days=2)
+    b_yd_end = today_end - datetime.timedelta(days=2)
+    
+    # 今日短链接总数
+    shorturl_total = int(SomeTotal.objects.filter(name='shorturl', time__gte=today_start, time__lte=today_end).values('count').\
+                            reverse()[0]['count'])
+    # 昨日短链接总数
+    shorturl_total_yd = int(SomeTotal.objects.filter(name='shorturl', time__gte=yd_start, time__lte=yd_end).\
+                            values('count').reverse()[0]['count'])
+    # 前日短链接总数
+    shorturl_total_b_yd = int(SomeTotal.objects.filter(name='shorturl', time__gte=b_yd_start, time__lte=b_yd_end).\
+                            values('count').reverse()[0]['count'])
+    
+    # 今日新增短链接数
+    shorturl_new = shorturl_total - shorturl_total_yd
+    
+    # 昨日新增链接数
+    shorturl_new_yd = shorturl_total_yd - shorturl_total_b_yd
+    
+    # 今日短链接总数_增长率
+    shorturl_total_inc = (abs(shorturl_new) + 0.00000001) / shorturl_total_yd
+    shorturl_total_inc = round(shorturl_total_inc, 4)
+    
+    # 昨日短链接总数_增长率
+    shorturl_total_inc_yd = (abs(shorturl_new_yd) + 0.00000001) / shorturl_total_b_yd
+    shorturl_total_inc_yd = round(shorturl_total_inc_yd, 4)
+        
+    if shorturl_new_yd > 0:
+        shorturl_new_inc = (shorturl_new - shorturl_new_yd + 0.00000001) / shorturl_new_yd 
+        shorturl_new_inc = round(shorturl_new_inc, 4)
+    else:
+        shorturl_new_inc = 0.0
+
+    ret = {}
+    ret['total'] = shorturl_total;
+    ret['total_yd'] = shorturl_total_yd;
+    ret['total_b_yd'] = shorturl_total_b_yd;
+    ret['total_inc'] = shorturl_total_inc;
+    ret['total_inc_yd'] = shorturl_total_inc_yd;
+    ret['new_inc'] = shorturl_new_inc 
+    return ret
+
 def get_fiction_for_day_report(today_start, today_end):
     today_end = today_end + datetime.timedelta(minutes=8)
     

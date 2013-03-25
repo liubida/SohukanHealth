@@ -88,6 +88,7 @@ var load_day_report_abstract = function(params) {
 	var day_report_bookmark = document.getElementById('day_report_bookmark');
 	var day_report_email = document.getElementById('day_report_email');
 	var day_report_fiction = document.getElementById('day_report_fiction');
+	var day_report_shorturl = document.getElementById('day_report_shorturl');
 
 	var user_total = document.getElementById('day_report_user_total');
 	clearElement(user_total);
@@ -107,6 +108,10 @@ var load_day_report_abstract = function(params) {
 	clearElement(fiction_total);
 	var fiction_new = document.getElementById('day_report_fiction_new');
 	clearElement(fiction_new);
+	var shorturl_total = document.getElementById('day_report_shorturl_total');
+	clearElement(shorturl_total);
+	var shorturl_new = document.getElementById('day_report_shorturl_new');
+	clearElement(shorturl_new);
 
 	myAjax(url, params, function(obj) {
 		data = obj;
@@ -192,6 +197,26 @@ var load_day_report_abstract = function(params) {
 		inc.appendChild(inc_text);
 		fiction_new.appendChild(value);
 		fiction_new.appendChild(inc);
+
+		var value = document.createTextNode(data['shorturl_total'] + ' ');
+		var inc = document.createElement('font');
+		inc.style.color = '#c00';
+		var inc_text = document.createTextNode('['
+				+ (parseFloat(data['shorturl_total_inc']) * 100).toFixed(2)
+				+ '%]');
+		inc.appendChild(inc_text);
+		shorturl_total.appendChild(value);
+		shorturl_total.appendChild(inc);
+
+		var value = document.createTextNode(data['shorturl_new'] + ' ');
+		var inc = document.createElement('font');
+		inc.style.color = data['shorturl_new_inc_color'];
+		var inc_text = document.createTextNode('['
+				+ (parseFloat(data['shorturl_new_inc']) * 100).toFixed(2)
+				+ '%]');
+		inc.appendChild(inc_text);
+		shorturl_new.appendChild(value);
+		shorturl_new.appendChild(inc);
 
 	(function(bookmark_failed_array) {
 			var array = bookmark_failed_array;

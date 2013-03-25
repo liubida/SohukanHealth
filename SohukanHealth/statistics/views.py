@@ -520,6 +520,11 @@ def day_report_abstract(request):
             'fiction_new'        : '-' if not data.has_key('fiction') else data['fiction']['total'] - data['fiction']['total_yd'],
             'fiction_new_inc'    : '-' if not data.has_key('fiction') else data['fiction']['new_inc'],
             'fiction_new_inc_color': c.red if not data.has_key('fiction') else (c.red if data['fiction']['new_inc'] > 0  else c.green),
+            'shorturl_total'      : '-' if not data.has_key('shorturl') else data['shorturl']['total'],
+            'shorturl_total_inc'  : '-' if not data.has_key('shorturl') else data['shorturl']['total_inc'],
+            'shorturl_new'        : '-' if not data.has_key('shorturl') else data['shorturl']['total'] - data['shorturl']['total_yd'],
+            'shorturl_new_inc'    : '-' if not data.has_key('shorturl') else data['shorturl']['new_inc'],
+            'shorturl_new_inc_color': c.red if not data.has_key('shorturl') else (c.red if data['shorturl']['new_inc'] > 0  else c.green),
         }
         
         try:
