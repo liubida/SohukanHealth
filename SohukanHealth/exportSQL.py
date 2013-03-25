@@ -23,7 +23,7 @@ def process(date):
         conn = MySQLdb.connect(**c.db_self_config)
         cursor = conn.cursor()
         while(time > 0):
-            sql = "select * from stats_operobject where gmt_create < %s limit %s" % (FILE_SIZE, date)
+            sql = "select * from stats_operobject where gmt_create < %s limit %s" % (date.strftime('%Y-%m-%d'), FILE_SIZE)
             cursor.execute(sql)
             results = cursor.fetchall()
             if len(results) == 0:
