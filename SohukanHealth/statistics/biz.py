@@ -289,7 +289,7 @@ def get_conversion(start_time, end_time, data_grain='day'):
     while cur <= end:
         key = cur.strftime("%Y-%m-%d")
         if key in data.keys():
-            ret.append({'time': cur.strftime("%m-%d"), 'share':data[key]['share']['conversion'], 'plug_in':data[key]['plug_in']['conversion']})
+            ret.append({'time': cur.strftime("%m-%d"), 'share':data[key]['share']['conversion'], 'plug_in':data[key]['plug_in']['conversion'], 'mobile':data[key]['mobile']['conversion']})
         else:
             if cur.date() == end.date():
                 break;

@@ -195,37 +195,38 @@ def conversion_core(start_time, end_time, type_name):
         share_custom = {'phone': 0, 'pad': 0, 'pc': 0, 'unknown': 0}
         for k in m.keys():
             sql = """select oo.object_key from stats_operobject oo, stats_oper o where o.id=oo.oper_id 
-                and o.oper_type_id=7 and oo.user_id = %s and (object_key like '%%\"iPhone\"%%' or object_key like '%%\"android\"%%') 
-                and gmt_create > '%s' and gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+                and o.oper_type_id=7 and oo.user_id = %s and (oo.object_key like '%%\"iPhone\"%%' or oo.object_key like '%%\"android\"%%') 
+                and oo.gmt_create > '%s' and oo.gmt_create < '%s' limit 1""" % (k, m[k], end_time)
             cursor.execute(sql)
             result = cursor.fetchall()
             if len(result) > 0:
                 share_custom['phone'] += 1
         for k in m.keys():
             sql = """select oo.object_key from stats_operobject oo, stats_oper o where o.id=oo.oper_id 
-                and o.oper_type_id=7 and oo.user_id = %s and object_key like '%%\"iPad\"%%'
-                and gmt_create > '%s' and gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+                and o.oper_type_id=7 and oo.user_id = %s and oo.object_key like '%%\"iPad\"%%'
+                and oo.gmt_create > '%s' and oo.gmt_create < '%s' limit 1""" % (k, m[k], end_time)
             cursor.execute(sql)
             result = cursor.fetchall()
             if len(result) > 0:
                 share_custom['pad'] += 1
         for k in m.keys():
             sql = """select oo.object_key from stats_operobject oo, stats_oper o where o.id=oo.oper_id 
-                and o.oper_type_id=7 and oo.user_id = %s and object_key like '%%\"reader\"%%' 
-                and gmt_create > '%s' and gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+                and o.oper_type_id=7 and oo.user_id = %s and oo.object_key like '%%\"reader\"%%' 
+                and oo.gmt_create > '%s' and oo.gmt_create < '%s' limit 1""" % (k, m[k], end_time)
             cursor.execute(sql)
             result = cursor.fetchall()
             if len(result) > 0:
                 share_custom['pc'] += 1
         for k in m.keys():
             sql = """select oo.object_key from stats_operobject oo, stats_oper o where o.id=oo.oper_id 
-                and o.oper_type_id=7 and oo.user_id = %s and object_key not like '%%\"client_type\"%%' 
-                and gmt_create > '%s' and gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+                and o.oper_type_id=7 and oo.user_id = %s and oo.object_key not like '%%\"client_type\"%%' 
+                and oo.gmt_create > '%s' and oo.gmt_create < '%s' limit 1""" % (k, m[k], end_time)
             cursor.execute(sql)
             result = cursor.fetchall()
             if len(result) > 0:
                 share_custom['unknown'] += 1
-
+        print share_custom
+        
         sql = """select o.user_id, oo.gmt_create from stats_oper o left join stats_operobject oo on oo.oper_id = o.id 
                 where o.oper_type_id = 1 and oo.gmt_create >= '%s' and oo.gmt_create < '%s' 
                 and oo.object_key like '%%\"from2\":%%'""" % (start_time, end_time)
@@ -239,39 +240,40 @@ def conversion_core(start_time, end_time, type_name):
             else:
                 m[d[0]] = d[1]
         plug_in_add = len(m)
-        plug_in_custom = {'phone': 0, 'pad': 0, 'pc': 0}
+        plug_in_custom = {'phone': 0, 'pad': 0, 'pc': 0, 'unknown': 0}
         for k in m.keys():
             sql = """select oo.object_key from stats_operobject oo, stats_oper o where o.id=oo.oper_id 
-                and o.oper_type_id=7 and oo.user_id = %s and (object_key like '%%\"iPhone\"%%' or object_key like '%%\"android\"%%') 
-                and gmt_create > '%s' and gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+                and o.oper_type_id=7 and oo.user_id = %s and (oo.object_key like '%%\"iPhone\"%%' or oo.object_key like '%%\"android\"%%') 
+                and oo.gmt_create > '%s' and oo.gmt_create < '%s' limit 1""" % (k, m[k], end_time)
             cursor.execute(sql)
             result = cursor.fetchall()
             if len(result) > 0:
                 plug_in_custom['phone'] += 1
         for k in m.keys():
             sql = """select oo.object_key from stats_operobject oo, stats_oper o where o.id=oo.oper_id 
-                and o.oper_type_id=7 and oo.user_id = %s and object_key like '%%\"iPad\"%%'
-                and gmt_create > '%s' and gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+                and o.oper_type_id=7 and oo.user_id = %s and oo.object_key like '%%\"iPad\"%%'
+                and oo.gmt_create > '%s' and oo.gmt_create < '%s' limit 1""" % (k, m[k], end_time)
             cursor.execute(sql)
             result = cursor.fetchall()
             if len(result) > 0:
                 plug_in_custom['pad'] += 1
         for k in m.keys():
             sql = """select oo.object_key from stats_operobject oo, stats_oper o where o.id=oo.oper_id 
-                and o.oper_type_id=7 and oo.user_id = %s and object_key like '%%\"reader\"%%' 
-                and gmt_create > '%s' and gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+                and o.oper_type_id=7 and oo.user_id = %s and oo.object_key like '%%\"reader\"%%' 
+                and oo.gmt_create > '%s' and oo.gmt_create < '%s' limit 1""" % (k, m[k], end_time)
             cursor.execute(sql)
             result = cursor.fetchall()
             if len(result) > 0:
                 plug_in_custom['pc'] += 1
         for k in m.keys():
             sql = """select oo.object_key from stats_operobject oo, stats_oper o where o.id=oo.oper_id 
-                and o.oper_type_id=7 and oo.user_id = %s and object_key not like '%%\"client_type\"%%' 
-                and gmt_create > '%s' and gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+                and o.oper_type_id=7 and oo.user_id = %s and oo.object_key not like '%%\"client_type\"%%' 
+                and oo.gmt_create > '%s' and oo.gmt_create < '%s' limit 1""" % (k, m[k], end_time)
             cursor.execute(sql)
             result = cursor.fetchall()
             if len(result) > 0:
                 plug_in_custom['unknown'] += 1
+        print plug_in_custom
 
         sql = """select o.user_id, oo.gmt_create from stats_oper o left join stats_operobject oo on oo.oper_id = o.id 
                 where o.oper_type_id = 1 and oo.gmt_create >= '%s' and oo.gmt_create < '%s' 
@@ -286,39 +288,41 @@ def conversion_core(start_time, end_time, type_name):
             else:
                 m[d[0]] = d[1]
         mobile_add = len(m)
-        mobile_custom = {'phone': 0, 'pad': 0, 'pc': 0}
+        mobile_custom = {'phone': 0, 'pad': 0, 'pc': 0, 'unknown': 0}
         for k in m.keys():
             sql = """select oo.object_key from stats_operobject oo, stats_oper o where o.id=oo.oper_id 
-                and o.oper_type_id=7 and oo.user_id = %s and (object_key like '%%\"iPhone\"%%' or object_key like '%%\"android\"%%') 
-                and gmt_create > '%s' and gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+                and o.oper_type_id=7 and oo.user_id = %s and (oo.object_key like '%%\"iPhone\"%%' or oo.object_key like '%%\"android\"%%') 
+                and oo.gmt_create > '%s' and oo.gmt_create < '%s' limit 1""" % (k, m[k], end_time)
             cursor.execute(sql)
             result = cursor.fetchall()
             if len(result) > 0:
                 mobile_custom['phone'] += 1
         for k in m.keys():
             sql = """select oo.object_key from stats_operobject oo, stats_oper o where o.id=oo.oper_id 
-                and o.oper_type_id=7 and oo.user_id = %s and object_key like '%%\"iPad\"%%'
-                and gmt_create > '%s' and gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+                and o.oper_type_id=7 and oo.user_id = %s and oo.object_key like '%%\"iPad\"%%'
+                and oo.gmt_create > '%s' and oo.gmt_create < '%s' limit 1""" % (k, m[k], end_time)
             cursor.execute(sql)
             result = cursor.fetchall()
             if len(result) > 0:
                 mobile_custom['pad'] += 1
         for k in m.keys():
             sql = """select oo.object_key from stats_operobject oo, stats_oper o where o.id=oo.oper_id 
-                and o.oper_type_id=7 and oo.user_id = %s and object_key like '%%\"reader\"%%' 
-                and gmt_create > '%s' and gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+                and o.oper_type_id=7 and oo.user_id = %s and oo.object_key like '%%\"reader\"%%' 
+                and oo.gmt_create > '%s' and oo.gmt_create < '%s' limit 1""" % (k, m[k], end_time)
             cursor.execute(sql)
             result = cursor.fetchall()
             if len(result) > 0:
                 mobile_custom['pc'] += 1
         for k in m.keys():
             sql = """select oo.object_key from stats_operobject oo, stats_oper o where o.id=oo.oper_id 
-                and o.oper_type_id=7 and oo.user_id = %s and object_key not like '%%\"client_type\"%%' 
-                and gmt_create > '%s' and gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+                and o.oper_type_id=7 and oo.user_id = %s and oo.object_key not like '%%\"client_type\"%%' 
+                and oo.gmt_create > '%s' and oo.gmt_create < '%s' limit 1""" % (k, m[k], end_time)
             cursor.execute(sql)
             result = cursor.fetchall()
             if len(result) > 0:
                 mobile_custom['unknown'] += 1
+
+        print mobile_custom
 
         share = {'phone': 0, 'pad': 0, 'pc': 0, 'unknown': 0}
         plug_in = {'phone': 0, 'pad': 0, 'pc': 0, 'unknown': 0}
