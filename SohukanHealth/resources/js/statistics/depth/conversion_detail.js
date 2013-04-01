@@ -12,7 +12,7 @@ var make_conversion_chart = function(chartData) {
 	// AXES
 	// category
 	var categoryAxis = chart.categoryAxis;
-	categoryAxis.labelRotation = 90;
+	categoryAxis.labelRotation = 30;
 	categoryAxis.gridPosition = "start";
 
 	// GRAPH
