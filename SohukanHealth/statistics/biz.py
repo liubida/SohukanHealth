@@ -281,7 +281,6 @@ def get_conversion(start_time, end_time, data_grain='day'):
     for d in raw_data:
         data[d['time'].strftime("%Y-%m-%d")] = anyjson.loads(d['content'])
 
-    ret = []
     start = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
     end = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S")
     cur = start
@@ -289,7 +288,19 @@ def get_conversion(start_time, end_time, data_grain='day'):
     while cur <= end:
         key = cur.strftime("%Y-%m-%d")
         if key in data.keys():
-            ret.append({'time': cur.strftime("%m-%d"), 'share':data[key]['share']['conversion'], 'plug_in':data[key]['plug_in']['conversion'], 'mobile':data[key]['mobile']['conversion']})
+            ret =  ({'convert': 'share_to_phone', 'rate': data[key]['share']['conversion']['phone'], 'customer': data[key]['share']['customer']['phone']}, \
+                    {'convert': 'share_to_pad', 'rate': data[key]['share']['conversion']['pad'], 'customer': data[key]['share']['customer']['pad']}, \
+                    {'convert': 'share_to_pc', 'rate': data[key]['share']['conversion']['pc'], 'customer': data[key]['share']['customer']['pc']}, \
+                    {'convert': 'share_to_unknown', 'rate': data[key]['share']['conversion']['unknown'], 'customer': data[key]['share']['customer']['unknown']}, \
+                    {'convert': 'plug_in_to_phone', 'rate': data[key]['plug_in']['conversion']['phone'], 'customer': data[key]['plug_in']['customer']['phone']}, \
+                    {'convert': 'plug_in_to_pad', 'rate': data[key]['plug_in']['conversion']['pad'], 'customer': data[key]['plug_in']['customer']['pad']}, \
+                    {'convert': 'plug_in_to_pc', 'rate': data[key]['plug_in']['conversion']['pc'], 'customer': data[key]['plug_in']['customer']['pc']}, \
+                    {'convert': 'plug_in_to_unknown', 'rate': data[key]['plug_in']['conversion']['unknown'], 'customer': data[key]['plug_in']['customer']['unknown']}, \
+                    {'convert': 'mobile_to_phone', 'rate': data[key]['mobile']['conversion']['phone'], 'customer': data[key]['mobile']['customer']['phone']}, \
+                    {'convert': 'mobile_to_pad', 'rate': data[key]['mobile']['conversion']['pad'], 'customer': data[key]['mobile']['customer']['pad']}, \
+                    {'convert': 'mobile_to_pc', 'rate': data[key]['mobile']['conversion']['pc'], 'customer': data[key]['mobile']['customer']['pc']}, \
+                    {'convert': 'mobile_to_unknown', 'rate': data[key]['mobile']['conversion']['unknown'], 'customer': data[key]['mobile']['customer']['unknown']}, \
+            )
         else:
             if cur.date() == end.date():
                 break;
