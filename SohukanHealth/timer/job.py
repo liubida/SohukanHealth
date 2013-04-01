@@ -21,7 +21,7 @@ from monitor.models import AppAvailableData, SomeTotal, SysAlarm
 from monitor.system.worker import add_worker, read_worker
 from statistics.biz import get_userdata_for_day_report, get_bookmark_website, get_bookmark_website_detail, \
     get_bookmarkdata_for_day_report, get_bookmark_percent_raw_data, _is_test, get_week_report_add_way_and_platform, \
-    get_email_for_day_report, get_fiction_for_day_report, get_shorturl_for_day_report
+    get_email_for_day_report, get_fiction_for_day_report, get_shorturl_for_day_report, get_set_public_for_day_report
 from statistics.models import Report, UA
 from timer.sms import sms
 from util import print_info, query_ua, timediff, read_file, get_date_and_time
@@ -134,11 +134,10 @@ def set_public_total_job(now=None):
         now_str = now.strftime('%Y-%m-%d %H:%M:%S')
         
         sql = "select count(*) from stats_oper s, stats_operobject o, stats_opertype t where s.oper_type_id=t.id and s.id=o.oper_id and (t.id=64 or t.id=65 or t.id=67)"
-        print sql
         cursor.execute(sql)
         result = cursor.fetchone()
         
-        data = SomeTotal(name='set-public', time=now, count=result[0])
+        data = SomeTotal(name='set-public', time=now, count=result[0] + 1029)
         data.save()
         return result[0]
     except Exception, e:
@@ -431,6 +430,7 @@ def day_report_job(now=None):
     email = get_email_for_day_report(today_start, today_end)
     fiction = get_fiction_for_day_report(today_start, today_end)
     shorturl = get_shorturl_for_day_report(today_start, today_end)
+    set_public = get_set_public_for_day_report(today_start, today_end)
     
     bookmark_count = {}
     bookmark_count['percent'], bookmark_count['data'] = get_bookmark_percent_raw_data(today_start, today_end, limit=20)
@@ -442,6 +442,7 @@ def day_report_job(now=None):
     jsondata['email'] = email
     jsondata['fiction'] = fiction
     jsondata['shorturl'] = shorturl 
+    jsondata['set_public'] = set_public 
     jsondata['bookmark'] = bookmark
     jsondata['bookmark_website'] = bookmark_website
     jsondata['bookmark_count'] = bookmark_count

@@ -898,6 +898,56 @@ def get_shorturl_for_day_report(today_start, today_end):
     ret['new_inc'] = shorturl_new_inc 
     return ret
 
+def get_set_public_for_day_report(today_start, today_end):
+    today_end = today_end + datetime.timedelta(minutes=8)
+    
+    # 昨天
+    yd_start = today_start - datetime.timedelta(days=1)
+    yd_end = today_end - datetime.timedelta(days=1)
+    
+    # 前天
+    b_yd_start = today_start - datetime.timedelta(days=2)
+    b_yd_end = today_end - datetime.timedelta(days=2)
+    
+    # 今日分享总数
+    set_public_total = int(SomeTotal.objects.filter(name='set-public', time__gte=today_start, time__lte=today_end).values('count').\
+                            reverse()[0]['count'])
+    # 昨日分享总数
+    set_public_total_yd = int(SomeTotal.objects.filter(name='set-public', time__gte=yd_start, time__lte=yd_end).\
+                            values('count').reverse()[0]['count'])
+    # 前日分享总数
+    set_public_total_b_yd = int(SomeTotal.objects.filter(name='set-public', time__gte=b_yd_start, time__lte=b_yd_end).\
+                            values('count').reverse()[0]['count'])
+    
+    # 今日新增分享数
+    set_public_new = set_public_total - set_public_total_yd
+    
+    # 昨日新增分享数
+    set_public_new_yd = set_public_total_yd - set_public_total_b_yd
+    
+    # 今日分享总数_增长率
+    set_public_total_inc = (abs(set_public_new) + 0.00000001) / set_public_total_yd
+    set_public_total_inc = round(set_public_total_inc, 4)
+    
+    # 昨日分享总数_增长率
+    set_public_total_inc_yd = (abs(set_public_new_yd) + 0.00000001) / set_public_total_b_yd
+    set_public_total_inc_yd = round(set_public_total_inc_yd, 4)
+        
+    if set_public_new_yd > 0:
+        set_public_new_inc = (set_public_new - set_public_new_yd + 0.00000001) / set_public_new_yd 
+        set_public_new_inc = round(set_public_new_inc, 4)
+    else:
+        set_public_new_inc = 0.0
+
+    ret = {}
+    ret['total'] = set_public_total;
+    ret['total_yd'] = set_public_total_yd;
+    ret['total_b_yd'] = set_public_total_b_yd;
+    ret['total_inc'] = set_public_total_inc;
+    ret['total_inc_yd'] = set_public_total_inc_yd;
+    ret['new_inc'] = set_public_new_inc 
+    return ret
+
 def get_fiction_for_day_report(today_start, today_end):
     today_end = today_end + datetime.timedelta(minutes=8)
     

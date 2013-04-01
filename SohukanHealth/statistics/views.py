@@ -491,12 +491,13 @@ def day_report_abstract(request):
     start_time = request.GET.get('start_time', '')
     end_time = request.GET.get('end_time', '')
     
-    
+    if not start_time and not end_time: 
+        end_time = datetime.datetime.today()
+        start_time = end_time - datetime.timedelta(days=1)
     jsondata_array = Report.objects.filter(type='day', time__gte=start_time, time__lt=end_time).values('jsondata')
     if jsondata_array:
         jsondata = jsondata_array[0]['jsondata']
         data = anyjson.loads(jsondata)
-
         bookmark_new = data['bookmark']['total'] - data['bookmark']['total_yd']
         s = {
             'name': 'liubida',
@@ -525,6 +526,11 @@ def day_report_abstract(request):
             'shorturl_new'        : '-' if not data.has_key('shorturl') else data['shorturl']['total'] - data['shorturl']['total_yd'],
             'shorturl_new_inc'    : '-' if not data.has_key('shorturl') else data['shorturl']['new_inc'],
             'shorturl_new_inc_color': c.red if not data.has_key('shorturl') else (c.red if data['shorturl']['new_inc'] > 0  else c.green),
+            'set_public_total'      : '-' if not data.has_key('set_public') else data['set_public']['total'],
+            'set_public_total_inc'  : '-' if not data.has_key('set_public') else data['set_public']['total_inc'],
+            'set_public_new'        : '-' if not data.has_key('set_public') else data['set_public']['total'] - data['set_public']['total_yd'],
+            'set_public_new_inc'    : '-' if not data.has_key('set_public') else data['set_public']['new_inc'],
+            'set_public_new_inc_color': c.red if not data.has_key('set_public') else (c.red if data['set_public']['new_inc'] > 0  else c.green),
         }
         
         try:
