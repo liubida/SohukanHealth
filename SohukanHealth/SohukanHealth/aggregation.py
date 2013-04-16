@@ -75,9 +75,13 @@ def share_channels(start_time):
 
         for d in results:
             user_id = int(d[0])
-            object_key = anyjson.loads(d[1])
-            object_key['user_id'] = user_id
-            
+            try:
+                object_key = anyjson.loads(d[1])
+            except:
+                #当title过长没有被完整写入数据库时，anyjson.loads()会报错
+                #by cescgao
+                object_key = anyjson.loads(d[1][:d[1].find(', "title"')]+'}')
+                object_key['title'] = 'None'
             # 去掉测试用户
             if not _is_test(user_id):
                 if jiathis == object_key['from']:

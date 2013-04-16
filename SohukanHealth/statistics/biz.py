@@ -1247,7 +1247,7 @@ def get_week_report_add_way_and_platform(start_time, end_time):
 def get_week_report_abstract(start_time, end_time):
     cur = start_time;
     step = datetime.timedelta(days=1)
-    
+
 if __name__ == '__main__':
 #    start_time = datetime.datetime(2012, 11, 5, 0, 0, 20)
 #    end_time = datetime.datetime(2012, 11, 11, 23, 59, 59)
