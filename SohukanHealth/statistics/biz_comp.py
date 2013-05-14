@@ -136,6 +136,132 @@ def get_share_channels(start_time, end_time, data_grain='day'):
             cur += step
     return ret
 
+def get_add_channels(start_time, end_time, data_grain='day'):
+    '''start_time, end_time is string'''
+    raw_data = Aggregation.objects.filter(type='add_channels', time__gte=start_time, time__lte=end_time).values('time', 'content')
+
+    data = {}
+    for d in raw_data:
+        data[d['time'].strftime("%Y-%m-%d")] = anyjson.loads(d['content'])
+        print data
+    ret = []
+    start = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
+    end = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S")
+    cur = start
+    if data_grain == 'day':
+        step = datetime.timedelta(days=1)
+        while cur <= end:
+            key = cur.strftime("%Y-%m-%d")
+            if key in data.keys():
+                ret.append({'time': cur.strftime("%m-%d"),
+                            'share':data[key]['share']['count'],
+                            'chrome':data[key]['chrome']['count'],
+                            'sogou':data[key]['sogou']['count'],
+                            'iPhone':data[key]['iPhone']['count'],
+                            'iPad':data[key]['iPad']['count'],
+                            'android':data[key]['android']['count'],
+                            'other':data[key]['other']['count']})
+            else:
+                if cur.date() == end.date():
+                    break;
+                else:
+                    cur += step
+                    continue;
+            cur += step
+    elif data_grain == 'week':
+        step = datetime.timedelta(days=1)
+        middle = {'share': 0, 'chrome': 0, 'sogou': 0, 'iPhone': 0, 'iPad': 0, 'android': 0, 'other': 0}
+        
+        while cur <= end:
+            key = cur.strftime("%Y-%m-%d")
+            if key not in data.keys():
+                if cur.date() == end.date():
+                    ret.append({'time': (cur-step).strftime("%m-%d"),
+                                'share':data[key]['share']['count'],
+                                'chrome':data[key]['chrome']['count'],
+                                'sogou':data[key]['sogou']['count'],
+                                'iPhone':data[key]['iPhone']['count'],
+                                'iPad':data[key]['iPad']['count'],
+                                'android':data[key]['baidu']['count'],
+                                'other':data[key]['other']['count']})
+                    break;
+                else:
+                    cur += step
+                    continue;
+                
+            middle['share'] += data[key]['share']['count']
+            middle['chrome'] += data[key]['chrome']['count']
+            middle['sogou'] += data[key]['sogou']['count']
+            middle['iPhone'] += data[key]['iPhone']['count']
+            middle['iPad'] += data[key]['iPad']['count']
+            middle['android'] += data[key]['baidu']['count']
+            middle['other'] += data[key]['other']['count']
+            
+            if cur.weekday() == 6 or cur.date() == end.date():
+                # 这一天是周日
+                ret.append({'time': cur.strftime("%m-%d"),
+                            bshare:middle['share'],
+                            jiathis:middle['chrome'],
+                            webapp:middle['sogou'],
+                            sohu_blog:middle['iPhone'],
+                            sohu_news:middle['iPad'],
+                            baidu:middle['android'],
+                            other:middle['other']})
+                middle['share'] = 0
+                middle['chrome'] = 0
+                middle['sogou'] = 0
+                middle['iPhone'] = 0 
+                middle['iPad'] = 0
+                middle['android'] = 0
+                middle['other'] = 0
+            cur += step
+    elif data_grain == 'month':
+        step = datetime.timedelta(days=1)
+        middle = {bshare:0, jiathis:0, webapp:0, sohu_blog:0, sohu_news:0, baidu:0, other:0}
+        
+        while cur <= end:
+            key = cur.strftime("%Y-%m-%d")
+            if key not in data.keys():
+                if cur.date() == end.date():
+                    ret.append({'time': (cur-step).strftime("%m-%d"),
+                                'share':data[key]['share']['count'],
+                                'chrome':data[key]['chrome']['count'],
+                                'sogou':data[key]['sogou']['count'],
+                                'iPhone':data[key]['iPhone']['count'],
+                                'iPad':data[key]['iPad']['count'],
+                                'android':data[key]['baidu']['count'],
+                                'other':data[key]['other']['count']})
+                    break;
+                else:
+                    cur += step
+                    continue;
+            middle['share'] += data[key]['share']['count']
+            middle['chrome'] += data[key]['chrome']['count']
+            middle['sogou'] += data[key]['sogou']['count']
+            middle['iPhone'] += data[key]['iPhone']['count']
+            middle['iPad'] += data[key]['iPad']['count']
+            middle['android'] += data[key]['baidu']['count']
+            middle['other'] += data[key]['other']['count']
+            
+            if (cur + step).month != cur.month or cur.date() == end.date():
+                ret.append({'time': cur.strftime("%Y-%m-%d"),
+                            bshare:middle['share'],
+                            jiathis:middle['chrome'],
+                            webapp:middle['sogou'],
+                            sohu_blog:middle['iPhone'],
+                            sohu_news:middle['iPad'],
+                            baidu:middle['android'],
+                            other:middle['other']})
+                middle['share'] = 0
+                middle['chrome'] = 0
+                middle['sogou'] = 0
+                middle['iPhone'] = 0 
+                middle['iPad'] = 0
+                middle['android'] = 0
+                middle['other'] = 0
+            cur += step
+    return ret
+
 def get_public_client(start_time, end_time, data_grain='day'):
     '''start_time, end_time is string'''
     raw_data = Aggregation.objects.filter(type='public_client', time__gte=start_time, time__lte=end_time).values('time', 'content')

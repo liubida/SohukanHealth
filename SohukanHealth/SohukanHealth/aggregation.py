@@ -7,13 +7,10 @@ Created on Nov 13, 2012
 import sys
 import os
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print root_path
 sys.path.append(root_path)
-print sys.path
     
 from django.core.management import setup_environ
 from SohukanHealth import settings
-print settings
 setup_environ(settings)
 
 from config.config import c
@@ -31,8 +28,11 @@ webapp = 'webapp'
 sohu_blog = 'sohu_blog'
 sohu_news = 'sohu_news'
 baidu = 'baidu'
-other = 'share'
+other = 'other'
 
+share = 'share'
+chrome = 'chrome'
+sogou = 'sogou'
 iPhone = 'iPhone'
 iPad = 'iPad'
 android = 'android'
@@ -104,6 +104,100 @@ def share_channels(start_time):
                 m[k]['count'] = len(m[k]['object_key'])
                 
         data = Aggregation(type='share_channels', time=start_time.date(), content=anyjson.dumps(m))
+        data.save()
+    except Exception, e:
+        c.logger.error(e)
+        raise e
+    finally:
+        try:
+            if cursor:
+                cursor.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()
+
+
+def add_channels(start_time):
+    '''为[收藏渠道统计]聚合数据
+    '''
+    
+    start_time = start_time.replace(hour=0, minute=0, second=0)
+    step = datetime.timedelta(days=1)
+    end_time = start_time + step
+    
+    try:
+        conn = MySQLdb.connect(**c.db_self_config)
+        cursor = conn.cursor()
+
+        sql = '''select oo.user_id, oo.object_key from stats_operobject oo, stats_oper o 
+        where oo.oper_id=o.id and o.oper_type_id=1 and oo.object_key like '%% \"from\":%%' 
+        and oo.gmt_create > '%s' and oo.gmt_create < '%s' ''' % (start_time, end_time)
+        cursor.execute(sql)
+        share_results = cursor.fetchall()
+
+        sql = '''select oo.user_id, oo.object_key from stats_operobject oo, stats_oper o 
+        where oo.oper_id=o.id and o.oper_type_id=1 and oo.object_key like '%%\"from2\": \"chrome\"%%' 
+        and oo.gmt_create > '%s' and oo.gmt_create < '%s' ''' % (start_time, end_time)
+        cursor.execute(sql)
+        chrome_results = cursor.fetchall()
+
+        sql = '''select oo.user_id, oo.object_key from stats_operobject oo, stats_oper o 
+        where oo.oper_id=o.id and o.oper_type_id=1 and oo.object_key like '%%\"from2\": \"sogou\"%%' 
+        and oo.gmt_create > '%s' and oo.gmt_create < '%s' ''' % (start_time, end_time)
+        cursor.execute(sql)
+        sogou_results = cursor.fetchall()
+
+        sql = '''select oo.user_id, oo.object_key from stats_operobject oo, stats_oper o 
+        where oo.oper_id=o.id and o.oper_type_id=1 and oo.object_key like '%%\"from3\": \"iPhone\"%%' 
+        and oo.gmt_create > '%s' and oo.gmt_create < '%s' ''' % (start_time, end_time)
+        cursor.execute(sql)
+        iPhone_results = cursor.fetchall()
+
+        sql = '''select oo.user_id, oo.object_key from stats_operobject oo, stats_oper o 
+        where oo.oper_id=o.id and o.oper_type_id=1 and oo.object_key like '%%\"from3\": \"iPad\"%%' 
+        and oo.gmt_create > '%s' and oo.gmt_create < '%s' ''' % (start_time, end_time)
+        cursor.execute(sql)
+        iPad_results = cursor.fetchall()
+
+        sql = '''select oo.user_id, oo.object_key from stats_operobject oo, stats_oper o 
+        where oo.oper_id=o.id and o.oper_type_id=1 and oo.object_key like '%%\"from3\": \"android\"%%' 
+        and oo.gmt_create > '%s' and oo.gmt_create < '%s' ''' % (start_time, end_time)
+        cursor.execute(sql)
+        android_results = cursor.fetchall()
+
+        sql = '''select oo.user_id, oo.object_key from stats_operobject oo, stats_oper o 
+        where oo.oper_id=o.id and o.oper_type_id=1 and oo.object_key not like '%%\"from%%' 
+        and oo.gmt_create > '%s' and oo.gmt_create < '%s' ''' % (start_time, end_time)
+        cursor.execute(sql)
+        other_results = cursor.fetchall()
+
+        other_test = 0
+        for d in other_results:
+            user_id = int(d[0])
+            try:
+                object_key = anyjson.loads(d[1])
+            except:
+                #当title过长没有被完整写入数据库时，anyjson.loads()会报错
+                #by cescgao
+                object_key = anyjson.loads(d[1][:d[1].find(', "title"')]+'}')
+                object_key['title'] = 'None'
+            # 去掉测试用户
+            if _is_test(user_id):
+                other_test += 1
+
+        
+        m = {'time':datetime.datetime.strftime(start_time, "%Y-%m-%d"),
+             share:{'count': len(share_results)},
+             chrome:{'count': len(chrome_results)},
+             sogou:{'count': len(sogou_results)},
+             iPhone:{'count': len(iPhone_results)},
+             iPad:{'count': len(iPad_results)},
+             android:{'count': len(android_results)},
+             other:{'count': len(other_results) - other_test}}
+        print m
+        data = Aggregation(type='add_channels', time=start_time.date(), content=anyjson.dumps(m))
         data.save()
     except Exception, e:
         c.logger.error(e)

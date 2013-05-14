@@ -7,13 +7,10 @@ Created on Jun 19, 2012
 import sys
 import os
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print root_path
 sys.path.append(root_path)
-print sys.path
 
 from django.core.management import setup_environ
 from SohukanHealth import settings
-print settings
 setup_environ(settings)
 
 from statistics.models import Aggregation

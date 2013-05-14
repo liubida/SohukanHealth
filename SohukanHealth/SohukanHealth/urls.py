@@ -9,7 +9,7 @@ from statistics.views import user_total, user_bookmark_percent, bookmark_total, 
     user_platform, week_report_date, week_report_abstract, bookmark_website_detail, \
     week_report_bookmark_website, bookmark_website_for_user, share_channels, \
     bookmark_shorturl, bookmark_set_public, public_client, bookmark_email, \
-    fiction_total, conversion
+    fiction_total, conversion, add_channels
 
 # Uncomment the next two lines to enable the admin:
 admin.autodiscover()
@@ -32,6 +32,7 @@ urlpatterns = patterns('',
                        (r'^statistics/bookmark/per_user/?$', bookmark_per_user),
                        (r'^statistics/bookmark/time/?$', bookmark_time),
                        (r'^statistics/bookmark/share_channels/?$', share_channels),
+                       (r'^statistics/bookmark/add_channels/?$', add_channels),
                        (r'^statistics/bookmark/public_client/?$', public_client),
                        (r'^statistics/bookmark/shorturl/?$', bookmark_shorturl),
                        (r'^statistics/bookmark/set-public/?$', bookmark_set_public),

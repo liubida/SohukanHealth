@@ -7,13 +7,10 @@ Created on Jun 7, 2012
 import sys
 import os
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print root_path
 sys.path.append(root_path)
-print sys.path
 
 from django.core.management import setup_environ
 from SohukanHealth import settings, aggregation
-print settings
 setup_environ(settings)
 
 from config.config import c
@@ -492,13 +489,14 @@ def fix_ua_job():
 def day_aggregation_job(start_time=datetime.datetime.now()):
     try:
         aggregation.share_channels(start_time)
+        aggregation.add_channels(start_time)
         aggregation.public_client(start_time)
         aggregation.activate_user(start_time)
         aggregation.bookmark_website(start_time)
         aggregation.user_platform(start_time)
     except Exception, e:
         c.logger.error(e)
-        
+       
 @print_info(name='conversion')
 def conversion_job(start_time=datetime.datetime.now()):
     try:

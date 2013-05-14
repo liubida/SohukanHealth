@@ -247,6 +247,47 @@
 </div>
 
 <div class="clearfix" style="height: 420">
+	<div id="statistics_add_channels" class="statistics_div"></div>
+	<div style="padding-top: 60px">
+		<table id="table_add_channels" class="table_1">
+			<tr>
+				<td colspan=2><strong>收藏文章渠道</strong></td>
+			</tr>
+			<tr>
+				<td colspan=2><strong>此统计从2013-5-1开始</strong></td>
+			</tr>
+			<tr>
+				<td>开始时间:</td>
+				<td><input type="text" id="statistics_add_channels_from"
+					style="width: 120px" /><input type="submit" id="reset"
+					value="reset" /></td>
+			</tr>
+			<tr>
+				<td>结束时间:</td>
+				<td><input type="text" id="statistics_add_channels_to"
+					style="width: 120px" /></td>
+			</tr>
+			<!-- tr>
+				<td><input type="radio" name="bookmark_total_items" value="0"
+					checked="checked">默认</input></td>
+				<td><input type="radio" name="bookmark_total_items" value="1">增长率</input></td>
+			</tr> -->
+			<tr>
+				<td>数据粒度:</td>
+				<td><select id="data_grain">
+						<option value="day" selected='selected'>日</option>
+						<option value="week">周</option>
+						<option value="month">月</option>
+				</select></td>
+			</tr>
+			<tr>
+				<td><input type="submit" id="add_channels_submit" /></td>
+			</tr>
+		</table>
+	</div>
+</div>
+
+<div class="clearfix" style="height: 420">
 	<div id="statistics_public_client" class="statistics_div"></div>
 	<div style="padding-top: 60px">
 		<table id="table_public_client" class="table_1">
@@ -384,6 +425,8 @@
 	src="/static/js/statistics/email_total.js"></script>
 <script type="text/javascript"
 	src="/static/js/statistics/share_channels.js"></script>
+<script type="text/javascript"
+	src="/static/js/statistics/add_channels.js"></script>
 <script type="text/javascript"
 	src="/static/js/statistics/bookmark_per_user.js"></script>
 <script type="text/javascript"
