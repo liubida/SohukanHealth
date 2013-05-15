@@ -5,7 +5,7 @@ Created on Oct 31, 2012
 @author: liubida
 '''
 
-from SohukanHealth.aggregation import bshare, jiathis, other, webapp, sohu_blog, sohu_news, baidu, iPhone, iPad, android, unknown
+from SohukanHealth.aggregation import bshare, jiathis, other, webapp, sohu_blog, sohu_news, baidu, iPhone, iPad, android, unknown, share
 from statistics.models import Aggregation
 import anyjson
 import datetime
@@ -34,7 +34,7 @@ def get_share_channels(start_time, end_time, data_grain='day'):
                             sohu_blog:data[key][sohu_blog]['count'],
                             sohu_news:data[key][sohu_news]['count'],
                             baidu:data[key][baidu]['count'],
-                            other:data[key][other]['count']})
+                            share:data[key][share]['count']})
             else:
                 if cur.date() == end.date():
                     break;
@@ -44,7 +44,7 @@ def get_share_channels(start_time, end_time, data_grain='day'):
             cur += step
     elif data_grain == 'week':
         step = datetime.timedelta(days=1)
-        middle = {bshare:0, jiathis:0, webapp:0, sohu_blog:0, sohu_news:0,  baidu:0, other:0}
+        middle = {bshare:0, jiathis:0, webapp:0, sohu_blog:0, sohu_news:0,  baidu:0, share:0}
         
         while cur <= end:
             key = cur.strftime("%Y-%m-%d")
@@ -57,7 +57,7 @@ def get_share_channels(start_time, end_time, data_grain='day'):
                                 sohu_blog:middle[sohu_blog],
                                 sohu_news:middle[sohu_news],
                                 baidu:middle[baidu],
-                                other:middle[other]})
+                                share:middle[share]})
                     break;
                 else:
                     cur += step
@@ -69,7 +69,7 @@ def get_share_channels(start_time, end_time, data_grain='day'):
             middle[sohu_blog] += data[key][sohu_blog]['count']
             middle[sohu_news] += data[key][sohu_news]['count']
             middle[baidu] += data[key][baidu]['count']
-            middle[other] += data[key][other]['count']
+            middle[share] += data[key][share]['count']
             
             if cur.weekday() == 6 or cur.date() == end.date():
                 # 这一天是周日
@@ -80,18 +80,18 @@ def get_share_channels(start_time, end_time, data_grain='day'):
                             sohu_blog:middle[sohu_blog],
                             sohu_news:middle[sohu_news],
                             baidu:middle[baidu],
-                            other:middle[other]})
+                            share:middle[share]})
                 middle[bshare] = 0
                 middle[jiathis] = 0
                 middle[webapp] = 0
                 middle[sohu_blog] = 0 
                 middle[sohu_news] = 0
                 middle[baidu] = 0
-                middle[other] = 0
+                middle[share] = 0
             cur += step
     elif data_grain == 'month':
         step = datetime.timedelta(days=1)
-        middle = {bshare:0, jiathis:0, webapp:0, sohu_blog:0, sohu_news:0, baidu:0, other:0}
+        middle = {bshare:0, jiathis:0, webapp:0, sohu_blog:0, sohu_news:0, baidu:0, share:0}
         
         while cur <= end:
             key = cur.strftime("%Y-%m-%d")
@@ -104,7 +104,7 @@ def get_share_channels(start_time, end_time, data_grain='day'):
                                 sohu_blog:middle[sohu_blog],
                                 sohu_news:middle[sohu_news],
                                 baidu:middle[baidu],
-                                other:middle[other]})
+                                share:middle[share]})
                     break;
                 else:
                     cur += step
@@ -115,7 +115,7 @@ def get_share_channels(start_time, end_time, data_grain='day'):
             middle[sohu_blog] += data[key][sohu_blog]['count']
             middle[sohu_news] += data[key][sohu_news]['count']
             middle[baidu] += data[key][baidu]['count']
-            middle[other] += data[key][other]['count']
+            middle[share] += data[key][share]['count']
             
             if (cur + step).month != cur.month or cur.date() == end.date():
                 ret.append({'time': cur.strftime("%Y-%m-%d"),
@@ -125,14 +125,14 @@ def get_share_channels(start_time, end_time, data_grain='day'):
                             sohu_blog:middle[sohu_blog],
                             sohu_news:middle[sohu_news],
                             baidu:middle[baidu],
-                            other:middle[other]})
+                            share:middle[share]})
                 middle[bshare] = 0
                 middle[jiathis] = 0
                 middle[webapp] = 0
                 middle[sohu_blog] = 0 
                 middle[sohu_news] = 0
                 middle[baidu] = 0
-                middle[other] = 0                            
+                middle[share] = 0                            
             cur += step
     return ret
 
@@ -200,13 +200,13 @@ def get_add_channels(start_time, end_time, data_grain='day'):
             if cur.weekday() == 6 or cur.date() == end.date():
                 # 这一天是周日
                 ret.append({'time': cur.strftime("%m-%d"),
-                            bshare:middle['share'],
-                            jiathis:middle['chrome'],
-                            webapp:middle['sogou'],
-                            sohu_blog:middle['iPhone'],
-                            sohu_news:middle['iPad'],
-                            baidu:middle['android'],
-                            other:middle['other']})
+                            'share':middle['share'],
+                            'chrome':middle['chrome'],
+                            'sogou':middle['sogou'],
+                            'iPhone':middle['iPhone'],
+                            'iPad':middle['iPad'],
+                            'android':middle['android'],
+                            'other':middle['other']})
                 middle['share'] = 0
                 middle['chrome'] = 0
                 middle['sogou'] = 0

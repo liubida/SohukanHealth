@@ -71,7 +71,7 @@ def share_channels(start_time):
              sohu_blog:{'count':0, 'object_key':[]},
              sohu_news:{'count':0, 'object_key':[]},
              baidu:{'count':0, 'object_key':[]},
-             other:{'count':0, 'object_key':[]}}
+             share:{'count':0, 'object_key':[]}}
 
         for d in results:
             user_id = int(d[0])
@@ -97,7 +97,7 @@ def share_channels(start_time):
                 elif baidu == object_key['from']:
                     m[baidu]['object_key'].append(object_key)
                 else:
-                    m[other]['object_key'].append(object_key)
+                    m[share]['object_key'].append(object_key)
         
         for k in m:
             if k != 'time':
