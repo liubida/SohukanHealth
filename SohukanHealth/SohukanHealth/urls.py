@@ -58,6 +58,10 @@ urlpatterns = patterns('',
                        (r'^admin/?', include(admin.site.urls)),
 )
 
+urlpatterns += patterns('',
+        (r'migration/sys_alarm/?$', 'migration.views.sys_alarm'),
+        )
+
 urlpatterns += patterns('django.contrib.auth.views',
                         (r'^monitor/mlogin/?', 'login', {'template_name': 'login.html'}),
                         (r'^monitor/mlogout/?', 'logout', {'template_name': 'logout.html', 'next_page': '/'}),

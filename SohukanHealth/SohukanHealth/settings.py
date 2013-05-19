@@ -23,7 +23,7 @@ DATABASES = {
         'NAME': 'sohukanhealth', # Or path to database file if using sqlite3.
         'USER': 'sohukan', # Not used with sqlite3.
         'PASSWORD': 'sohukan', # Not used with sqlite3.
-        'HOST': '10.10.69.53', # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': '10.11.6.67', # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '', # Set to empty string for default. Not used with sqlite3.
     }
 }

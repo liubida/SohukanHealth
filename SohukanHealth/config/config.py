@@ -115,12 +115,15 @@ class ConfigFactory:
     def getConfig(self):
         import socket
         hostname = socket.gethostname()
+
         ip = socket.gethostbyname(hostname)
         
-        if ip in ('10.10.69.53'):
+        if ip in ('10.11.6.67'):
             ENV_TAG = 'prod'
         elif ip in ('10.7.8.58'):
             ENV_TAG = 'dev'
+        elif hostname in ('tc_6_67'):
+            ENV_TAG = 'prod'
         else:
             ENV_TAG = None
         
