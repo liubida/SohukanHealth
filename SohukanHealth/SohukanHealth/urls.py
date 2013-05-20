@@ -60,6 +60,12 @@ urlpatterns = patterns('',
 
 urlpatterns += patterns('',
         (r'migration/sys_alarm/?$', 'migration.views.sys_alarm'),
+        (r'migration/stats_ua/?$', 'migration.views.stats_ua'),
+        (r'migration/stats_opertype/?$', 'migration.views.stats_opertype'),
+        (r'migration/app_available_data/?$', 'migration.views.app_available_data'),
+        (r'migration/aggregation/?$', 'migration.views.aggregation'),
+        (r'migration/report/?$', 'migration.views.report'),
+        (r'migration/stats_oper/?$', 'migration.views.stats_oper'),
         )
 
 urlpatterns += patterns('django.contrib.auth.views',

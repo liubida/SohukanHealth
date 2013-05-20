@@ -87,8 +87,8 @@ class Config:
     #cookie = ["Cookie", "access_token = be5ea9377ef8ccb813b1c8cfa6cfea676aaf5676"]
 
     db_config = {'host':'10.10.58.17', 'port':3306, 'user':'sohupocketlib', 'passwd':'SejJGGk2', 'db':'sohupocketlib'}
-    db_self_config = {'host':'10.10.69.53', 'port':3306, 'user':'sohukan', 'passwd':'sohukan', 'db':'sohukanhealth'}
-    redis_config = {'host':'10.10.69.53', 'port':6379, 'db':4}
+    db_self_config = {'host':'10.11.6.67', 'port':3306, 'user':'sohukan', 'passwd':'sohukan', 'db':'sohukanhealth', 'charset':'utf8'}
+    redis_config = {'host':'10.11.6.67', 'port':6379, 'db':4}
     redis_instance = redis.StrictRedis(**redis_config)
     
     #memcache_instance = mem_cache
