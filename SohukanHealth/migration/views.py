@@ -189,3 +189,33 @@ def stats_oper(request):
             if conn:
                 conn.close()
     return HttpResponse('')
+
+def stats_operobject(request):
+    try:
+        conn = MySQLdb.connect(**c.db_self_config)
+        cur = conn.cursor()
+        for i in range(7140441, 17594571):
+            d = OperObject.objects.filter(id=i)
+            if d:
+                d = d[0]
+                if not d.user_id:
+                    user_id = '-1'
+                else:
+                    user_id = d.user_id
+                jsondata = d.object_key.replace('\\', '\\\\')
+                jsondata = jsondata.replace('"', '\\"')
+                sql = '''insert into stats_operobject values(%s, %s, %s, "%s", "%s", "%s", "%s");''' % (d.id, user_id, d.oper_id, d.object_type, jsondata, d.gmt_create, d.gmt_modify)
+                print sql
+                cur.execute(sql)
+                conn.commit()
+    except Exception, e:
+        c.logger.error(e)
+    finally:
+        try:
+            cur.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()
+    return HttpResponse('')

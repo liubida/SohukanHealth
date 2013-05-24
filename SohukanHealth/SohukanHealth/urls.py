@@ -66,6 +66,7 @@ urlpatterns += patterns('',
         (r'migration/aggregation/?$', 'migration.views.aggregation'),
         (r'migration/report/?$', 'migration.views.report'),
         (r'migration/stats_oper/?$', 'migration.views.stats_oper'),
+        (r'migration/stats_operobject/?$', 'migration.views.stats_operobject'),
         )
 
 urlpatterns += patterns('django.contrib.auth.views',
