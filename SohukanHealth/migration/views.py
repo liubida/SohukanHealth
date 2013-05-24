@@ -219,3 +219,25 @@ def stats_operobject(request):
             if conn:
                 conn.close()
     return HttpResponse('')
+
+def some_total(request):
+    try:
+        conn = MySQLdb.connect(**c.db_self_config)
+        cur = conn.cursor()
+        data_raw = SomeTotal.objects.all()
+        for d in data_raw:
+            sql = '''insert into some_total values(%s, "%s", "%s", %s, "", "%s", "%s");''' % (d.id, d.name, d.time, d.count, d.gmt_create, d.gmt_modify)
+            print sql
+            cur.execute(sql)
+            conn.commit()
+    except Exception, e:
+        c.logger.error(e)
+    finally:
+        try:
+            cur.close()
+        except Exception, e:
+            c.logger.error(e)
+        finally:
+            if conn:
+                conn.close()
+    return HttpResponse('')
