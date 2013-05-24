@@ -166,9 +166,7 @@ def stats_oper(request):
     try:
         conn = MySQLdb.connect(**c.db_self_config)
         cur = conn.cursor()
-        o = Oper.objects.all().order_by('-gmt_create')[0]
-        print o.id, o.user_id, o.oper_type_id
-        raw_data = Oper.objects.all()
+        raw_data = Oper.objects.filter(id<1000)
         for d in raw_data:
             if not d.user_id:
                 d.user_id = ''
