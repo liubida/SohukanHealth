@@ -166,13 +166,18 @@ def stats_oper(request):
     try:
         conn = MySQLdb.connect(**c.db_self_config)
         cur = conn.cursor()
-        raw_data = Oper.objects.filter(id<1000)
-        for d in raw_data:
-            if not d.user_id:
-                d.user_id = ''
-            sql = '''insert into stats_oper values("%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s");''' % (d.id, d.user_id, d.oper_type_id, d.ua_id, d.remote_ip, '', d.gmt_create, d.gmt_modify)
-            cur.execute(sql)
-            conn.commit()
+        for i in range(7293500, 17950588):
+            d = Oper.objects.filter(id=i)
+            if d:
+                d = d[0]
+                if not d.user_id:
+                    user_id = '-1'
+                else:
+                    user_id = d.user_id
+                sql = '''insert into stats_oper values(%s, %s, %s, %s, "%s", "%s", "%s", "%s");''' % (d.id, user_id, d.oper_type_id, d.ua_id, d.remote_ip, '', d.gmt_create, d.gmt_modify)
+                print sql
+                cur.execute(sql)
+                conn.commit()
     except Exception, e:
         c.logger.error(e)
     finally:
