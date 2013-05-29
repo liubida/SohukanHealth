@@ -5,11 +5,29 @@
 </div>
 <hr />
 <div>
-    {% for d in rtn %}
-    <p>{{d.id}} | {{d.email}} | {{d.content}} | {{d.user_id}} | 
-    {{d.gmt_create}} | {{d.os }} | {{ d.version }} | {{ d.device_model}}
-    </p>
-    <hr />
-    {% endfor %}
+    <table width=90%>
+        <tr>
+            <td width=4%>id</td>
+            <td width=15%>email</td>
+            <td width=30%>content</td>
+            <td width=5%>user_id</td>
+            <td width=15%>gmt_create</td>
+            <td width=10%>os</td>
+            <td width=10%>version</td>
+            <td width=11%>device</td>
+        </tr>
+        {% for d in rtn %}
+        <tr>
+            <td width=4%>{{d.id}}</td>
+            <td width=15%>{{d.email}}</td>
+            <td width=30%>{{d.content}}</td>
+            <td width=5%>{{d.user_id}}</td>
+            <td width=15%>{{d.gmt_create}}</td>
+            <td width=10%>{{d.os }}</td>
+            <td width=10%>{{ d.version }}</td>
+            <td width=11%>{{ d.device_model}}</td>
+        </tr>
+        {% endfor %}
+    </table>
 <div>
 {% endblock %}

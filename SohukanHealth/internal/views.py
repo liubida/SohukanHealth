@@ -37,7 +37,7 @@ def feedback(request):
                 'email': d[1],
                 'content': d[2],
                 'user_id': d[3],
-                'gmt_create': d[4],
+                'gmt_create': d[4].strftime('%Y-%M-%d %H:%m:%S') if d[4] else '',
                 'gmt_modify': d[5], 
                 'os': d[6],
                 'version': d[7],
