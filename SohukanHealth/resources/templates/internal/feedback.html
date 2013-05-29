@@ -1,0 +1,15 @@
+{% extends "internal/internal_base.html" %} {% block title %} 统计信息
+{% endblock %}{% block content1 %}
+<div id="note">
+    <p>用户反馈</p>
+</div>
+<hr />
+<div>
+    {% for d in rtn %}
+    <p>{{d.id}} | {{d.email}} | {{d.content}} | {{d.user_id}} | 
+    {{d.gmt_create}} | {{d.os }} | {{ d.version }} | {{ d.device_model}}
+    </p>
+    <hr />
+    {% endfor %}
+<div>
+{% endblock %}

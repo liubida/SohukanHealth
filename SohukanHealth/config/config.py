@@ -88,6 +88,7 @@ class Config:
 
     db_config = {'host':'10.10.58.17', 'port':3306, 'user':'sohupocketlib', 'passwd':'SejJGGk2', 'db':'sohupocketlib'}
     db_self_config = {'host':'10.11.6.68', 'port':3306, 'user':'sohukan', 'passwd':'sohukan', 'db':'sohukanhealth', 'charset':'utf8'}
+    db_prod_config = {'host':'10.10.58.16', 'port':3306, 'user':'sohupocketlib', 'passwd':'SejJGGk2', 'db':'sohupocketlib', 'charset':'utf8'}
     redis_config = {'host':'10.11.6.68', 'port':6379, 'db':4}
     redis_instance = redis.StrictRedis(**redis_config)
     

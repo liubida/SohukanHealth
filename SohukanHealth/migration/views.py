@@ -93,6 +93,8 @@ def app_available_data(request):
         cur = conn.cursor()
         raw_data = AppAvailableData.objects.all()
         for d in raw_data:
+            if d.id < 175362:
+                continue
             d.category = ''
             if d.result:
                 d.result = '1'

@@ -70,6 +70,9 @@ urlpatterns += patterns('',
         (r'migration/some_total/?$', 'migration.views.some_total'),
         )
 
+urlpatterns += patterns('',
+        (r'internal/feedback/?$', 'internal.views.feedback'),
+        )
 urlpatterns += patterns('django.contrib.auth.views',
                         (r'^monitor/mlogin/?', 'login', {'template_name': 'login.html'}),
                         (r'^monitor/mlogout/?', 'logout', {'template_name': 'logout.html', 'next_page': '/'}),
