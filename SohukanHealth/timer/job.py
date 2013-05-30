@@ -102,7 +102,7 @@ def shorturl_total_job(now=None):
         cursor.execute(sql)
         result = cursor.fetchone()
         
-        data = SomeTotal(name='shorturl', time=now, count=(result[0] + 594))
+        data = SomeTotal(name='shorturl', time=now, count=(result[0] + 943))
         data.save()
         return result[0]
     except Exception, e:
@@ -134,7 +134,7 @@ def set_public_total_job(now=None):
         cursor.execute(sql)
         result = cursor.fetchone()
         
-        data = SomeTotal(name='set-public', time=now, count=result[0] + 1029)
+        data = SomeTotal(name='set-public', time=now, count=result[0] + 1061)
         data.save()
         return result[0]
     except Exception, e:
@@ -247,7 +247,7 @@ def fiction_total_job(now=None):
             if not _is_test(user_id):
                 sum += count
         now = datetime.datetime.now()
-        data = SomeTotal(name='fiction', time=now, count=sum)
+        data = SomeTotal(name='fiction', time=now, count=sum + 4)
         data.save()
         return sum
     except Exception, e:
