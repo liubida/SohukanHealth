@@ -27,6 +27,7 @@ bshare = 'bshare'
 webapp = 'webapp'
 sohu_blog = 'sohu_blog'
 sohu_news = 'sohu_news'
+sohu_email = 'sohu_email'
 baidu = 'baidu'
 other = 'other'
 
@@ -70,6 +71,7 @@ def share_channels(start_time):
              webapp:{'count':0, 'object_key':[]},
              sohu_blog:{'count':0, 'object_key':[]},
              sohu_news:{'count':0, 'object_key':[]},
+             sohu_email:{'count':0, 'object_key':[]},
              baidu:{'count':0, 'object_key':[]},
              share:{'count':0, 'object_key':[]}}
 
@@ -94,6 +96,8 @@ def share_channels(start_time):
                     m[sohu_blog]['object_key'].append(object_key)
                 elif sohu_news == object_key['from']:
                     m[sohu_news]['object_key'].append(object_key)
+                elif sohu_email == object_key['from']:
+                    m[sohu_email]['object_key'].append(object_key)
                 elif baidu == object_key['from']:
                     m[baidu]['object_key'].append(object_key)
                 else:

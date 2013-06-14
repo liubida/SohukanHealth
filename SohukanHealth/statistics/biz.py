@@ -1077,7 +1077,7 @@ def get_bookmark_failed(start, end):
             user_id = int(d[0])
             url = str(d[1])
             if not _is_test(user_id):
-                if (not d[2]) or (purify_timeout == str(d[2])):
+                if (not d[2]) or (purify_timeout == d[2]):
                     reason = purify_timeout
                 else:
                     reason = "purify error | table stats_failure id: %s" % str(d[3])                    

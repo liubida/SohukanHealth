@@ -5,7 +5,7 @@ Created on Oct 31, 2012
 @author: liubida
 '''
 
-from SohukanHealth.aggregation import bshare, jiathis, other, webapp, sohu_blog, sohu_news, baidu, iPhone, iPad, android, unknown, share
+from SohukanHealth.aggregation import bshare, jiathis, other, webapp, sohu_blog, sohu_news, baidu, iPhone, iPad, android, unknown, share, sohu_email
 from statistics.models import Aggregation
 import anyjson
 import datetime
@@ -16,7 +16,10 @@ def get_share_channels(start_time, end_time, data_grain='day'):
 
     data = {}
     for d in raw_data:
-        data[d['time'].strftime("%Y-%m-%d")] = anyjson.loads(d['content'])
+        Json = anyjson.loads(d['content'])
+        if not Json.has_key(sohu_email):
+            Json[sohu_email] = {'count': 0, 'object_key': []}
+        data[d['time'].strftime("%Y-%m-%d")] = Json
 
     ret = []
     start = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
@@ -33,6 +36,7 @@ def get_share_channels(start_time, end_time, data_grain='day'):
                             webapp:data[key][webapp]['count'],
                             sohu_blog:data[key][sohu_blog]['count'],
                             sohu_news:data[key][sohu_news]['count'],
+                            sohu_email:data[key][sohu_email]['count'],
                             baidu:data[key][baidu]['count'],
                             share:data[key][share]['count']})
             else:
@@ -56,6 +60,7 @@ def get_share_channels(start_time, end_time, data_grain='day'):
                                 webapp:middle[webapp],
                                 sohu_blog:middle[sohu_blog],
                                 sohu_news:middle[sohu_news],
+                                sohu_email:data[key][sohu_email],
                                 baidu:middle[baidu],
                                 share:middle[share]})
                     break;
@@ -68,6 +73,7 @@ def get_share_channels(start_time, end_time, data_grain='day'):
             middle[webapp] += data[key][webapp]['count']
             middle[sohu_blog] += data[key][sohu_blog]['count']
             middle[sohu_news] += data[key][sohu_news]['count']
+            middle[sohu_email] += data[key][sohu_email]['count'],
             middle[baidu] += data[key][baidu]['count']
             middle[share] += data[key][share]['count']
             
@@ -86,6 +92,7 @@ def get_share_channels(start_time, end_time, data_grain='day'):
                 middle[webapp] = 0
                 middle[sohu_blog] = 0 
                 middle[sohu_news] = 0
+                middle[sohu_email] = 0
                 middle[baidu] = 0
                 middle[share] = 0
             cur += step
@@ -103,6 +110,7 @@ def get_share_channels(start_time, end_time, data_grain='day'):
                                 webapp:middle[webapp],
                                 sohu_blog:middle[sohu_blog],
                                 sohu_news:middle[sohu_news],
+                                sohu_email:middle[sohu_email],
                                 baidu:middle[baidu],
                                 share:middle[share]})
                     break;
@@ -114,6 +122,7 @@ def get_share_channels(start_time, end_time, data_grain='day'):
             middle[webapp] += data[key][webapp]['count']
             middle[sohu_blog] += data[key][sohu_blog]['count']
             middle[sohu_news] += data[key][sohu_news]['count']
+            middle[sohu_email] += data[key][sohu_email]['count'],
             middle[baidu] += data[key][baidu]['count']
             middle[share] += data[key][share]['count']
             
@@ -124,6 +133,7 @@ def get_share_channels(start_time, end_time, data_grain='day'):
                             webapp:middle[webapp],
                             sohu_blog:middle[sohu_blog],
                             sohu_news:middle[sohu_news],
+                            sohu_email:data[key][sohu_email],
                             baidu:middle[baidu],
                             share:middle[share]})
                 middle[bshare] = 0
@@ -131,6 +141,7 @@ def get_share_channels(start_time, end_time, data_grain='day'):
                 middle[webapp] = 0
                 middle[sohu_blog] = 0 
                 middle[sohu_news] = 0
+                middle[sohu_email] = 0
                 middle[baidu] = 0
                 middle[share] = 0                            
             cur += step

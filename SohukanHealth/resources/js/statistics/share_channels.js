@@ -36,7 +36,7 @@ var make_share_channels_chart = function(chartData) {
 	var graph = new AmCharts.AmGraph();
 	graph.title = "bshare";
 	graph.labelText = "[[value]]";
-	graph.balloonText = "[[value]] ([[percents]]%)";
+	graph.balloonText = "bshare: [[value]] ([[percents]]%)";
 	graph.valueField = "bshare";
 	graph.type = "column";
 	graph.lineAlpha = 0;
@@ -48,7 +48,7 @@ var make_share_channels_chart = function(chartData) {
 	var graph = new AmCharts.AmGraph();
 	graph.title = "jiathis";
 	graph.labelText = "[[value]]";
-	graph.balloonText = "[[value]] ([[percents]]%)";
+	graph.balloonText = "jiathis: [[value]] ([[percents]]%)";
 	graph.valueField = "jiathis";
 	graph.type = "column";
 	graph.lineAlpha = 0;
@@ -60,7 +60,7 @@ var make_share_channels_chart = function(chartData) {
 	var graph = new AmCharts.AmGraph();
 	graph.title = "webapp";
 	graph.labelText = "[[value]]";
-	graph.balloonText = "[[value]] ([[percents]]%)";
+	graph.balloonText = "webapp: [[value]] ([[percents]]%)";
 	graph.valueField = "webapp";
 	graph.type = "column";
 	graph.lineAlpha = 0;
@@ -72,7 +72,7 @@ var make_share_channels_chart = function(chartData) {
 	var graph = new AmCharts.AmGraph();
 	graph.title = "sohu_blog";
 	graph.labelText = "[[value]]";
-	graph.balloonText = "[[value]] ([[percents]]%)";
+	graph.balloonText = "sohu_blog: [[value]] ([[percents]]%)";
 	graph.valueField = "sohu_blog";
 	graph.type = "column";
 	graph.lineAlpha = 0;
@@ -84,7 +84,7 @@ var make_share_channels_chart = function(chartData) {
 	var graph = new AmCharts.AmGraph();
 	graph.title = "sohu_news";
 	graph.labelText = "[[value]]";
-	graph.balloonText = "[[value]] ([[percents]]%)";
+	graph.balloonText = "sohu_news: [[value]] ([[percents]]%)";
 	graph.valueField = "sohu_news";
 	graph.type = "column";
 	graph.lineAlpha = 0;
@@ -94,9 +94,21 @@ var make_share_channels_chart = function(chartData) {
 
 	// 6th graph
 	var graph = new AmCharts.AmGraph();
+	graph.title = "sohu_email";
+	graph.labelText = "[[value]]";
+	graph.balloonText = "sohu_email: [[value]] ([[percents]]%)";
+	graph.valueField = "sohu_email";
+	graph.type = "column";
+	graph.lineAlpha = 0;
+	graph.fillAlphas = 1;
+	graph.lineColor = "#00ccff";
+	chart.addGraph(graph);
+
+	// 7th graph
+	var graph = new AmCharts.AmGraph();
 	graph.title = "baidu";
 	graph.labelText = "[[value]]";
-	graph.balloonText = "[[value]] ([[percents]]%)";
+	graph.balloonText = "baidu: [[value]] ([[percents]]%)";
 	graph.valueField = "baidu";
 	graph.type = "column";
 	graph.lineAlpha = 0;
@@ -104,11 +116,11 @@ var make_share_channels_chart = function(chartData) {
 	graph.lineColor = "#CD0D74";
 	chart.addGraph(graph);
 
-	// 7th graph
+	// 8th graph
 	var graph = new AmCharts.AmGraph();
 	graph.title = "other";
 	graph.labelText = "[[value]]";
-	graph.balloonText = "[[value]] ([[percents]]%)";
+	graph.balloonText = "other: [[value]] ([[percents]]%)";
 	graph.valueField = "other";
 	graph.type = "column";
 	graph.lineAlpha = 0;
@@ -173,6 +185,7 @@ var load_share_channels = function(params, callback) {
 								webapp : data[i].webapp,
                                 sohu_blog : data[i].sohu_blog,
                                 sohu_news : data[i].sohu_news,
+                                sohu_email : data[i].sohu_email,
                                 baidu : data[i].baidu,
 								other : data[i].share
 							});
