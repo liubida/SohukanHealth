@@ -285,6 +285,8 @@ def get_conversion(start_time, end_time, data_grain='day'):
     while cur <= end:
         key = cur.strftime("%Y-%m-%d")
         if key in data.keys():
+            if not data[key].has_key('email'):
+                data[key]['email'] = {'conversion': {'phone': 0, 'pad': 0, 'pc': 0, 'unknown': 0}, 'add': 0, 'customer': {'phone': 0, 'pad': 0, 'pc': 0, 'unknown': 0}}
             ret =  ({'convert': 'share_to_phone', 'rate': data[key]['share']['conversion']['phone'], 'customer': data[key]['share']['customer']['phone']}, \
                     {'convert': 'share_to_pad', 'rate': data[key]['share']['conversion']['pad'], 'customer': data[key]['share']['customer']['pad']}, \
                     {'convert': 'share_to_pc', 'rate': data[key]['share']['conversion']['pc'], 'customer': data[key]['share']['customer']['pc']}, \
@@ -297,6 +299,10 @@ def get_conversion(start_time, end_time, data_grain='day'):
                     {'convert': 'mobile_to_pad', 'rate': data[key]['mobile']['conversion']['pad'], 'customer': data[key]['mobile']['customer']['pad']}, \
                     {'convert': 'mobile_to_pc', 'rate': data[key]['mobile']['conversion']['pc'], 'customer': data[key]['mobile']['customer']['pc']}, \
                     {'convert': 'mobile_to_unknown', 'rate': data[key]['mobile']['conversion']['unknown'], 'customer': data[key]['mobile']['customer']['unknown']}, \
+                    {'convert': 'email_to_phone', 'rate': data[key]['email']['conversion']['phone'], 'customer': data[key]['email']['customer']['phone']}, \
+                    {'convert': 'email_to_pad', 'rate': data[key]['email']['conversion']['pad'], 'customer': data[key]['email']['customer']['pad']}, \
+                    {'convert': 'email_to_pc', 'rate': data[key]['email']['conversion']['pc'], 'customer': data[key]['email']['customer']['pc']}, \
+                    {'convert': 'email_to_unknown', 'rate': data[key]['email']['conversion']['unknown'], 'customer': data[key]['email']['customer']['unknown']}, \
             )
         else:
             if cur.date() == end.date():

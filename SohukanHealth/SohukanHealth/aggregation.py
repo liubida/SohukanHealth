@@ -426,9 +426,59 @@ def conversion_core(start_time, end_time, type_name):
 
         print mobile_custom
 
+        sql = """select o.user_id, oo.gmt_create from stats_oper o left join stats_operobject oo on oo.oper_id = o.id 
+                where o.oper_type_id = 1 and oo.gmt_create >= '%s' and oo.gmt_create < '%s' 
+                and oo.object_key like '%%sohu_email%%'""" % (start_time, end_time)
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        m = {}
+        for d in results:
+            if m.has_key(d[0]):
+                if m[d[0]] > d[1]:
+                    m[d[0]] = d[1]
+            else:
+                m[d[0]] = d[1]
+        email_add = len(m)
+        email_custom = {'phone': 0, 'pad': 0, 'pc': 0, 'unknown': 0}
+        for k in m.keys():
+            sql = """select oo.object_key from stats_operobject oo, stats_oper o where o.id=oo.oper_id 
+                and o.oper_type_id=7 and oo.user_id = %s and (oo.object_key like '%%\"iPhone\"%%' or oo.object_key like '%%\"android\"%%') 
+                and oo.gmt_create > '%s' and oo.gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            if len(result) > 0:
+                email_custom['phone'] += 1
+        for k in m.keys():
+            sql = """select oo.object_key from stats_operobject oo, stats_oper o where o.id=oo.oper_id 
+                and o.oper_type_id=7 and oo.user_id = %s and oo.object_key like '%%\"iPad\"%%'
+                and oo.gmt_create > '%s' and oo.gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            if len(result) > 0:
+                email_custom['pad'] += 1
+        for k in m.keys():
+            sql = """select oo.object_key from stats_operobject oo, stats_oper o where o.id=oo.oper_id 
+                and o.oper_type_id=7 and oo.user_id = %s and oo.object_key like '%%\"reader\"%%' 
+                and oo.gmt_create > '%s' and oo.gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            if len(result) > 0:
+                email_custom['pc'] += 1
+        for k in m.keys():
+            sql = """select oo.object_key from stats_operobject oo, stats_oper o where o.id=oo.oper_id 
+                and o.oper_type_id=7 and oo.user_id = %s and oo.object_key not like '%%\"client_type\"%%' 
+                and oo.gmt_create > '%s' and oo.gmt_create < '%s' limit 1""" % (k, m[k], end_time)
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            if len(result) > 0:
+                email_custom['unknown'] += 1
+
+        print email_custom
+
         share = {'phone': 0, 'pad': 0, 'pc': 0, 'unknown': 0}
         plug_in = {'phone': 0, 'pad': 0, 'pc': 0, 'unknown': 0}
         mobile = {'phone': 0, 'pad': 0, 'pc': 0, 'unknown': 0}
+        email = {'phone': 0, 'pad': 0, 'pc': 0, 'unknown': 0}
         if share_add > 0:
             share['phone'] = round(float(share_custom['phone']) / share_add, 4)
             share['pad'] = round(float(share_custom['pad']) / share_add, 4)
@@ -444,10 +494,16 @@ def conversion_core(start_time, end_time, type_name):
             mobile['pad'] = round(float(mobile_custom['pad']) / mobile_add, 4)
             mobile['pc'] = round(float(mobile_custom['pc']) / mobile_add, 4)
             mobile['unknown'] = round(float(mobile_custom['unknown']) / mobile_add, 4)
+        if email_add > 0: 
+            email['phone'] = round(float(email_custom['phone']) / email_add, 4)
+            email['pad'] = round(float(email_custom['pad']) / email_add, 4)
+            email['pc'] = round(float(email_custom['pc']) / email_add, 4)
+            email['unknown'] = round(float(email_custom['unknown']) / email_add, 4)
         m = {"time":datetime.datetime.strftime(end_time, "%Y-%m-%d"),
              "share":{"conversion": share, "add": share_add, "customer": share_custom},
              "plug_in":{"conversion": plug_in, "add": plug_in_add, "customer": plug_in_custom},
-             "mobile":{"conversion": mobile, "add": mobile_add, "customer": mobile_custom}}
+             "mobile":{"conversion": mobile, "add": mobile_add, "customer": mobile_custom},
+             "email":{"conversion": email, "add": email_add, "customer": email_custom}}
         data = Aggregation(type=type_name, time=end_time.date(), content=anyjson.dumps(m))
         data.save()
     except Exception, e:

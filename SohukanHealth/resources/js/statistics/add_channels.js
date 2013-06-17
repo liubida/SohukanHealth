@@ -138,7 +138,7 @@ var load_add_channels = function(params, callback) {
 	to = to || now.format('yyyy-MM-dd hh:mm:ss');
 	var from = $("#statistics_add_channels_from").val()
 	tmp = now;
-	tmp.setMonth(4);
+	tmp.setMonth(3);
 	tmp.setDate(1);
 	tmp.setYear(2013);
 	from = from || tmp.format('yyyy-MM-dd hh:mm:ss');

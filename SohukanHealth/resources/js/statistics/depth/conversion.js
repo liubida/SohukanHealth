@@ -145,7 +145,7 @@ var make_conversion_chart = function(chartData) {
 	graph.title = "mobile_to_pad";
 	graph.labelText = "[[value]]";
 	graph.balloonText = "[[value]] ([[title]])";
-	graph.valueField = "mobile_pad";
+	graph.valueField = "mobile_to_pad";
 	graph.type = "column";
 	graph.lineAlpha = 0;
 	graph.fillAlphas = 1;
@@ -157,7 +157,7 @@ var make_conversion_chart = function(chartData) {
 	graph.title = "mobile_to_pc";
 	graph.labelText = "[[value]]";
 	graph.balloonText = "[[value]] ([[title]])";
-	graph.valueField = "plug_in_to_pc";
+	graph.valueField = "mobile_to_pc";
 	graph.type = "column";
 	graph.lineAlpha = 0;
 	graph.fillAlphas = 1;
@@ -170,6 +170,54 @@ var make_conversion_chart = function(chartData) {
 	graph.labelText = "[[value]]";
 	graph.balloonText = "[[value]] ([[title]])";
 	graph.valueField = "mobile_to_unknown";
+	graph.type = "column";
+	graph.lineAlpha = 0;
+	graph.fillAlphas = 1;
+	graph.lineColor = "#CCFF33";
+	chart.addGraph(graph);
+    
+	// 13th graph
+	var graph = new AmCharts.AmGraph();
+	graph.title = "email_to_phone";
+	graph.labelText = "[[value]]";
+	graph.balloonText = "[[value]] ([[title]])";
+	graph.valueField = "email_to_phone";
+	graph.type = "column";
+	graph.lineAlpha = 0;
+	graph.fillAlphas = 1;
+	graph.lineColor = "#00CC00";
+	chart.addGraph(graph);
+
+	// 14th graph
+	var graph = new AmCharts.AmGraph();
+	graph.title = "email_to_pad";
+	graph.labelText = "[[value]]";
+	graph.balloonText = "[[value]] ([[title]])";
+	graph.valueField = "email_to_pad";
+	graph.type = "column";
+	graph.lineAlpha = 0;
+	graph.fillAlphas = 1;
+	graph.lineColor = "#99FF99";
+	chart.addGraph(graph);
+
+	// 15th graph
+	var graph = new AmCharts.AmGraph();
+	graph.title = "email_to_pc";
+	graph.labelText = "[[value]]";
+	graph.balloonText = "[[value]] ([[title]])";
+	graph.valueField = "email_to_pc";
+	graph.type = "column";
+	graph.lineAlpha = 0;
+	graph.fillAlphas = 1;
+	graph.lineColor = "#99FFFF";
+	chart.addGraph(graph);
+    
+	// 16th graph
+	var graph = new AmCharts.AmGraph();
+	graph.title = "email_to_unknown";
+	graph.labelText = "[[value]]";
+	graph.balloonText = "[[value]] ([[title]])";
+	graph.valueField = "email_to_unknown";
 	graph.type = "column";
 	graph.lineAlpha = 0;
 	graph.fillAlphas = 1;
@@ -240,6 +288,10 @@ var load_conversion = function(params, callback) {
 								mobile_to_pad : data[i].mobile.pad,
 								mobile_to_pc : data[i].mobile.pc,
 								mobile_to_unknown : data[i].mobile.unknown
+							    email_to_phone : data[i].email.phone,
+								email_to_pad : data[i].email.pad,
+								email_to_pc : data[i].email.pc,
+								email_to_unknown : data[i].email.unknown
 							});
 				}
 				make_conversion_chart(chartData);
