@@ -207,7 +207,6 @@ def bookmark_total_job(now=None):
                 # 去掉测试用户添加的文章
                 if not _is_test(user_id):
                     sum += count
-        now = datetime.datetime.now()
         data = SomeTotal(name='bookmark', time=now, count=sum)
         data.save()
         return sum
@@ -246,7 +245,6 @@ def fiction_total_job(now=None):
             # 去掉测试用户添加的文章
             if not _is_test(user_id):
                 sum += count
-        now = datetime.datetime.now()
         data = SomeTotal(name='fiction', time=now, count=sum + 4)
         data.save()
         return sum

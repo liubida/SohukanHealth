@@ -123,7 +123,7 @@ class ConfigFactory:
             ENV_TAG = 'prod'
         elif ip in ('10.7.8.58'):
             ENV_TAG = 'dev'
-        elif hostname in ('tc_6_68'):
+        elif hostname in ('mx6_68'):
             ENV_TAG = 'prod'
         else:
             ENV_TAG = None
@@ -146,8 +146,8 @@ if __name__ == '__main__':
     import socket
     hostname = socket.gethostname()
     ip = socket.gethostbyname(hostname)
-    print hostname
-    print ip
+    
+    
     if ip in ('10.10.69.53'):
         ENV_TAG = 'prod'
     elif ip in ('10.7.8.58'):

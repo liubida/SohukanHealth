@@ -267,7 +267,6 @@ def public_client(start_time):
 def conversion(end_time=None):
     '''为[收藏渠道统计]聚合数据
     ''' 
-    end_time = datetime.datetime.now()
     end_time = end_time.replace(hour=0, minute=0, second=0)
     end_time = end_time - datetime.timedelta(days=0)
     start_time = end_time - datetime.timedelta(days=1)
