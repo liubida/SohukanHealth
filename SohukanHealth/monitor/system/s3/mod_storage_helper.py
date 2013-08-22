@@ -6,7 +6,9 @@ Created on Jun 14, 2012
 '''
 
 from boto.s3.connection import Location
+from config.config import c
 import boto
+import azure
 #from django.conf import settings
 
 s3 = None
@@ -79,13 +81,20 @@ def store_data_from_stream(bucket_name, key_name, stream, metadata=None, headers
 
 
 def store_data_from_string(bucket_name, key_name, need_store_string, metadata=None, headers=None, policy='public-read'):
-    bucket = get_or_create_bucket(bucket_name, policy)
-    key = bucket.new_key(key_name)
-    key.set_contents_from_string(need_store_string, headers=headers, policy=policy)
-    if metadata:
-        key.metadata.update(metadata)
+    client = azure.client.BladeAzureClient(c.BLADE_AZURE_ACCESS_KEY, c.BLADE_AZURE_SECRET_KEY)
+    client.host = 'bjcnc.azure.sohuno.com'
+    client.delete_object(bucket_name, key_name)
+    if type(need_store_string) == type(u''):
+        need_store_string = need_store_string.encode('utf-8')
+    res = client.put_object(bucket_name, key_name, need_store_string)
+    return res
 
-    return key
+
+def get_text_from_bladeAzure(bucket_name, key_name):
+    client = azure.client.BladeAzureClient(c.BLADE_AZURE_ACCESS_KEY, c.BLADE_AZURE_SECRET_KEY)
+    client.host = 'bjcnc.azure.sohuno.com'
+    res = client.get_object(bucket_name, key_name)
+    return res
 
 
 def modify_metadata(bucket_name, key_name, metadata):

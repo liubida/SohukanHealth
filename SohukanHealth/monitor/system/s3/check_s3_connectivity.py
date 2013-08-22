@@ -11,16 +11,14 @@ import urllib2
 
 def check_s3():
     status = True
-    url = mod_storage_helper.get_expire_data_url('sohukan', 'bookmark-prod-24-1274', 60)
-    try:
-        mod_storage_helper.store_data_from_string('sohukan', 'bookmark-prod-24-1274', 'foo')
-    except Exception, exc:
-        raise JobException(exc)
+    #url = mod_storage_helper.get_expire_data_url('sohukan', 'bookmark-prod-24-1274', 60)
+    res = mod_storage_helper.store_data_from_string('sohukan', 'bookmark-prod-24-1274', 'foo')
+    if not res['status']:
+        raise JobException(res['error'])
         status = False
-    try:
-        urllib2.urlopen(url)
-    except Exception, exc:
-        raise JobException(exc)
+    res = mod_storage_helper.get_text_from_bladeAzure('sohukan', 'bookmark-prod-24-1274')
+    if not res['status']:
+        raise JobException(res['error'])
         status = False
     
     return status

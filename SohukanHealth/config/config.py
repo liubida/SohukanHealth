@@ -91,6 +91,9 @@ class Config:
     db_prod_config = {'host':'10.10.58.16', 'port':3306, 'user':'sohupocketlib', 'passwd':'SejJGGk2', 'db':'sohupocketlib', 'charset':'utf8'}
     redis_config = {'host':'10.10.69.53', 'port':6379, 'db':4}
     redis_instance = redis.StrictRedis(**redis_config)
+
+    BLADE_AZURE_ACCESS_KEY = 'XNwITCMTOjfuedcZGf8cig=='
+    BLADE_AZURE_SECRET_KEY = 'A4yXqFX83Iyokc3XDtXurQ=='
     
     #memcache_instance = mem_cache
     
@@ -123,11 +126,11 @@ class ConfigFactory:
             ENV_TAG = 'prod'
         elif ip in ('10.7.8.58'):
             ENV_TAG = 'dev'
-        elif hostname in ('mx6_68'):
+        elif hostname in ('mx6_68', 'cesegao'):
             ENV_TAG = 'prod'
         else:
             ENV_TAG = None
-        
+
         if ENV_TAG == 'prod':
             config = ProdConfig();
         elif ENV_TAG == 'dev':
