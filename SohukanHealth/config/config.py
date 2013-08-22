@@ -126,7 +126,7 @@ class ConfigFactory:
             ENV_TAG = 'prod'
         elif ip in ('10.7.8.58'):
             ENV_TAG = 'dev'
-        elif hostname in ('mx6_68', 'cesegao'):
+        elif hostname in ('mx1024', 'cesegao'):
             ENV_TAG = 'prod'
         else:
             ENV_TAG = None
