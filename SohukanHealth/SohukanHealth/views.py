@@ -62,7 +62,7 @@ def http_request_add(token, title, content):
         resp = urllib2.urlopen(req).read()
         print resp
     except Exception, e:
-        raise e
+        c.logger.error(e)
 
 @login_required
 def logtest(request):
