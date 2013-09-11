@@ -22,6 +22,33 @@ import anyjson
 import datetime
 import urlparse
 
+def get_notice_args(request):
+    submit = request.POST.get('submit', None)
+    title = request.POST.get('title', '').encode('utf-8')
+    content = request.POST.get('content', '').encode('utf-8')
+    users = request.POST.get('users', 'all')
+    user_list = request.POST.get('user_list', '')
+    if user_list:
+        user_list = user_list.split(',')
+    return submit, title, content, users, user_list
+
+def get_token_list(user_list=None):
+    conn = MySQLdb.connect(**c.db_config)
+    cursor = conn.cursor()
+    token_list = []
+    if user_list:
+        sql = 'select a.access_token from account_access a, account_user u where a.user_id = u.id and u.passport_userid in ("%s");' % '","'.join(user_list)
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        for r in results:
+            token_list.append(r[0])
+    else:
+        sql = 'select access_token from account_access;'
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        for r in results:
+            token_list.append(r[0])
+    return token_list
 
 def get_data_interval(raw_data, delta=datetime.timedelta(days=1), time_format='str'):
     ret = []

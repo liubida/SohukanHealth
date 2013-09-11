@@ -1,4 +1,4 @@
-from SohukanHealth.views import about, index, logtest, add_job_monitor, read_job_monitor, web_job_monitor
+from SohukanHealth.views import about, index, logtest, add_job_monitor, read_job_monitor, web_job_monitor, push
 from django.conf.urls import patterns, include
 from django.contrib import admin
 from monitor.views import read, add, monitor, sys_alarm
@@ -54,6 +54,7 @@ urlpatterns = patterns('',
                        (r'^statistics/week_report/abstract/?$', week_report_abstract),
                        (r'^statistics/week_report/bookmark_website/?$', week_report_bookmark_website),
                        (r'^about/?$', about),
+                       (r'^push/?$', push),
                        (r'^logtest/?$', logtest),
                        (r'^admin/?', include(admin.site.urls)),
 )

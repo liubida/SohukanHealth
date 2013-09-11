@@ -8,13 +8,15 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.template import loader
 from django.template.context import Context
+from django.shortcuts import render_to_response
 
 from timer.job import add_job, read_job
-from timer.alarm_job import web_alarm_job
+from statistics.biz import get_notice_args, get_token_list
+from statistics.models import Notice
 
 import random
 import json
-import urllib
+import urllib, urllib2
 
 @login_required
 def index(request):
@@ -28,7 +30,39 @@ def index(request):
 def about(request):
     t = loader.get_template('about.html')
     c = Context()
-    return HttpResponse(t.render(c)) 
+    return HttpResponse(t.render(c))
+
+@login_required
+def push(request):
+    submit, title, content, users, user_list = get_notice_args(request)
+    flag = ''
+    if submit:
+        if not (title and content):
+            flag = 'miss params!'
+            return render_to_response('push.html', locals())
+        data = Notice(title=title, content=content, group=0 if users=='all' else 1, users=';'.join(user_list))
+        data.save()
+        if users == 'all':
+            #return render_to_response('push.html', locals())
+            token_list = get_token_list()
+        else:
+            token_list = get_token_list(user_list=user_list)
+        for token in token_list:
+            http_request_add(token=token, title=title, content=content)
+        user_list = ','.join(user_list)
+        flag = 'Done!'
+    return render_to_response('push.html', locals())
+
+def http_request_add(token, title, content):
+    url = 'http://kan.sohu.com/api/2/bookmarks/add'
+    body = urllib.urlencode({'url': 'http://e.weibo.com/suishenkan', 'title': title, 'content': content, 'content_source': 'partial'})
+    try:
+        req = urllib2.Request(url, body)
+        req.add_header('Cookie', 'access_token=%s' % token)
+        resp = urllib2.urlopen(req).read()
+        print resp
+    except Exception, e:
+        raise e
 
 @login_required
 def logtest(request):

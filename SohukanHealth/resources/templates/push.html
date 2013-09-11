@@ -1,0 +1,27 @@
+{% extends "base.html" %} {% block title %} 推送公告 {% endblock %}
+{% block css %}
+    <!-- link rel="stylesheet" href="/static/css/demo1.css"> -->
+{% endblock %}{% block content %}
+    <h1 align="center" xmlns="http://www.w3.org/1999/html">推 送 公 告</h1>
+    <form action="/push/" method="POST">
+        <ul><input type="radio" id="all_users" name="users" value="all" onclick="_users(0)" /><label for="all_users">推送给所有用户</label><br /></ul>
+        <ul><input type="radio" id="partial_users" name="users" value="partial" onclick="_users(1)" checked/><label for="partial_users">推送给指定用户</label><br /></ul>
+        <ul id="partial" style="visibility: hidden;">用户列表：<input type="text" size="100" name="user_list" value="{{ user_list }}"/><font color=red>（username@domain 多个用户以逗号分隔）</font><br /></ul>
+        <hr />
+        <ul align="center">标题 <input type="text" name="title" size="50" value="{{ title }}"/></ul>
+        <ul align="center"><textarea rows="30" cols="150" name="content">{{ content }}</textarea></ul>
+        <ul><input type="submit" name="submit" value="push" /><font color=red>{{ flag }}</font></ul>
+    </form>
+
+    <script type="text/javascript">
+    _users(1);
+    function _users(id){
+        if (id > 0){
+            document.getElementById("partial").style.visibility = "visible";
+        }
+        else{
+            document.getElementById("partial").style.visibility = "hidden";
+        }
+    }
+    </script>
+{% endblock %}
