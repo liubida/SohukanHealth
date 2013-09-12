@@ -2,7 +2,7 @@ from SohukanHealth.views import about, index, logtest, add_job_monitor, read_job
 from django.conf.urls import patterns, include
 from django.contrib import admin
 from monitor.views import read, add, monitor, sys_alarm
-from log.views import collector, logger
+from log.views import collector, logger, logclear
 from statistics.views import user_total, user_bookmark_percent, bookmark_total, \
     statistics, bookmark_per_user, bookmark_time, day_report, \
     day_report_bookmark_percent, day_report_bookmark_website, day_report_abstract, \
@@ -59,6 +59,7 @@ urlpatterns = patterns('',
                        (r'^logtest/?$', logtest),
                        (r'^log/collector/?$', collector),
                        (r'^log/logger/?$', logger),
+                       (r'^log/clear/?$', logclear),
                        (r'^admin/?', include(admin.site.urls)),
 )
 

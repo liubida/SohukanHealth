@@ -2,6 +2,7 @@
 
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
+from django.shortcuts import redirect
 
 collection = dict()
 
@@ -18,3 +19,7 @@ def collector(request):
 
 def logger(request):
     return render_to_response('collector.html', globals())
+
+def logclear(request):
+    collection.clear()
+    return redirect('/log/logger')
