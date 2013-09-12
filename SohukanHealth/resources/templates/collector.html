@@ -1,0 +1,15 @@
+<html>
+    <head>
+        <title>日志收集</title>
+    </head>
+    <body>
+        <h1 align=center>日 志 收 集</h1>
+        <hr />
+        {% for k, v in collection.items %}
+            <li>{{ k }}</li>
+            {% for l in v %}
+                <ul>{{ l }}</ul>
+            {% endfor %}
+        {% endfor %}
+    </body>
+</html>
